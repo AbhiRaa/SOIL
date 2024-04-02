@@ -14,6 +14,32 @@ const SignIn = () => {
     setErrorMessage(''); // Reset error message on input change
   };
 
+  // Add the same hashing functionality you use in your SignUp component
+  const generatePasswordHash = async (password, salt) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const importedKey = await crypto.subtle.importKey(
+      'raw',
+      data,
+      { name: 'PBKDF2' },
+      false,
+      ['deriveBits']
+    );
+    
+    const keyBits = await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        salt: encoder.encode(salt),
+        iterations: 1000,
+        hash: 'SHA-1',
+      },
+      importedKey,
+      256
+    );
+
+    return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
+  };
+
   const validateForm = () => {
     if (!formData.email) {
       setErrorMessage("Email is required.");
@@ -29,18 +55,25 @@ const SignIn = () => {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      const storedUser = localStorage.getItem(formData.email);
-      if (storedUser) {
-        const { password } = JSON.parse(storedUser);
-        // Assuming password stored in localStorage is hashed (base64 for demonstration)
-        if (password === btoa(formData.password)) {
+      const storedUserData = localStorage.getItem(formData.email);
+      const userData = storedUserData ? JSON.parse(storedUserData) : null;
+
+      if (userData) {
+        const salt = Uint8Array.from(atob(userData.salt), c => c.charCodeAt(0));
+        const hashedPassword = await generatePasswordHash(formData.password, salt);
+
+        if (hashedPassword === userData.password) {
           alert("Login successful!");
-          // Redirect or manage logged-in state here
-          navigate('/profile'); // Redirecting to the profile page
+          // Inside your handleSubmit function in SignIn.js, after successful login:
+          localStorage.setItem('isLoggedIn', 'true');
+
+          console.log("Navigating to profile...");
+          
+          navigate('/profile');
         } else {
           setErrorMessage("Incorrect password.");
         }
@@ -51,35 +84,54 @@ const SignIn = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Side Illustration Panel */}
+      <div className="w-1/2 bg-white p-5">
+        <div className="flex items-center justify-center h-full">
+          {/* Placeholder for illustration */}
+          <div>Your illustration here</div>
         </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            required
-          />
+      </div>
+
+      {/* Form Container */}
+      <div className="w-1/2 flex flex-col justify-center p-12">
+        <div className="max-w-md w-full mx-auto">
+          <h2 className="mb-6 text-3xl font-bold text-center text-gray-900">Log in</h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="text-sm font-semibold text-gray-600 block">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="text-sm font-semibold text-gray-600 block">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="w-full p-2 border border-gray-300 rounded mt-1"
+              />
+            </div>
+            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+            <button type="submit" className="w-full p-2 bg-green-600 text-white rounded">Let's start!</button>
+          </form>
+          <div className="mt-6 text-center">
+            <p>Don't have an account? <a href="/signup" className="text-green-600">Sign up</a></p>
+          </div>
         </div>
-        {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-        <button type="submit" className="bg-green-500 text-white p-2">Sign In</button>
-      </form>
+      </div>
     </div>
   );
-};
+  };
 
 export default SignIn;
