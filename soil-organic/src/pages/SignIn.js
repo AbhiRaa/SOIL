@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting after successful login
+import Navigator from '../components/NavigationBar';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const SignIn = () => {
 
   return (
     <div>
+      <Navigator />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email">Email:</label>

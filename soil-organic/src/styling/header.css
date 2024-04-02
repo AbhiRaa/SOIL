@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap');
+
+.logoImage{
+    height: 100%;
+    width:20%;
+}
+
+.parent-container{
+        
+        background-image: url('../images/header-background.jpg');
+        height: 100vh;
+        opacity: 0.97;
+        width: 100vw;
+        
+}
+
+
+h3{
+    font-size: 1.2em;
+}
+
+h1 {
+    font-size: 6em;
+    font-weight: 700;
+}

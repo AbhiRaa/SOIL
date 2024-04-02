@@ -8,24 +8,24 @@ import SignUpPage from './pages/SignUp';
 import SignInPage from './pages/SignIn';
 import ProfilePage from './pages/Profile';
 import SpecialsPage from './pages/Specials';
+import Content from './components/content';
 
 function App() {
   return (
     <Router>
-      <Header />
-      <NavigationBar />
+       {/* <NavigationBar />   */}
       <main>
         <Routes> {/* Use Routes instead of Switch */}
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/specials" element={<SpecialsPage />} />
+          <Route path="/specials" element={<SpecialsPage />} />        
           {/* Add more routes as needed */}
         </Routes>
       </main>
-      <Footer />
     </Router>
+    
   );
 }
 

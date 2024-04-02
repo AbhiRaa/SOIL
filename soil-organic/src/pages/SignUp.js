@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting after successful signup
 import { isStrongPassword } from '../utils/validation';
+import Navigator from '../components/NavigationBar';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ const SignUp = () => {
 
   return (
     <div>
+      <Navigator />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name">Name:</label>
