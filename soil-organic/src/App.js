@@ -7,7 +7,7 @@ import HomePage from './pages/Home';
 import SignUpPage from './pages/SignUp';
 import SignInPage from './pages/SignIn';
 import ProfilePage from './pages/Profile';
-import SpecialsPage from './pages/Specials;
+import SpecialsPage from './pages/Specials';
 import Content from './components/content';
 import useAuth from './hooks/useAuth'; // Hook to check the login state
 
