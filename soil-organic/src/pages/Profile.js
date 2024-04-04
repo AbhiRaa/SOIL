@@ -2,8 +2,12 @@
 import Navigator from '../components/NavigationBar';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import UserContext from '../hooks/context';
+import { findUser } from '../data/users';
 
 const Profile = () => {
+  const {currentloggedInUser} = useContext(UserContext);
   const navigate = useNavigate();
   const [user, setUser] = useState({
     name: '',
@@ -14,28 +18,33 @@ const Profile = () => {
   useEffect(() => {
     // Retrieve the user object from local storage.
     // It's stored under the key 'user' according to SignUp.js
-    const storedUser = localStorage.getItem('user');
-    const userData = storedUser ? JSON.parse(storedUser) : null;
-
-    // Format the joining date using toLocaleDateString() for a more readable format
-    const formattedJoinDate = new Date(userData.joinDate).toLocaleDateString("en-US", {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long'
-    });
-
-    if (userData) {
-      setUser({
-        name: userData.name,
-        email: userData.email,
-        // Using stored join date or showing 'Not available'
-        joinDate: formattedJoinDate,
+    if(currentloggedInUser){
+      const storedUser = findUser(currentloggedInUser);
+      console.log(storedUser);
+      //const userData = storedUser ? JSON.parse(storedUser) : null;
+  
+      // Format the joining date using toLocaleDateString() for a more readable format
+      const formattedJoinDate = new Date(storedUser.joinDate).toLocaleDateString("en-US", {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
       });
-    } else {
-      navigate('/signin'); // Redirect to sign-in page if no user data is found
+  
+      if (storedUser) {
+        setUser({
+          name: storedUser.name,
+          email: storedUser.email,
+          // Using stored join date or showing 'Not available'
+          joinDate: formattedJoinDate,
+        });
+        console.log(user);
+      } else {
+        navigate('/signin'); // Redirect to sign-in page if no user data is found
+      }
     }
-  }, [navigate]);
+
+  }, [currentloggedInUser]);
 
   const handleEdit = () => {
     // Navigate to the user edit page or show an edit form
@@ -50,7 +59,9 @@ const Profile = () => {
   };
 
   return (
+    
     <div className="container mx-auto mt-10">
+      <Navigator/ >
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900">Profile Information</h3>

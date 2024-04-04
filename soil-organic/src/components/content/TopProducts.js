@@ -1,4 +1,4 @@
-import react from 'react';
+import react, { useEffect } from 'react';
 import { initProducts, getProducts } from '../../data/products';
 import Cards from '../../utils/Cards'
 // import Container from 'react-bootstrap/Container';
@@ -9,7 +9,6 @@ import Button from 'react-bootstrap/Button';
 function Products() {
     initProducts();
     const products = getProducts();
-     console.log(products);
     return (
         <>  
             <section>

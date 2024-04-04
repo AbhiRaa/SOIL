@@ -1,34 +1,56 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import NavigationBar from './components/NavigationBar';
+import React, { createContext, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import HomePage from './pages/Home';
 import SignUpPage from './pages/SignUp';
 import SignInPage from './pages/SignIn';
 import ProfilePage from './pages/Profile';
 import SpecialsPage from './pages/Specials';
-import Content from './components/content';
-import useAuth from './hooks/useAuth'; // Hook to check the login state
+import { getUser,setUser, verifyUser } from './data/users';
+import  UserContext  from './hooks/context';
+
+
+
 
 function App() {
-  const isLoggedIn = useAuth();
+  //const isLoggedIn = useAuth();
+  const [currentloggedInUser, setLoggedInUser] = useState(null);
+
+  const signIn = (userObject) => {
+    if(userObject!==null){
+      setLoggedInUser(userObject.email);
+    }
+  }
+
+  function signOut() {
+    localStorage.setItem('user',null);
+    setLoggedInUser(null);
+  }
+
+
+  function signUp(userObject){
+    setUser(userObject);
+    setLoggedInUser(userObject.email);
+    
+  }
+
+  
 
   return (
     <Router>
-       {/* <NavigationBar />   */}
       <main>
-      <Routes>
+      <UserContext.Provider value={{currentloggedInUser , signOut}} >
+        <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={isLoggedIn ? <Navigate replace to="/profile" /> : <SignUpPage />} />
+          <Route path="/signup" element={<SignUpPage signUp = {signUp} /> } />
           {/* Redirect from SignInPage to ProfilePage if already logged in */}
-          <Route path="/signin" element={isLoggedIn ? <Navigate replace to="/profile" /> : <SignInPage />} />
+          <Route path="/signin" element={ <SignInPage signIn = {signIn} />}  />
           {/* Protect the ProfilePage route, redirecting to SignInPage if not logged in */}
-          <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate replace to="/signin" />} />
+          <Route path="/profile" element={<ProfilePage /> } />
           <Route path="/specials" element={<SpecialsPage />} />
           {/* Redirect to HomePage or another route if the route doesn't exist */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+      </ UserContext.Provider>
       </main>
     </Router>
     

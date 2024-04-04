@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting after successful signup
 // import { isStrongPassword } from '../utils/validation';
 import Navigator from '../components/NavigationBar';
+import { setUser } from '../data/users.js';
+
 
 import { isStrongPassword } from '../utils/validation.js';
 
-const SignUp = () => {
+const SignUp = (props) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -79,6 +81,7 @@ const SignUp = () => {
     e.preventDefault();
     if (validateForm()) {
       const salt = generateSalt();
+      console.log(formData);
       const hashedPassword = await generatePasswordHash(formData.password, salt);
       // Saving user with hashed password and salt to local storage
       const user = { 
@@ -88,20 +91,25 @@ const SignUp = () => {
         salt: btoa(String.fromCharCode(...salt)),
         joinDate: new Date().toISOString() // Storing the current timestamp
       };
-      localStorage.setItem(formData.email, JSON.stringify(user));
+      console.log(user);
+
+      props.signUp(user);
+      //localStorage.setItem(formData.email, JSON.stringify(user));
 
       // Save user data to local storage
-      localStorage.setItem('user', JSON.stringify(user));
-      alert('Registration successful');
+      navigate('/profile');
+
+      }
+      // localStorage.setItem('user', JSON.stringify(user));
+      // alert('Registration successful');
       
       // Redirecting to the profile page upon successful signup
-      navigate('/profile');
     }
-  };
+  
 
   return (
     <div>
-
+      <Navigator />
       {/* Sign Up Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -160,6 +168,6 @@ const SignUp = () => {
       </form>
     </div>
   );
-};
+  };
 
 export default SignUp;

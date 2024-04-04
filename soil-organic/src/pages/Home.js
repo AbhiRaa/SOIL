@@ -4,10 +4,10 @@ import Header from '../components/Header'
 import Content from '../components/content';
 import Footer from '../components/Footer';
 
-function Home() {
+function Home(Props) {
   return (
     <div>
-      <Header />
+      <Header/>
       <Content />
       <Footer />
     </div>

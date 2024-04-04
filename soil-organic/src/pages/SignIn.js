@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // For redirecting after successful login
 import Navigator from '../components/NavigationBar';
+import { findUser } from '../data/users';
 
-const SignIn = () => {
+const SignIn = (props) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -60,17 +61,19 @@ const SignIn = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      const storedUserData = localStorage.getItem(formData.email);
-      const userData = storedUserData ? JSON.parse(storedUserData) : null;
+      const storedUserData = findUser(formData.email);
+      console.log(storedUserData);
+      //const userData = storedUserData ? JSON.parse(storedUserData) : null;
 
-      if (userData) {
-        const salt = Uint8Array.from(atob(userData.salt), c => c.charCodeAt(0));
+      if (storedUserData) {
+        const salt = Uint8Array.from(atob(storedUserData.salt), c => c.charCodeAt(0));
         const hashedPassword = await generatePasswordHash(formData.password, salt);
 
-        if (hashedPassword === userData.password) {
+        if (hashedPassword === storedUserData.password) {
+          props.signIn(storedUserData);
           alert("Login successful!");
           // Inside your handleSubmit function in SignIn.js, after successful login:
-          localStorage.setItem('isLoggedIn', 'true');
+          //localStorage.setItem('isLoggedIn', 'true');
 
           console.log("Navigating to profile...");
           
