@@ -15,5 +15,15 @@ module.exports = {
     },
   },
   plugins: [],
+
+  theme: {
+    extend: {
+      colors: {
+        smoke: {
+          light: 'rgba(0, 0, 0, 0.5)',  // Change the opacity as needed
+        },
+      },
+    },
+  },
 }
 

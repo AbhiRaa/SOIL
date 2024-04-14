@@ -12,6 +12,7 @@ import ProfilePage from "./pages/Profile";
 import SpecialsPage from "./pages/Specials";
 import { getUser, setUser, verifyUser } from "./data/users";
 import UserContext from "./hooks/context";
+import ShoppingCart from './components/ShoppingCart';
 
 function App() {
   const [currentloggedInUser, setLoggedInUser] = useState(null);
@@ -44,6 +45,7 @@ function App() {
             {/* Protect the ProfilePage route, redirecting to SignInPage if not logged in */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/specials" element={<SpecialsPage />} />
+            <Route path="/cart" element={<ShoppingCart />} />
             {/* Redirect to HomePage or another route if the route doesn't exist */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
