@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import PurchaseSummaryModal from '../components/PurchaseSummaryModal';
 
 function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
     const [cardDetails, setCardDetails] = useState({
@@ -9,7 +8,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
         cvv: ''
     });
 
-    const [showSummaryModal, setShowSummaryModal] = useState(false);
+    // const [showSummaryModal, setShowSummaryModal] = useState(false);
     const [errorMessages, setErrorMessages] = useState({});
     const expiryRef = useRef(null);
     const cvvRef = useRef(null);
@@ -84,8 +83,6 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
         if (isFormValid) {
             console.log('Card details are valid, processing checkout...');
             onCheckoutComplete();
-            setShowSummaryModal(true); // Show the purchase summary
-            console.log('Should show summary modal now');
         } else {
             console.log('Card details validation failed');
         }
@@ -190,14 +187,6 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
                         >
                             Checkout
                         </button>
-                        <PurchaseSummaryModal
-                            isOpen={showSummaryModal}
-                            onClose={() => {
-                                setShowSummaryModal(false);
-                                onClose(); // Ensure closure of checkout modal after closing summary
-                            }}
-                            purchaseDetails={{ items: cartItems }}
-                        />
                     </div>
                 </form>
             </div>

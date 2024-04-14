@@ -6,6 +6,7 @@ import UserContext from "../hooks/context";
 import { useContext } from "react";
 import { useState } from "react";
 import CheckoutModal from "../components/CheckoutModal";
+import PurchaseSummaryModal from '../components/PurchaseSummaryModal';
 
 function ShoppingCart() {
     const { currentloggedInUser } = useContext(UserContext);
@@ -14,20 +15,16 @@ function ShoppingCart() {
     const { cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useCart();
 
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    const [showSummaryModal, setShowSummaryModal] = useState(false);
 
     // Function to increase the quantity of an item
     const increaseQuantity = (item) => {
-        // addToCart({ ...item, quantity: 1 });
         updateCartQuantity(item, 1);
     };
 
     // Function to decrease the quantity of an item
     const decreaseQuantity = (item) => {
-        // if (item.quantity > 1) {
-        //     addToCart({ ...item, quantity: -1 });
-        // } else {
-        //     removeFromCart(item.product_id);
-        // }
+        
         updateCartQuantity(item, -1);
     };
 
@@ -70,19 +67,29 @@ function ShoppingCart() {
             </ul>
             ) : <p>Your cart is empty.</p>}
             <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
-            <button onClick={handleCheckout}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Proceed to Checkout
-            </button>
+            {cartItems.length > 0 && (
+                <button onClick={handleCheckout}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Proceed to Checkout
+                </button>
+            )}
             <CheckoutModal
                 isOpen={isCheckoutOpen}
                 onClose={() => setIsCheckoutOpen(false)}
                 onCheckoutComplete={() => {
                     alert('Purchase successful! Thank you for your order.');
-                    clearCart();
-                    setIsCheckoutOpen(false);
+                    // clearCart();
+                    setIsCheckoutOpen(false); // Close Checkout Modal
+                    setShowSummaryModal(true); // Show Purchase Summary Modal
                 }}
                 cartItems={cartItems} // Pass current cart items to CheckoutModal
+            />
+            <PurchaseSummaryModal
+                isOpen={showSummaryModal}
+                onClose={() => {
+                    clearCart();
+                    setShowSummaryModal(false)}}
+                purchaseDetails={{ items: cartItems }} // Ensure cartItems are updated correctly for summary
             />
         </div>
     );
