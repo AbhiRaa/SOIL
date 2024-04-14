@@ -2,14 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import 'bootstrap/dist/css/bootstrap.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
-/* :root{
-  --background-color:  white 
-  --primary-font-color:#FF8800;
-  --button-primary-color:#7DEB6E;
-} */
+
 
 body {
   margin: 0;
@@ -18,10 +13,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* background-color:azure; */
-  /* color: white; */
-  
-  
   
 }
 

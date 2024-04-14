@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // For redirecting after successful login
-import Navigator from '../components/NavigationBar';
-import { findUser } from '../data/users';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // For redirecting after successful login
+import Navigator from "../components/NavigationBar";
+import { findUser } from "../data/users";
 
 const SignIn = (props) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrorMessage(''); // Reset error message on input change
+    setErrorMessage(""); // Reset error message on input change
   };
 
   // Add the same hashing functionality you use in your SignUp component
@@ -21,19 +21,19 @@ const SignIn = (props) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
     const importedKey = await crypto.subtle.importKey(
-      'raw',
+      "raw",
       data,
-      { name: 'PBKDF2' },
+      { name: "PBKDF2" },
       false,
-      ['deriveBits']
+      ["deriveBits"]
     );
-    
+
     const keyBits = await crypto.subtle.deriveBits(
       {
-        name: 'PBKDF2',
+        name: "PBKDF2",
         salt: encoder.encode(salt),
         iterations: 1000,
-        hash: 'SHA-1',
+        hash: "SHA-1",
       },
       importedKey,
       256
@@ -62,22 +62,22 @@ const SignIn = (props) => {
 
     if (validateForm()) {
       const storedUserData = findUser(formData.email);
-      console.log(storedUserData);
-      //const userData = storedUserData ? JSON.parse(storedUserData) : null;
-
       if (storedUserData) {
-        const salt = Uint8Array.from(atob(storedUserData.salt), c => c.charCodeAt(0));
-        const hashedPassword = await generatePasswordHash(formData.password, salt);
+        const salt = Uint8Array.from(atob(storedUserData.salt), (c) =>
+          c.charCodeAt(0)
+        );
+        const hashedPassword = await generatePasswordHash(
+          formData.password,
+          salt
+        );
 
         if (hashedPassword === storedUserData.password) {
           props.signIn(storedUserData);
           alert("Login successful!");
-          // Inside your handleSubmit function in SignIn.js, after successful login:
-          //localStorage.setItem('isLoggedIn', 'true');
 
           console.log("Navigating to profile...");
-          
-          navigate('/profile');
+
+          navigate("/profile");
         } else {
           setErrorMessage("Incorrect password.");
         }
@@ -100,10 +100,17 @@ const SignIn = (props) => {
       {/* Form Container */}
       <div className="w-1/2 flex flex-col justify-center p-12">
         <div className="max-w-md w-full mx-auto">
-          <h2 className="mb-6 text-3xl font-bold text-center text-gray-900">Log in</h2>
+          <h2 className="mb-6 text-3xl font-bold text-center text-gray-900">
+            Log in
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="text-sm font-semibold text-gray-600 block">Email</label>
+              <label
+                htmlFor="email"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -115,7 +122,12 @@ const SignIn = (props) => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="text-sm font-semibold text-gray-600 block">Password</label>
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
@@ -127,15 +139,25 @@ const SignIn = (props) => {
               />
             </div>
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-            <button type="submit" className="w-full p-2 bg-green-600 text-white rounded">Let's start!</button>
+            <button
+              type="submit"
+              className="w-full p-2 bg-green-600 text-white rounded"
+            >
+              Let's start!
+            </button>
           </form>
           <div className="mt-6 text-center">
-            <p>Don't have an account? <a href="/signup" className="text-green-600">Sign up</a></p>
+            <p>
+              Don't have an account?{" "}
+              <a href="/signup" className="text-green-600">
+                Sign up
+              </a>
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-  };
+};
 
 export default SignIn;

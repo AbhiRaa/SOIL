@@ -1,16 +1,14 @@
-import React from 'react';
-import Products from './content/TopProducts';
-import About from './about';
-import Container from 'react-bootstrap/Container';
+import React from "react";
+import Products from "./content/TopProducts";
+import About from "./content/about";
 
 function Content() {
-    return (
-        <Container fluid>
-            <About />
-            <Products />
-        </Container>
-        
-        );
+  return (
+    <div>
+      <About />
+      <Products />
+    </div>
+  );
 }
- 
+
 export default Content;

@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // For redirecting after successful signup
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // For redirecting after successful signup
 // import { isStrongPassword } from '../utils/validation';
-import Navigator from '../components/NavigationBar';
-import { setUser } from '../data/users.js';
+import Navigator from "../components/NavigationBar";
+import { setUser } from "../data/users.js";
 
-
-import { isStrongPassword } from '../utils/validation.js';
+import { isStrongPassword } from "../utils/validation.js";
 
 const SignUp = (props) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
 
@@ -26,14 +25,20 @@ const SignUp = (props) => {
   const generatePasswordHash = async (password, salt) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
-    const key = await crypto.subtle.importKey('raw', data, { name: 'PBKDF2' }, false, ['deriveBits']);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      data,
+      { name: "PBKDF2" },
+      false,
+      ["deriveBits"]
+    );
 
     const keyBits = await crypto.subtle.deriveBits(
       {
-        name: 'PBKDF2',
+        name: "PBKDF2",
         salt: encoder.encode(salt),
         iterations: 1000,
-        hash: 'SHA-1',
+        hash: "SHA-1",
       },
       key,
       256
@@ -59,7 +64,8 @@ const SignUp = (props) => {
 
     if (!isStrongPassword(formData.password)) {
       formIsValid = false;
-      newErrors["password"] = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.";
+      newErrors["password"] =
+        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -82,30 +88,23 @@ const SignUp = (props) => {
     if (validateForm()) {
       const salt = generateSalt();
       console.log(formData);
-      const hashedPassword = await generatePasswordHash(formData.password, salt);
+      const hashedPassword = await generatePasswordHash(
+        formData.password,
+        salt
+      );
       // Saving user with hashed password and salt to local storage
-      const user = { 
-        name: formData.name, 
-        email: formData.email, 
-        password: hashedPassword, 
+      const user = {
+        name: formData.name,
+        email: formData.email,
+        password: hashedPassword,
         salt: btoa(String.fromCharCode(...salt)),
-        joinDate: new Date().toISOString() // Storing the current timestamp
+        joinDate: new Date().toISOString(), // Storing the current timestamp
       };
-      console.log(user);
 
       props.signUp(user);
-      //localStorage.setItem(formData.email, JSON.stringify(user));
-
-      // Save user data to local storage
-      navigate('/profile');
-
-      }
-      // localStorage.setItem('user', JSON.stringify(user));
-      // alert('Registration successful');
-      
-      // Redirecting to the profile page upon successful signup
+      navigate("/profile");
     }
-  
+  };
 
   return (
     <div>
@@ -149,7 +148,9 @@ const SignUp = (props) => {
             required
             className={errors.password ? "input-error" : ""}
           />
-          {errors.password && <div className="text-red-500">{errors.password}</div>}
+          {errors.password && (
+            <div className="text-red-500">{errors.password}</div>
+          )}
         </div>
         <div>
           <label htmlFor="confirmPassword">Confirm Password:</label>
@@ -162,12 +163,16 @@ const SignUp = (props) => {
             required
             className={errors.confirmPassword ? "input-error" : ""}
           />
-          {errors.confirmPassword && <div className="text-red-500">{errors.confirmPassword}</div>}
+          {errors.confirmPassword && (
+            <div className="text-red-500">{errors.confirmPassword}</div>
+          )}
         </div>
-        <button type="submit" className="bg-green-500 text-white p-2">Sign Up</button>
+        <button type="submit" className="bg-green-500 text-white p-2">
+          Sign Up
+        </button>
       </form>
     </div>
   );
-  };
+};
 
 export default SignUp;
