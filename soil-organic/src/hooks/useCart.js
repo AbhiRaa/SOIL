@@ -1,14 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import UserContext from "../hooks/context";
 
-const CART_ITEMS_KEY = 'cartItems';
+// const CART_ITEMS_KEY = 'cartItems';
 
 function useCart() {
+    const { currentloggedInUser } = useContext(UserContext);
     const [cartItems, setCartItems] = useState([]);
 
+    // useEffect(() => {
+    //     const items = JSON.parse(localStorage.getItem(CART_ITEMS_KEY)) || [];
+    //     setCartItems(items);
+    // }, []);
+
     useEffect(() => {
-        const items = JSON.parse(localStorage.getItem(CART_ITEMS_KEY)) || [];
+        const userCartKey = `cartItems_${currentloggedInUser}`;  // Suffix the cart key with the user's email
+        const items = JSON.parse(localStorage.getItem(userCartKey)) || [];
         setCartItems(items);
-    }, []);
+    }, [currentloggedInUser]);
+
+    const saveCartItems = (items) => {
+        const userCartKey = `cartItems_${currentloggedInUser}`;
+        localStorage.setItem(userCartKey, JSON.stringify(items));
+        setCartItems(items);
+    };
 
     const addToCart = (item) => {
         const existingIndex = cartItems.findIndex(cartItem => cartItem.product_id === item.product_id);
@@ -26,8 +40,9 @@ function useCart() {
             newCartItems = [...cartItems, { ...item, quantity: 1 }];
         }
 
-        setCartItems(newCartItems);
-        localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
+        // setCartItems(newCartItems);
+        // localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
+        saveCartItems(newCartItems);
     };
 
     const updateCartQuantity = (item, deltaQuantity) => {
@@ -55,18 +70,26 @@ function useCart() {
             return;
         }
 
-        setCartItems(newCartItems);
-        localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
+        // setCartItems(newCartItems);
+        // localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
+        saveCartItems(newCartItems);
     };
 
     const removeFromCart = (itemId) => {
         const updatedCartItems = cartItems.filter(item => item.product_id !== itemId);
-        setCartItems(updatedCartItems);
-        localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+        // setCartItems(updatedCartItems);
+        // localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+        saveCartItems(updatedCartItems);
     };
 
+    // const clearCart = () => {
+    //     localStorage.removeItem(CART_ITEMS_KEY);
+    //     setCartItems([]);
+    // };
+
     const clearCart = () => {
-        localStorage.removeItem(CART_ITEMS_KEY);
+        const userCartKey = `cartItems_${currentloggedInUser}`;
+        localStorage.removeItem(userCartKey);
         setCartItems([]);
     };
 
