@@ -11,17 +11,7 @@ function getUsers() {
 }
 
 function findUser(email) {
-  const allUsers = getUsers();
-  console.log(allUsers);
-  console.log(email);
-  for (let i = 0; i < allUsers.length; i++) {
-    console.log(allUsers[i].email);
-    if (allUsers[i].email == email) {
-      return allUsers[i];
-    }
-  }
-
-  return null;
+  return getUsers().find(user => user.email === email);
 }
 
 function verifyUser(username, password) {
@@ -36,8 +26,32 @@ function verifyUser(username, password) {
 
 function addUser(userObject) {
   let allUsers = getUsers();
+  userObject.profile = userObject.profile || {
+    age: '',
+    weight: '',
+    height: '',
+    activityLevel: '',
+    dietaryPreferences: [],
+    healthGoals: []
+  };
   allUsers.push(userObject);
   localStorage.setItem(ALL_USERS, JSON.stringify(allUsers));
+}
+
+function updateUser(updatedUser) {
+  let users = getUsers();
+  const index = users.findIndex(user => user.email === updatedUser.email);
+  if (index !== -1) {
+    users[index] = updatedUser;
+    localStorage.setItem(ALL_USERS, JSON.stringify(users));
+  }
+}
+
+function deleteUser(email) {
+  let users = getUsers();
+  users = users.filter(user => user.email !== email);
+  localStorage.setItem(ALL_USERS, JSON.stringify(users));
+  localStorage.removeItem(CURRENT_USER);
 }
 
 function setUser(userObject) {
@@ -53,4 +67,4 @@ function removeUser() {
   localStorage.removeItem(CURRENT_USER);
 }
 
-export { setUser, getUser, removeUser, verifyUser, findUser };
+export { setUser, getUser, removeUser, verifyUser, findUser, updateUser, deleteUser };

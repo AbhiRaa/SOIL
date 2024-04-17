@@ -99,6 +99,14 @@ const SignUp = (props) => {
         password: hashedPassword,
         salt: btoa(String.fromCharCode(...salt)),
         joinDate: new Date().toISOString(), // Storing the current timestamp
+        profile: {
+          age: "",
+          weight: "",
+          height: "",
+          activityLevel: "",
+          dietaryPreferences: [],
+          healthGoals: []
+        }
       };
 
       props.signUp(user);
