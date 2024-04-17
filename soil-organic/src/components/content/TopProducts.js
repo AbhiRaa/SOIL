@@ -1,6 +1,7 @@
 import react, { useEffect } from "react";
 import { initProducts, getProducts } from "../../data/products";
 import Cards from "../../utils/Cards";
+import ProductList from "../ProductList";
 
 function Products() {
   initProducts();
@@ -19,18 +20,9 @@ function Products() {
         >
           Top Products
         </h2>
-      </section>
-      <section className="grid md:grid-cols-4 gap-4">
-        {products.map((product) => (
-          <Cards
-            key={product.product_id}
-            name={product.product_name}
-            image={product.product_image}
-            quantity={product.product_quantity}
-            price={product.product_price}
-          />
-        ))}
-      </section>
+      </section>    
+        <ProductList/>
+
     </>
   );
 }

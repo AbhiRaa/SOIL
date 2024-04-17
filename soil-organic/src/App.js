@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import HomePage from "./pages/Home";
 import SignUpPage from "./pages/SignUp";
@@ -19,6 +20,7 @@ function App() {
 
   const signIn = (userObject) => {
     if (userObject !== null) {
+      setUser(userObject)
       setLoggedInUser(userObject.email);
     }
   };

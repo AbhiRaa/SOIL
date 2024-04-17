@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../hooks/context";
+import logo from "../images/logo.png";
 
 function NavigationBar() {
   let { currentloggedInUser, signOut } = useContext(UserContext);
@@ -8,30 +9,32 @@ function NavigationBar() {
   return currentloggedInUser == null ? (
     <>
       <nav>
-        <ul
-          className="flex space-x-4 justify-center py-5 gap-5"
-          style={{ fontSize: "1.2rem", fontWeight: "bolder" }}
-        >
-          <li>
+        <header className=" container mx-auto flex items-center justify-between ">
+          <img className=" flex-none logoImage" src={logo} alt="Logo" />
+          <ul
+            className="flex space-x-4 justify-center py-5 gap-5 text-xl font-bold"
+          >
+            <li>
             <Link to="/">Home</Link>
-          </li>
-          {/* <li><Link to="/signup">Sign Up</Link></li> */}
-          <li>
+            </li>
+            <li>
             <Link to="/signin">Sign In</Link>
-          </li>
-          {/* <li><Link to="/profile">Profile</Link></li> */}
-          <li>
+            </li>
+            <li>
             <Link to="/specials">Specials</Link>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </header>
       </nav>
     </>
   ) : (
-    <nav>
-      <ul
-        className="flex space-x-4 justify-center py-5 gap-5"
-        style={{ fontSize: "1.2rem", fontWeight: "bolder" }}
-      >
+    <>
+      <nav>
+      <header className=" container mx-auto flex items-center justify-between ">
+        <img className=" flex-none logoImage" src={logo} alt="Logo" />
+        <ul
+        className="flex space-x-4 justify-center py-5 gap-5 text-xl font-bold"
+        >
         <li>
           <Link to="/">Hi,{currentloggedInUser}</Link>
         </li>
@@ -47,8 +50,11 @@ function NavigationBar() {
         <li>
           <button onClick={signOut}> Sign Out</button>
         </li>
-      </ul>
+        </ul>
+      </header>
     </nav>
+    </>
+    
   );
 }
 

@@ -10,10 +10,10 @@ function Header() {
   return (
     <>
       <div className="parent-container bg-cover bg-opacity-100">
-        <header className=" container mx-auto flex items-center justify-between ">
-          <img className=" flex-none logoImage" src={logo} alt="Logo" />
+        {/* <header className=" container mx-auto flex items-center justify-between "> */}
+          {/* <img className=" flex-none logoImage" src={logo} alt="Logo" /> */}
           <Navbar />
-        </header>
+        {/* </header> */}
         <section className="container flex-col items-center justify-center mx-auto">
           <h1 className="flex py-1 justify-center items-center">
             WELCOME TO <br />

@@ -3,10 +3,10 @@ import aboutus from "../../images/aboutUs-collage.jpg";
 
 function About() {
   return (
-    <section className="continer mx-auto flex py-5 px-5 about">
+    <section className="continer mx-auto flex py-5 px-5 about text-primary">
       <div className="description flex-col justify-center p-2">
         <h1 className="text-center py-5">About Us</h1>
-        <p className="text-left px-10">
+        <p className="text-left px-10 text-xl">
           Welcome to SOIL, your premier destination for premium organic food in
           Melbourne. At SOIL, we believe in more than just providing nourishment
           for the body; we're dedicated to cultivating a community centered

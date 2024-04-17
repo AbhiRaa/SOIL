@@ -6,24 +6,25 @@ module.exports = {
   theme: {
     extend: {
       colors:{
-        'background-color':'#212B1E',
-        'primary-font-color':'#FF8800',
-        'button-primary-color':'7DEB6E',
+        'primary':'#207187',
+        'custom-green': '#10B981'
+      },
+      backgroundImage: {
+        'signIn': "url('./images/backgroundSignIn.jpg')",
       },
       
-      
+  
     },
   },
   plugins: [],
-
-  theme: {
-    extend: {
-      colors: {
-        smoke: {
-          light: 'rgba(0, 0, 0, 0.5)',  // Change the opacity as needed
-        },
-      },
-    },
-  },
+  // theme: {
+  //   extend: {
+  //     colors: {
+  //       smoke: {
+  //         light: 'rgba(0, 0, 0, 0.5)',  // Change the opacity as needed
+  //       },
+  //     },
+  //   },
+  // },
 }
 

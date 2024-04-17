@@ -115,70 +115,128 @@ const SignUp = (props) => {
   };
 
   return (
-    <div>
-      <Navigator />
+    <div className="min-h-screen bg-signIn bg-cover">
+      <div>
+        <Navigator />
+      </div>
       {/* Sign Up Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className={errors.name ? "input-error" : ""}
-          />
-          {errors.name && <div className="text-red-500">{errors.name}</div>}
+      <div className="flex justify-end">
+      <div className="flex justify-center p-12 rounded-md border-2 m-10 border-primary shadow-2xl md:w-1/3 content-center">
+        <div className="md:w-1/2">
+          <h2 className="mb-6 text-3xl font-bold text-center text-primary">
+            Sign Up
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label
+                htmlFor="name"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className={`w-full p-2 border border-gray-300 rounded mt-1 ${
+                  errors.name ? "border-red-500" : ""
+                }`}
+              />
+              {errors.name && (
+                <div className="text-red-500 text-sm mt-1">{errors.name}</div>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="email"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className={`w-full p-2 border border-gray-300 rounded mt-1 ${
+                  errors.email ? "border-red-500" : ""
+                }`}
+              />
+              {errors.email && (
+                <div className="text-red-500 text-sm mt-1">{errors.email}</div>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className={`w-full p-2 border border-gray-300 rounded mt-1 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
+              />
+              {errors.password && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.password}
+                </div>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-semibold text-gray-600 block"
+              >
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                className={`w-full p-2 border border-gray-300 rounded mt-1 ${
+                  errors.confirmPassword ? "border-red-500" : ""
+                }`}
+              />
+              {errors.confirmPassword && (
+                <div className="text-red-500 text-sm mt-1">
+                  {errors.confirmPassword}
+                </div>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-primary text-white p-2 rounded"
+            >
+              Sign Up
+            </button>
+          </form>
+          <div className="mt-6 text-center">
+            <p>
+              Already have an account?{" "}
+              <a href="/signin" className="text-primary">
+                Sign in
+              </a>
+            </p>
+          </div>
         </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className={errors.email ? "input-error" : ""}
-          />
-          {errors.email && <div className="text-red-500">{errors.email}</div>}
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className={errors.password ? "input-error" : ""}
-          />
-          {errors.password && (
-            <div className="text-red-500">{errors.password}</div>
-          )}
-        </div>
-        <div>
-          <label htmlFor="confirmPassword">Confirm Password:</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            className={errors.confirmPassword ? "input-error" : ""}
-          />
-          {errors.confirmPassword && (
-            <div className="text-red-500">{errors.confirmPassword}</div>
-          )}
-        </div>
-        <button type="submit" className="bg-green-500 text-white p-2">
-          Sign Up
-        </button>
-      </form>
+      </div>
+      </div>
     </div>
   );
 };

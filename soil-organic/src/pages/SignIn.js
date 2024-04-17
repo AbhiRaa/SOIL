@@ -88,20 +88,17 @@ const SignIn = (props) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <>
+    <div className="flex-col min-h-screen bg-signIn bg-cover">
+      <Navigator className="text-primary" />
       {/* Side Illustration Panel */}
-      <div className="w-1/2 bg-white p-5">
-        <div className="flex items-center justify-center h-full">
-          {/* Placeholder for illustration */}
-          <div>Your illustration here</div>
-        </div>
-      </div>
-
       {/* Form Container */}
-      <div className="w-1/2 flex flex-col justify-center p-12">
+      <div className="w-full flex justify-around">
+        <div className="md:w-1/2"></div>
+        <div className=" flex flex-col justify-end p-12 rounded-md border-2 m-10 border-primary shadow-2xl">
         <div className="max-w-md w-full mx-auto">
-          <h2 className="mb-6 text-3xl font-bold text-center text-gray-900">
-            Log in
+          <h2 className="mb-6 text-3xl font-bold text-center text-primary">
+            Sign in
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -141,7 +138,7 @@ const SignIn = (props) => {
             {errorMessage && <p className="text-red-500">{errorMessage}</p>}
             <button
               type="submit"
-              className="w-full p-2 bg-green-600 text-white rounded"
+              className="w-full p-2 bg-primary text-white rounded"
             >
               Let's start!
             </button>
@@ -149,14 +146,16 @@ const SignIn = (props) => {
           <div className="mt-6 text-center">
             <p>
               Don't have an account?{" "}
-              <a href="/signup" className="text-green-600">
+              <a href="/signup" className="text-primary">
                 Sign up
               </a>
             </p>
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      </div>
+    </>
   );
 };
 
