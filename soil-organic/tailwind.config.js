@@ -11,6 +11,7 @@ module.exports = {
       },
       backgroundImage: {
         'signIn': "url('./images/backgroundSignIn.jpg')",
+        // 'cartBackground':"url('./images/cartBackground.webp')",
       },
       
   

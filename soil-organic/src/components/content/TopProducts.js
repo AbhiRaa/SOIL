@@ -1,11 +1,10 @@
-import react, { useEffect } from "react";
-import { initProducts, getProducts } from "../../data/products";
-import Cards from "../../utils/Cards";
+
+import { initProducts } from "../../data/products";
+
 import ProductList from "../ProductList";
 
 function Products() {
   initProducts();
-  const products = getProducts();
   return (
     <>
       <section>
@@ -22,7 +21,7 @@ function Products() {
         </h2>
       </section>    
         <ProductList/>
-
+        
     </>
   );
 }
