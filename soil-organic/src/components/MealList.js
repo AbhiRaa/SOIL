@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * MealList component that displays a list of meal cards.
+ * Each card shows detailed information about the meal including its nutritional content and provides an
+ * option to add the meal to a meal plan.
+ *
+ * @param {Object[]} meals - Array of meal objects to display.
+ * @param {Function} onAdd - Callback function to handle adding a meal to the meal plan.
+ */
 function MealList({ meals, onAdd }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">

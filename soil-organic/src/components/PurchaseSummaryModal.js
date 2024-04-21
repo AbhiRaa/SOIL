@@ -1,5 +1,14 @@
 import React from 'react';
 
+/**
+ * Component to display a summary of the user's purchase.
+ * It renders a modal with details about each item purchased, the total cost, and the purchase date.
+ *
+ * @param {Object} props - Component properties
+ * @param {boolean} isOpen - Flag to control the visibility of the modal
+ * @param {function} onClose - Function to call when closing the modal
+ * @param {Object} purchaseDetails - Details about the purchase including a list of items
+ */
 function PurchaseSummaryModal({ isOpen, onClose, purchaseDetails }) {
     if (!isOpen) return null; // First check if the modal should even open
 

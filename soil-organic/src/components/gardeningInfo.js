@@ -1,9 +1,18 @@
 import React, { useState,useEffect } from 'react';
 import {initTips , getTips} from '../data/gardenTips';
 
+/**
+ * BackyardGardeningTips component that displays gardening tips in an accordion format.
+ * This component is ideal for users interested in gardening but with limited space,
+ * offering practical tips and suggestions. Shown on Specials page.
+ */
 function BackyardGardeningTips() {
+  // State to track the active accordion index
   const [activeIndex, setActiveIndex] = useState(0);
+  // State to store gardening tips fetched from an external source
   const [gardeningTips, setGardeningTips] = useState([]);
+
+  // Effect to initialize and fetch gardening tips data on component mount
   useEffect(() => {
     initTips(); // Initialize the tips data
     const tips = getTips(); // Fetch the tips
@@ -11,7 +20,12 @@ function BackyardGardeningTips() {
     setGardeningTips(tips); // Set the fetched tips into state
   }, []);
 
+  /**
+   * Handles accordion item clicks to toggle visibility of content.
+   * @param {number} index - The index of the clicked accordion item
+   */
   const handleAccordionClick = (index) => {
+    // Toggle active index; reset if the same index is clicked again
     setActiveIndex(index === activeIndex ? -1 : index);
   };
 

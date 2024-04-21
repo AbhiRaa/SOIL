@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
 
+/**
+ * EditProfileModal component provides a user interface for editing user profile details.
+ * It allows users to update their personal information including dietary preferences and health goals.
+ * 
+ * Props:
+ * - user: The current user object whose profile is to be edited.
+ * - isOpen: A boolean that controls the visibility of the modal.
+ * - onClose: A function to call when closing the modal.
+ * - onUpdate: A function to call when the user submits the updated profile.
+ */
 function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
   // Initialize profile safely by ensuring all fields are accounted for
   const [updatedUser, setUpdatedUser] = useState({
@@ -15,6 +25,7 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
     }
   });
 
+  // Function to handle changes to input fields and update state accordingly.
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (['age', 'weight', 'height'].includes(name) && value <= 0) {
@@ -22,15 +33,18 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
       return;
     }
     if (['age', 'weight', 'height', 'gender', 'activityLevel'].includes(name)) {
+      // Update state for the profile fields.
       setUpdatedUser(prev => ({
         ...prev,
         profile: { ...prev.profile, [name]: value }
       }));
     } else if (name === "name") {
+      // Update state for the name field.
       setUpdatedUser(prev => ({ ...prev, name: value }));
     }
   };
 
+  // Function to toggle dietary preferences in the user's profile.
   const toggleDietaryPreference = (preference) => {
     setUpdatedUser(prev => ({
       ...prev,
@@ -43,6 +57,7 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
     }));
   };
 
+  // Function to toggle health goals in the user's profile.
   const toggleHealthGoal = (goal) => {
     setUpdatedUser(prev => ({
       ...prev,
@@ -55,13 +70,14 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
     }));
   };
 
+  // Function to handle form submission.
   const handleSubmit = (e) => {
     e.preventDefault();
     onUpdate(updatedUser);
-    onClose();
+    onClose();  // Close the modal after successful update.
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Don't render the modal if it's not open.
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">

@@ -1,3 +1,22 @@
+/**
+ * A custom hook to manage meal plans within a React application.
+ * This hook leverages localStorage to persist meal plans on a per-user basis,
+ * utilizing the current logged-in user's context to differentiate between users.
+ * 
+ * The hook exposes methods to add meals to a specific day, remove meals, clear the entire meal plan,
+ * and manually save an updated meal plan. This allows for flexible integration within components
+ * that require meal planning functionalities.
+ *
+ * Usage:
+ * - Import the hook into a React component.
+ * - Call the hook to access its functionalities and state.
+ * - Use the provided methods to manipulate the meal plan.
+ *
+ * Example:
+ * const { mealPlan, addMeal, removeMeal, clearMealPlan, saveMealPlan } = useMealPlanner();
+ *
+ * @module useMealPlanner
+ */
 import { useState, useEffect, useContext } from 'react';
 import UserContext from "../hooks/context";
 
@@ -41,40 +60,6 @@ function useMealPlanner() {
             localStorage.setItem(storageKey, JSON.stringify(mealPlan));
         }
     }, [mealPlan, currentloggedInUser]);
-
-    // const addMeal = (meal, day) => {
-    //     setMealPlan(prevPlan => {
-    //         const updatedPlan = { ...prevPlan };
-    //         if (!updatedPlan[day]) {
-    //             updatedPlan[day] = [];
-    //         }
-    //         updatedPlan[day].push(meal);
-    //         return updatedPlan;
-    //     });
-    // };
-
-    // const removeMeal = (mealId, day) => {
-    //     setMealPlan(prevPlan => {
-    //         const updatedPlan = { ...prevPlan };
-    //         if (updatedPlan[day]) {
-    //             updatedPlan[day] = updatedPlan[day].filter(meal => meal.id !== mealId);
-    //         }
-    //         return updatedPlan;
-    //     });
-    // };
-
-    // const clearMealPlan = () => {
-    //     setMealPlan({});
-    //     // Only remove from local storage if there's a valid user email
-    //     if (currentloggedInUser) {
-    //         const storageKey = `mealplan_${currentloggedInUser}`;
-    //         localStorage.removeItem(storageKey);
-    //     }
-    // };
-
-    // const saveMealPlan = (newPlan) => {
-    //     setMealPlan(newPlan);
-    // };
 
     const addMeal = (meal, day) => {
         setMealPlan(prevPlan => ({

@@ -8,13 +8,13 @@ import PurchaseSummaryModal from '../components/PurchaseSummaryModal';
 import cartBackground from '../images/cartBackground.png';
 
 function ShoppingCart() {
-    const { currentloggedInUser } = useContext(UserContext);
+    const { currentloggedInUser } = useContext(UserContext);    // Access the context for the currently logged-in user
     const navigate = useNavigate();
 
-    const { cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useCart();
+    const { cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useCart();  // Custom hook to manage cart operations
 
-    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-    const [showSummaryModal, setShowSummaryModal] = useState(false);
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);    // State to control visibility of the checkout modal
+    const [showSummaryModal, setShowSummaryModal] = useState(false);    // State to control visibility of the purchase summary modal
 
     // Redirect to signup if no user is logged in
     useEffect(() => {
@@ -35,10 +35,12 @@ function ShoppingCart() {
         updateCartQuantity(item, -1);
     };
 
+    // Handler to remove an item from the cart using its productId
     const handleRemoveItem = (productId) => {
         removeFromCart(productId);
     };
 
+    // Handler for initiating the checkout process
     const handleCheckout = () => {
         setIsCheckoutOpen(true);
     };

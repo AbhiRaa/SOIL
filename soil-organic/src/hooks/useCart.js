@@ -1,16 +1,27 @@
+/**
+ * Provides a custom hook for managing shopping cart operations in a React application.
+ *
+ * This hook integrates with the UserContext to handle user-specific cart data, 
+ * leveraging the browser's localStorage to persist cart items across sessions. 
+ * It provides functionalities to add items to the cart, update item quantities, 
+ * remove items, and clear the cart entirely.
+ *
+ * Usage:
+ * 1. Import the hook into a React component.
+ * 2. Call the hook to get access to cart functionalities and state.
+ * 3. Use the provided methods to manipulate the cart's state.
+ *
+ * Example:
+ * const { cartItems, addToCart, removeFromCart, updateCartQuantity, clearCart } = useCart();
+ *
+ * @module useCart
+ */
 import { useState, useEffect, useContext } from 'react';
 import UserContext from "../hooks/context";
-
-// const CART_ITEMS_KEY = 'cartItems';
 
 function useCart() {
     const { currentloggedInUser } = useContext(UserContext);
     const [cartItems, setCartItems] = useState([]);
-
-    // useEffect(() => {
-    //     const items = JSON.parse(localStorage.getItem(CART_ITEMS_KEY)) || [];
-    //     setCartItems(items);
-    // }, []);
 
     useEffect(() => {
         const userCartKey = `cartItems_${currentloggedInUser}`;  // Suffix the cart key with the user's email
@@ -39,9 +50,6 @@ function useCart() {
             // If item does not exist, add it
             newCartItems = [...cartItems, { ...item, quantity: 1 }];
         }
-
-        // setCartItems(newCartItems);
-        // localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
         saveCartItems(newCartItems);
     };
 
@@ -69,23 +77,13 @@ function useCart() {
             // If deltaQuantity is negative and item does not exist, do nothing
             return;
         }
-
-        // setCartItems(newCartItems);
-        // localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(newCartItems));
         saveCartItems(newCartItems);
     };
 
     const removeFromCart = (itemId) => {
         const updatedCartItems = cartItems.filter(item => item.product_id !== itemId);
-        // setCartItems(updatedCartItems);
-        // localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
         saveCartItems(updatedCartItems);
     };
-
-    // const clearCart = () => {
-    //     localStorage.removeItem(CART_ITEMS_KEY);
-    //     setCartItems([]);
-    // };
 
     const clearCart = () => {
         const userCartKey = `cartItems_${currentloggedInUser}`;

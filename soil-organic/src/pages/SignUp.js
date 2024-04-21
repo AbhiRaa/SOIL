@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful signup
-// import { isStrongPassword } from '../utils/validation';
 import Navigator from "../components/NavigationBar";
 import { findUser } from "../data/users.js";
-
 import { isStrongPassword } from "../utils/validation.js";
 
 const SignUp = (props) => {

@@ -157,13 +157,6 @@ function MealPlanningApp() {
     }));
     saveMealPlan(updatedMealPlanData);
   };
-  
-
-  // const handleRemoveMeal = (index) => {
-  //   const newMeals = [...selectedMeals];
-  //   newMeals.splice(index, 1);
-  //   setSelectedMeals(newMeals);
-  // };
 
   const handleChangeIntolerance = (event) => {
     const selectedOptions = Array.from(event.target.options)

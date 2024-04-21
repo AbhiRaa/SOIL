@@ -1,3 +1,10 @@
+/**
+ * MealCard component for displaying meal information in a card layout.
+ * It presents a meal's image, title, preparation time, number of servings, and a link to the full recipe.
+ * 
+ * @param {object} meal - An object containing details about the meal, such as title, id, imageType,
+ *                        readyInMinutes, servings, and sourceUrl.
+ */
 const MealCard = ({ meal }) => {
 
     return (

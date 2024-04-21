@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { isStrongPassword } from "../utils/validation.js";
 
+/**
+ * Modal component for changing user passwords.
+ * It allows a user to enter their current password for verification and set a new password.
+ * The component checks if the new password meets certain strength requirements and matches the confirmed password.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.user - The current user object containing the user's hashed password and salt.
+ * @param {boolean} props.isOpen - Flag to determine if the modal is visible.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Function} props.onUpdatePassword - Function to update the user's password.
+ */
 function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
+  // State to hold password inputs and error messages
   const [passwords, setPasswords] = useState({
     existingPassword: '',
     newPassword: '',
@@ -10,11 +22,13 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
 
   const [errors, setErrors] = useState({});
 
+  // Handles input changes and updates local state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPasswords(prev => ({ ...prev, [name]: value }));
   };
 
+  // Asynchronous function to hash the password using PBKDF2
   const generatePasswordHash = async (password, salt) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
@@ -40,11 +54,12 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
   };
 
+   // Validates the passwords entered by the user
   const validatePasswords = async () => {
     let tempErrors = {};
     const salt = Uint8Array.from(atob(user.salt), (c) => c.charCodeAt(0));
     const existingHashedPassword = await generatePasswordHash(passwords.existingPassword, salt);
-    
+    // Set error messages if conditions are not met
     if (existingHashedPassword !== user.password) {
       tempErrors.existingPassword = "Existing password is incorrect.";
     }
@@ -62,6 +77,7 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     return Object.keys(tempErrors).length === 0;
   };
 
+  // Submits the form after validation
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isValid = await validatePasswords();
@@ -77,6 +93,7 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     }
   };
 
+  // Return null to prevent the modal from rendering if it's not open
   if (!isOpen) return null;
 
   return (

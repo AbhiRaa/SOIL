@@ -3,9 +3,18 @@ import { Link } from "react-router-dom";
 import UserContext from "../hooks/context";
 import logo from "../images/logo.png";
 
+/**
+ * NavigationBar component displays different navigation links based on the user's authentication status.
+ * It uses the UserContext to determine if a user is currently logged in and changes the display accordingly.
+ */
 function NavigationBar() {
+  // Accessing currentloggedInUser and signOut method from UserContext
   let { currentloggedInUser, signOut } = useContext(UserContext);
+
+   // Log the current user status for debugging purposes
   console.log(currentloggedInUser);
+
+  // Conditionally render the navigation bar based on user authentication
   return currentloggedInUser == null ? (
     <>
       <nav>

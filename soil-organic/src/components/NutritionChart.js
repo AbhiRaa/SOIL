@@ -2,9 +2,15 @@ import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
+// Register the necessary ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+/**
+ * NutritionChart component visualizes the nutritional values of a meal.
+ * It takes `nutritionData` as a prop, which contains values for protein, carbohydrates, fat, and calories.
+ */
 const NutritionChart = ({ nutritionData }) => {
+  // Data for the Pie chart, utilizing the passed `nutritionData` prop
   const data = {
     labels: ['Protein', 'Carbs', 'Fat'],
     datasets: [
@@ -26,6 +32,7 @@ const NutritionChart = ({ nutritionData }) => {
     ],
   };
 
+  // Configuration options for the Pie chart
   const options = {
     responsive: true,
     plugins: {
@@ -35,6 +42,7 @@ const NutritionChart = ({ nutritionData }) => {
     },
   };
 
+  // Render a Pie chart using react-chartjs-2 with provided data and options
   return (
     <div className='m-4'>
       <Pie data={data} options={options} />

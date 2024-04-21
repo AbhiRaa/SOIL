@@ -1,5 +1,16 @@
+/**
+ * About.js
+ * 
+ * This module defines a React component for the "About Us" page of the application.
+ * It presents a narrative about the organization, SOIL, which emphasizes its commitment
+ * to sustainable living and organic food. The page includes textual content about SOIL's mission
+ * and values, alongside a descriptive image to visually represent the message.
+ * 
+ * The component utilizes basic React and Tailwind CSS for styling.
+ */
+
 import React from "react";
-import aboutus from "../../images/aboutUs-collage.jpg";
+import aboutus from "../../images/aboutUs-collage.jpg";   // Importing the image used in the About Us page.
 
 function About() {
   return (
@@ -17,7 +28,7 @@ function About() {
         </p>
       </div>
       <div>
-        <img src={aboutus} className="px-20"></img>
+        <img src={aboutus} className="px-20" alt='about-us'></img>
       </div>
     </section>
   );

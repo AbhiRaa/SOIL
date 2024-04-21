@@ -1,10 +1,20 @@
-
+/**
+ * TopProducts.js
+ * 
+ * This file defines the `Products` component that displays a curated list of top-rated products
+ * within the application. It leverages the `ProductList` component to render products that meet a
+ * specific rating threshold. The component initializes product data upon rendering and showcases
+ * products with a rating of 4.5 or higher.
+ * 
+ * Imports:
+ * - initProducts: A function from `../../data/products` that initializes the product dataset.
+ * - ProductList: A component that renders a list of products based on provided filtering criteria.
+ */
 import { initProducts } from "../../data/products";
-
 import ProductList from "../ProductList";
 
 function Products() {
-  initProducts();
+  initProducts();   // Initialize products at the start. This function could be fetching or setting up data.
   return (
     <>
       <section>

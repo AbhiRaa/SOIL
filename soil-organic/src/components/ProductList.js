@@ -4,23 +4,35 @@ import useCart from '../hooks/useCart';
 import UserContext from "../hooks/context";
 import Notification from '../utils/notifications';
 
+/**
+ * Renders a list of products that can be filtered by a minimum rating.
+ * It allows users to add products to a shopping cart.
+ * 
+ * @param {Object} props - Component props
+ * @param {number} props.filterRating - Minimum rating to filter products.
+ */
 function ProductList({filterRating}) {
-    const { addToCart } = useCart();
-    const [products, setProducts] = React.useState([]);
-    let { currentloggedInUser } = useContext(UserContext);
-    const [notification, setNotification] = React.useState('');
+    const { addToCart } = useCart();    // Hook to interact with the shopping cart
+    const [products, setProducts] = React.useState([]); // Local state to store products
+    let { currentloggedInUser } = useContext(UserContext);  // Context to access the currently logged-in user
+    const [notification, setNotification] = React.useState(''); // State for displaying notifications
 
-
+    // Effect to fetch products and apply rating filter
     useEffect(() => {
         initProducts();  // Initialize products in local storage if not already initialized
         setProducts(getProducts());  // Load products from local storage into state
         let fetchedProducts = getProducts();
         if(filterRating){
+            // Apply the rating filter if specified
             fetchedProducts = fetchedProducts.filter(product => product.product_rating > filterRating);
         }
         setProducts(fetchedProducts);
     }, [filterRating]);
 
+    /**
+     * Handles adding a product to the cart.
+     * @param {Object} product - Product to add to the cart.
+     */
     const handleAddToCart = (product) => {
         addToCart({
             ...product,

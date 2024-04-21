@@ -1,42 +1,59 @@
+/**
+ * CheckoutModal.js
+ *
+ * This React component is a modal that allows users to enter their payment card details for
+ * processing transactions. The modal includes fields for card type, card number, expiry date,
+ * and CVV. It validates the input to ensure it meets expected formats and standards before
+ * allowing the user to proceed with the checkout.
+ *
+ * Props:
+ * - isOpen: Boolean that controls whether the modal is displayed.
+ * - onClose: Function to call when closing the modal.
+ * - onCheckoutComplete: Function to execute after successful validation and submission of the form.
+ * - cartItems: Array of items currently in the shopping cart (not directly used in this file but may be part of a larger checkout process).
+ */
 import React, { useState, useRef } from 'react';
 
 function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
+    // State for storing and updating card details entered by the user.
     const [cardDetails, setCardDetails] = useState({
-        cardType: 'Visa',
-        cardNumber: '',
-        expiryDate: '',
-        cvv: ''
+        cardType: 'Visa',   // Default card type
+        cardNumber: '', // User-entered card number
+        expiryDate: '',  // Expiry date of the card
+        cvv: ''     // CVV number of the card
     });
-
-    // const [showSummaryModal, setShowSummaryModal] = useState(false);
+    // State for managing validation error messages.
     const [errorMessages, setErrorMessages] = useState({});
+    // Refs for managing focus transitions between form inputs.
     const expiryRef = useRef(null);
     const cvvRef = useRef(null);
 
+    // Handles input changes and formats them based on their type (e.g., card number, expiry date).
     const handleInputChange = (e) => {
         let { name, value } = e.target;
         let formattedValue = value;
-        //let errors = {};
 
+        // Formatting card number to groups of 4 digits separated by dashes.
         if (name === 'cardNumber') {
-            formattedValue = value.replace(/\D/g, '').substring(0, 16);
+            formattedValue = value.replace(/\D/g, '').substring(0, 16); // Remove non-digits and limit to 16 characters.
             formattedValue = formattedValue ? formattedValue.match(/.{1,4}/g).join('-') : '';
             if (formattedValue.length === 19) {
-                expiryRef.current.focus();
+                expiryRef.current.focus();  // Move focus to expiry input when card number is fully entered.
             }
         } else if (name === 'expiryDate') {
-            formattedValue = value.replace(/\D/g, '').substring(0, 4);
+            formattedValue = value.replace(/\D/g, '').substring(0, 4);  // Format for MM/YY.
             formattedValue = formattedValue.length > 2 ? `${formattedValue.substring(0,2)}/${formattedValue.substring(2,4)}` : formattedValue;
             if (formattedValue.length === 5) {
-                cvvRef.current.focus();
+                cvvRef.current.focus(); // Move focus to CVV input when expiry date is fully entered.
             }
         } else if (name === 'cvv') {
-            formattedValue = value.replace(/\D/g, '').substring(0, 3);
+            formattedValue = value.replace(/\D/g, '').substring(0, 3);  // Limit CVV to 3 digits.
         }
 
-        setCardDetails({ ...cardDetails, [name]: formattedValue });
+        setCardDetails({ ...cardDetails, [name]: formattedValue }); // Update state with formatted input.
     };
 
+    // Validates all card details to ensure they meet required standards.
     const validateCardDetails = () => {
         let valid = true;
         let errors = {};
@@ -76,19 +93,20 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
         return valid;
     };
 
+    // Handles the submission of the form after validating card details.
     const handleSubmit = (e) => {
         e.preventDefault();
         const isFormValid = validateCardDetails();
         console.log('Handling submit...');
         if (isFormValid) {
             console.log('Card details are valid, processing checkout...');
-            onCheckoutComplete();
+            onCheckoutComplete();   // Callback for successful checkout.
         } else {
             console.log('Card details validation failed');
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen) return null;   // Do not render if not open.
 
     return (
         <div className={`fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex ${isOpen ? '' : 'hidden'}`}>
