@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful signup
 // import { isStrongPassword } from '../utils/validation';
 import Navigator from "../components/NavigationBar";
-import { setUser } from "../data/users.js";
+import { findUser } from "../data/users.js";
 
 import { isStrongPassword } from "../utils/validation.js";
 
@@ -60,6 +60,9 @@ const SignUp = (props) => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       formIsValid = false;
       newErrors["email"] = "A valid email is required.";
+    } else if (findUser(formData.email)) {
+      formIsValid = false;
+      newErrors["email"] = "Email already exists. Please try another one.";
     }
 
     if (!isStrongPassword(formData.password)) {

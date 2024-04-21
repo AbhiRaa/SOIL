@@ -53,6 +53,33 @@ const Profile = () => {
     }
   };
 
+  const handleUpdatePassword = (newHashedPassword, userEmail) => {
+    // Find the current user data to update
+    const user = findUser(userEmail);
+    if (!user) {
+      alert('User not found.');
+      return;
+    }
+
+    // Update the user's password
+    const updatedUser = {
+      ...user,
+      password: newHashedPassword
+    };
+
+    // Update the user in local storage using the provided updateUser function
+    const updateSuccess = updateUser(updatedUser);
+    if (updateSuccess) {
+      setUser(updatedUser); // Optionally update local state if you're tracking user info locally
+      alert('Password successfully updated. Please login again!');
+      setIsEditPasswordlOpen(false); // Close the modal
+      signOut();
+      navigate("/signin");
+    } else {
+        alert('Failed to update password.');
+    }
+  };
+
   if (!user) {
     return <div>Loading...</div>; // Display a loading state while the user is null
   }
@@ -65,7 +92,7 @@ const Profile = () => {
       <div className="bg-orange-100 text-orange-500 flex-col border-2 rounded  overflow-hidden ">
         <div className="px-4 py-5 sm:px-6">
           <div className="flex items-center  gap-6">
-            <i class="fi fi-rr-user text-3xl"></i> 
+            <i className="fi fi-rr-user text-3xl"></i> 
             <div>
               <h3 className="text-2xl font-bold text-primary">Profile Information</h3>
               <p className="mt-1 max-w-2xl text-sm text-gray-700">Personal details and application.</p>
@@ -125,7 +152,7 @@ const Profile = () => {
         user={user}
         isOpen={isEditPasswordOpen}
         onClose={() => setIsEditPasswordlOpen(false)}
-        //onUpdate={handleUpdateUser} // 
+        onUpdatePassword={handleUpdatePassword} 
       />
       )}
     </div>

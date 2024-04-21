@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isStrongPassword } from "../utils/validation.js";
 
 function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
   const [passwords, setPasswords] = useState({
@@ -14,23 +15,65 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     setPasswords(prev => ({ ...prev, [name]: value }));
   };
 
-  const validatePasswords = () => {
+  const generatePasswordHash = async (password, salt) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const importedKey = await crypto.subtle.importKey(
+      "raw",
+      data,
+      { name: "PBKDF2" },
+      false,
+      ["deriveBits"]
+    );
+
+    const keyBits = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: encoder.encode(salt),
+        iterations: 1000,
+        hash: "SHA-1",
+      },
+      importedKey,
+      256
+    );
+
+    return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
+  };
+
+  const validatePasswords = async () => {
     let tempErrors = {};
+    const salt = Uint8Array.from(atob(user.salt), (c) => c.charCodeAt(0));
+    const existingHashedPassword = await generatePasswordHash(passwords.existingPassword, salt);
+    
+    if (existingHashedPassword !== user.password) {
+      tempErrors.existingPassword = "Existing password is incorrect.";
+    }
+
     if (passwords.newPassword === passwords.existingPassword) {
       tempErrors.newPassword = "New password must be different from the existing password.";
     }
     if (passwords.newPassword !== passwords.confirmPassword) {
       tempErrors.confirmPassword = "Confirm password does not match new password.";
     }
+    if (!isStrongPassword(passwords.newPassword)) {
+      tempErrors.newPassword = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.";
+    }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validatePasswords()) {
-      onUpdatePassword(passwords.newPassword);
+    const isValid = await validatePasswords();
+    console.log("Form validation result:", isValid, errors);
+    if (isValid) {
+      const salt = Uint8Array.from(atob(user.salt), (c) => c.charCodeAt(0)); // Use existing salt
+      const newHashedPassword = await generatePasswordHash(passwords.newPassword, salt);
+      onUpdatePassword(newHashedPassword, user.email); // Pass the hashed password and user email
+      console.log("Password update initiated.");
       onClose(); // Close modal after update
+    } else {
+      console.log("Failed to pass validation:", errors);
     }
   };
 
@@ -44,6 +87,7 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
           <div>
             <label htmlFor="existingPassword" className="block text-lg font-medium text-primary">Existing Password:</label>
             <input type="password" name="existingPassword" value={passwords.existingPassword} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+            {errors.existingPassword && <p className="text-red-500 text-sm">{errors.existingPassword}</p>}
           </div>
           <div>
             <label htmlFor="newPassword" className="block text-lg font-medium text-primary">New Password:</label>

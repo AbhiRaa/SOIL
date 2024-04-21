@@ -42,9 +42,12 @@ function updateUser(updatedUser) {
   let users = getUsers();
   const index = users.findIndex(user => user.email === updatedUser.email);
   if (index !== -1) {
-    users[index] = updatedUser;
+    // Merge the changes instead of replacing the whole user object
+    users[index] = { ...users[index], ...updatedUser };
     localStorage.setItem(ALL_USERS, JSON.stringify(users));
+    return true; // Indicate the update was successful
   }
+  return false; // Indicate the update failed
 }
 
 function deleteUser(email) {

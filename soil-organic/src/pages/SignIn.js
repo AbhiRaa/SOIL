@@ -16,7 +16,6 @@ const SignIn = (props) => {
     setErrorMessage(""); // Reset error message on input change
   };
 
-  // Add the same hashing functionality you use in your SignUp component
   const generatePasswordHash = async (password, salt) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(password);

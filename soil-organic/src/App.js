@@ -21,7 +21,6 @@ function App() {
 
   const signIn = (userObject) => {
     if (userObject !== null) {
-      setUser(userObject)
       setLoggedInUser(userObject.email);
     }
   };
