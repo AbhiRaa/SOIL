@@ -103,6 +103,7 @@ const SignUp = (props) => {
           age: "",
           weight: "",
           height: "",
+          gender: "",
           activityLevel: "",
           dietaryPreferences: [],
           healthGoals: []

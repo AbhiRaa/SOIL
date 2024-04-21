@@ -8,6 +8,7 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
       age: user.profile?.age || '',
       weight: user.profile?.weight || '',
       height: user.profile?.height || '',
+      gender: user.profile?.gender || '',
       activityLevel: user.profile?.activityLevel || '',
       dietaryPreferences: user.profile?.dietaryPreferences || [],
       healthGoals: user.profile?.healthGoals || []
@@ -20,7 +21,7 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
       // Prevent negative and zero  values for these fields
       return;
     }
-    if (['age', 'weight', 'height', 'activityLevel'].includes(name)) {
+    if (['age', 'weight', 'height', 'gender', 'activityLevel'].includes(name)) {
       setUpdatedUser(prev => ({
         ...prev,
         profile: { ...prev.profile, [name]: value }
@@ -80,22 +81,51 @@ function EditProfileModal({ user, isOpen, onClose, onUpdate }) {
           <div>
             <label htmlFor="activityLevel" className="block text-lg font-medium text-primary">Activity Level:</label>
             <select name="activityLevel" value={updatedUser.profile.activityLevel} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option value="sedentary">Sedentary</option>
+              <option value="lightly active">Lightly active</option>
+              <option value="moderately active">Moderately active</option>
+              <option value="very active">Very active</option>
+              <option value="super active">Super active</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Gender:</label>
+            <select name="gender" value={updatedUser.profile.gender} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               <option value="">Select Level</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
             </select>
           </div>
           <div>
             <span className="block text-lg font-medium text-primary">Dietary Preferences:</span>
             <div className="mt-2">
               <label className="inline-flex items-center">
-                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('gluten-free')} onChange={() => toggleDietaryPreference('gluten-free')} className="form-checkbox h-5 w-5 text-indigo-600" />
-                <span className="ml-2 text-primary text-lg">Gluten-free</span>
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('gluten free')} onChange={() => toggleDietaryPreference('gluten free')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Gluten free</span>
               </label>
               <label className="inline-flex items-center ml-6">
-                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('low-carb')} onChange={() => toggleDietaryPreference('low-carb')} className="form-checkbox h-5 w-5 text-indigo-600" />
-                <span className="ml-2 text-primary text-lg">Low-carb</span>
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('ketogenic')} onChange={() => toggleDietaryPreference('ketogenic')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Ketogenic</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('vegetarian')} onChange={() => toggleDietaryPreference('vegetarian')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Vegetarian</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('vegan')} onChange={() => toggleDietaryPreference('vegan')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Vegan</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('whole30')} onChange={() => toggleDietaryPreference('whole30')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Whole30</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('pescetarian')} onChange={() => toggleDietaryPreference('pescetarian')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Pescetarian</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input type="checkbox" checked={updatedUser.profile.dietaryPreferences.includes('paleo')} onChange={() => toggleDietaryPreference('paleo')} className="form-checkbox h-5 w-5 text-indigo-600" />
+                <span className="ml-2 text-primary text-lg">Paleo</span>
               </label>
             </div>
           </div>

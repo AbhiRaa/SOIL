@@ -48,6 +48,9 @@ function NavigationBar() {
           <Link to="/cart">Cart</Link>
         </li>
         <li>
+          <Link to="/meal">Meal Planner</Link>
+        </li>
+        <li>
           <button onClick={signOut}> Sign Out</button>
         </li>
         </ul>

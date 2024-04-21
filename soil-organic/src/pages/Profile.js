@@ -42,6 +42,7 @@ const Profile = () => {
     updateUser(updatedUser);
     setUser(updatedUser); // Update local state
     setIsEditModalOpen(false);
+    window.alert("Successfully updated the user's profile!")
   };
 
   const handleDelete = () => {
@@ -94,6 +95,7 @@ const Profile = () => {
                 Age: {user?.profile?.age || "Not set"}<br />
                 Weight: {user?.profile?.weight || "Not set"} kg<br />
                 Height: {user?.profile?.height || "Not set"} cm<br />
+                Gender: {user?.profile?.gender || "Not set"}<br />
                 Activity Level: {user?.profile?.activityLevel || "Not set"}<br />
                 Dietary Preferences: {user?.profile?.dietaryPreferences.join(", ") || "None"}<br />
                 Health Goals: {user?.profile?.healthGoals.join(", ") || "None"}
