@@ -13,7 +13,7 @@ function Specials() {
        <div className="absolute right-0 top-1/4 -translate-y-1/3 translate-x-2/3 z-15">
         <img src={imagePeeking1} alt="" className="w-auto" />
         </div>
-       <div className="absolute left-0 top-1/2  -translate-y-1/2 -translate-x-1/2 z-30">
+       <div className="absolute left-0 top-1/4  -translate-y-1/3 -translate-x-2/3 z-30">
         <img src={imagePeeking1} alt="" className="w-auto" />
       </div>
       <Navigator/>

@@ -214,57 +214,30 @@ function MealPlanningApp() {
   };
 
   return (
-    <div>
+    <div className="bg-cyan-50">
       <Navigator />
-      <div className="max-w-4xl mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold mb-4">Meal Planner</h2>
-        <h2 className="text-2xl font-semibold mb-4">Your Daily Calorie Target: {dailyCalories.toFixed(0)} kcal (BMR)</h2>
-        <h2 className="text-2xl font-semibold mb-4">Your Total Daily Energy Expenditure: {tdee.toFixed(0)} kcal</h2>
-        {macros && (
-          <>
-            <div className="text-xl mb-2">Macronutrients Target according to Health Goals:</div>
-            <ul>
+      <div className="max-w-full mx-auto mt-6 p-6 bg-orange-50 border-t-2 shadow-md">
+        <h2 className="text-5xl font-semibold mb-4 text-primary flex justify-center">Meal Planner</h2>
+        <div className="flex gap-5 justify-evenly mt-4 p-4">
+        <h2 className="text-2xl font-bold mb-4 text-primary">Daily Calorie Target: {dailyCalories.toFixed(0)} kcal (BMR)</h2>
+        <h2 className="text-2xl font-bold mb-4 text-primary">Total Daily Energy Expenditure: {tdee.toFixed(0)} kcal</h2>
+        {macros && ( 
+          <div className="text-2xl mb-2 text-primary font-bold">
+            <h2 className="mb-2">Macronutrients Target according to Health Goals:</h2>
+            <ul className="text-primary text-lg font-bold">
               <li>Protein: {macros.protein} grams</li>
               <li>Carbs: {macros.carbs} grams</li>
               <li>Fat: {macros.fat} grams</li>
             </ul>
-          </>
-        )}
-        {/* Weekly Menu Navigation */}
-        <div className="flex space-x-4 overflow-auto">
-          {daysOfWeek.map((day) => (
-            <button
-              key={day}
-              onClick={() => handleDaySelection(day)}
-              className={`py-2 px-4 rounded-md ${selectedDay === day.toLowerCase() ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
-        
-        {/* Meal Plan and Nutrition Chart for the Selected Day */}
-        <div className="flex flex-wrap mt-6">
-          <div className="w-full lg:w-1/2">
-            <h3 className="font-bold text-lg mb-2">Your Meal Plan for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</h3>
-             {/* Render meals for the selected day */}
-            <div className="flex flex-wrap -mx-2">
-              {renderMealsForDay(selectedDay)}
-            </div>
-          </div>
-          {/* Conditionally render the NutritionChart component if nutritional data is available */}
-        {selectedDayNutrition && (
-          <div className="w-full lg:w-1/3 mt-4 lg:mt-0 lg:ml-4">
-            <NutritionChart nutritionData={selectedDayNutrition} />
           </div>
         )}
-        </div>
-        {/* Meal Plan Generation and Dietary Restrictions */}
-        <div className="flex flex-wrap gap-4">
+
+        <div className="flex-col gap-4">
           {/* Multi-select dropdown for dietary restrictions */}
-          <div className="w-full md:w-1/2 lg:w-1/3">
-            <label htmlFor="intolerances" className="block text-sm font-medium text-gray-700 mb-1">Select Dietary Restrictions:</label>
-            <select multiple id="intolerances" name="intolerances" value={intolerances} onChange={handleChangeIntolerance} className="form-multiselect block w-full mt-1 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+          <div className="w-full flex-col gap-3">
+            <label htmlFor="intolerances" className="block text-2xl font-bold text-primary  mb-1">Select Dietary Restrictions:</label>
+            <p className="text-primary text-sm">*press Ctrl for multiple selections</p>
+            <select multiple id="intolerances" name="intolerances" value={intolerances} onChange={handleChangeIntolerance} className="form-multiselect bg-orange-50 block w-full mt-1 pl-3 pr-10 py-2 text-primary text-xl border-gray-300 focus:outline-none focus:ring-primary focus:border-primary  rounded-md">
               {intoleranceOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
@@ -272,7 +245,7 @@ function MealPlanningApp() {
           </div>
 
         {/* Generate and Clear Meal Plan Buttons */}
-        <div className="flex gap-4 mt-4 md:mt-0">
+        <div className="flex gap-4 mt-4 ">
           <button onClick={handleGenerateMealPlan} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Generate Meal Plan</button>
           {loading && <p>Loading meals...</p>}
           {error && <p>Error: {error}</p>}
@@ -280,16 +253,60 @@ function MealPlanningApp() {
         </div>
         </div>
 
-        {/* Save Meal Plan Button */}
-        <div className="mt-8">
-          <button onClick={handleSaveMealPlan} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Save Meal Plan</button>
         </div>
 
-        <MealSearch onSearch={handleMealSearch} />
+        {/* Meal Plan and Nutrition Chart for the Selected Day */}
+        <div className="md:flex   mt-6 border-t-2 justify-around border-primary">
+          <div className="w-full lg:w-1/2 m-4">
+            {/* Weekly Menu Navigation */}
+            <div className="flex gap-4 justify-between">
+            <div className="flex flex-wrap gap-2 space-x-4 overflow-auto">
+            {daysOfWeek.map((day) => (
+            <button
+              key={day}
+              onClick={() => handleDaySelection(day)}
+              className={`py-2 px-4 active:bg-primary rounded-md ${selectedDay === day.toLowerCase() ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            >
+              {day}
+            </button>
+          ))}
+          </div>
+            
+          </div>
+            <h3 className="font-bold text-3xl mt-5 mb-5 text-primary">Your Meal Plan for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</h3>
+             {/* Render meals for the selected day */}
+            <div className="flex flex-wrap justify-center gap-5 mx-2">
+              {renderMealsForDay(selectedDay)}
+            </div>
+          </div>
+          {/* Conditionally render the NutritionChart component if nutritional data is available */}
+        {selectedDayNutrition && (
+          <div className="w-full border-l-2 border-sm border-primary p-2 lg:w-1/3 mt-4 lg:mt-0 lg:ml-4">
+            <h1 className="text-5xl text-center mb-6 text-primary"> Your Daily Macros</h1>
+            <NutritionChart nutritionData={selectedDayNutrition} />
+          </div>
+        )}
+        </div>
+        {/* Meal Plan Generation and Dietary Restrictions */}
+        {/* Save Meal Plan Button */}
+            <div className="mt-8 flex justify-center">
+              <button onClick={handleSaveMealPlan} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Save Meal Plan</button>
+            </div>
+        <div className="mt-5 flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <div>
+            <h1 className="text-5xl mt-5 text-primary text-bold">Find Your Favourite Recipes</h1>
+            <p className="text-sm text-primary">*enter any recipe you desire in the search bar</p>
+            </div>
+            <div className="searchbox">
+            <MealSearch onSearch={handleMealSearch} />  
+            </div>
+          </div>
         {loading && <p>Loading meals...</p>}
         {error && <p>Error: {error}</p>}
         <MealList meals={meals} onAdd={handleAddMeal} />
         {/* <MealPlanner selectedMeals={selectedMeals} onRemove={handleRemoveMeal} /> */}
+        </div>
       </div>
     </div>
   );

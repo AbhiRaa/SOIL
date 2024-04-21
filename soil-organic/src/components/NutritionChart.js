@@ -36,9 +36,9 @@ const NutritionChart = ({ nutritionData }) => {
   };
 
   return (
-    <div>
+    <div className='m-4'>
       <Pie data={data} options={options} />
-      <div className="nutrition-info">
+      <div className="nutrition-info text-primary text-lg">
         <p><strong>Calories:</strong> {nutritionData.calories.toFixed(0)} kcal</p>
         <p><strong>Protein:</strong> {nutritionData.protein.toFixed(0)} grams</p>
         <p><strong>Carbs:</strong> {nutritionData.carbohydrates.toFixed(0)} grams</p>
