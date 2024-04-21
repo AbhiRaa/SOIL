@@ -1,5 +1,6 @@
 import Navigator from "../components/NavigationBar";
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from "react-router-dom";
 import MealSearch from '../components/MealSearch';
 import MealList from '../components/MealList';
 import MealCard from '../components/MealCard';
@@ -44,6 +45,15 @@ function MealPlanningApp() {
   const [intolerances, setIntolerances] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+
+  // Redirect to signup if no user is logged in
+  useEffect(() => {
+    if (!currentloggedInUser) {
+        navigate("/signin");
+    }
+  }, [currentloggedInUser, navigate]);
 
   useEffect(() => {
     if (currentloggedInUser) {

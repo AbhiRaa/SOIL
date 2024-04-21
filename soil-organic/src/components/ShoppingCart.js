@@ -1,10 +1,8 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import useCart from '../hooks/useCart';
 import Navigator from "../components/NavigationBar";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../hooks/context";
-import { useContext } from "react";
-import { useState } from "react";
 import CheckoutModal from "../components/CheckoutModal";
 import PurchaseSummaryModal from '../components/PurchaseSummaryModal';
 import cartBackground from '../images/cartBackground.png';
@@ -17,6 +15,14 @@ function ShoppingCart() {
 
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [showSummaryModal, setShowSummaryModal] = useState(false);
+
+    // Redirect to signup if no user is logged in
+    useEffect(() => {
+        if (!currentloggedInUser) {
+            navigate("/signin");
+        }
+    }, [currentloggedInUser, navigate]);
+
 
     // Function to increase the quantity of an item
     const increaseQuantity = (item) => {
