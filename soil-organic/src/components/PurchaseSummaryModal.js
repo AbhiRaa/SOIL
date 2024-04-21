@@ -33,9 +33,9 @@ function PurchaseSummaryModal({ isOpen, onClose, purchaseDetails }) {
 
     return (
         <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-75 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
-                <h2 className="text-2xl font-bold mb-4">Purchase Summary</h2>
-                <div className="overflow-x-auto">
+            <div className="bg-orange-100 p-6 rounded-lg shadow-lg max-w-2xl w-full">
+                <h2 className="text-2xl text-primary font-bold mb-4">Purchase Summary</h2>
+                <div className="overflow-x-auto rounded shadow-md">
                     <table className="min-w-full text-sm divide-y divide-gray-200">
                         <thead>
                             <tr className="bg-gray-50">
@@ -60,7 +60,7 @@ function PurchaseSummaryModal({ isOpen, onClose, purchaseDetails }) {
                 <div className="font-bold text-xl mt-4">
                     Total Price: ${totalAmount.toFixed(2)}
                 </div>
-                <div className="text-gray-600 mt-2">
+                <div className="text-primary text-lg  mt-2">
                     Purchase Date: {purchaseDateTime}
                 </div>
                 <button onClick={onClose} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">

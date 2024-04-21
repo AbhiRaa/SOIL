@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import UserContext from "../hooks/context";
 import { findUser, deleteUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
+import EditPasswordModal from '../components/updatePasswordModal';
 
 const Profile = () => {
   const { currentloggedInUser, signOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditPasswordOpen, setIsEditPasswordlOpen] = useState(false);
 
   useEffect(() => {
     // Retrieve the user object from local storage.
@@ -31,6 +33,11 @@ const Profile = () => {
     setIsEditModalOpen(true);
   };
 
+  const handleEditPassword = () => {
+    // Navigate to the edit password edit modal 
+    setIsEditPasswordlOpen(true);
+  };
+
   const handleUpdateUser = (updatedUser) => {
     updateUser(updatedUser);
     setUser(updatedUser); // Update local state
@@ -50,33 +57,40 @@ const Profile = () => {
   }
 
   return (
-    <div className="container mx-auto mt-10">
-      <Navigator />
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div className="min-h-screen bg-cyan-50">
+    <Navigator />
+    <div className="container bg-orange-200 rounded-lg p-3  shadow-lg mx-auto mt-10">
+      
+      <div className="bg-orange-100 text-orange-500 flex-col border-2 rounded  overflow-hidden ">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Profile Information</h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">Personal details and application.</p>
+          <div className="flex items-center  gap-6">
+            <i class="fi fi-rr-user text-3xl"></i> 
+            <div>
+              <h3 className="text-2xl font-bold text-primary">Profile Information</h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-700">Personal details and application.</p>
+            </div>
+          </div> 
         </div>
-        <div className="border-t border-gray-200">
-          <dl>
+        <div className="border-t border-gray-200 text-xl ">
+          <dl className="sm:divide-y sm:divide-gray-200">
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Full name</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user.name}</dd>
+              <dt className="font-medium text-gray-500">Full name</dt>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.name}</dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Email address</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{user.email}</dd>
+              <dt className="font-medium text-gray-500">Email address</dt>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.email}</dd>
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Join date</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"> 
+              <dt className="font-medium text-gray-500">Join date</dt>
+              <dd className="mt-1 text-gray-900 sm:mt-0 sm:col-span-2"> 
               {/* Format the joining date using toLocaleDateString() for a more readable format */}
               {new Date(user.joinDate).toLocaleDateString(("en-US",{year: "numeric", month: "long", day: "numeric", weekday: "long",}))}</dd>
             </div>
             {/* Displaying profile details */}
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-              <dt className="text-sm font-medium text-gray-500">Profile Details</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <dt className="font-medium text-gray-500">Personal Details</dt>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">
                 Age: {user?.profile?.age || "Not set"}<br />
                 Weight: {user?.profile?.weight || "Not set"} kg<br />
                 Height: {user?.profile?.height || "Not set"} cm<br />
@@ -88,9 +102,12 @@ const Profile = () => {
           </dl>
         </div>
       </div>
-      <div className="flex justify-end mt-4">
-        <button onClick={handleEdit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Edit</button>
-        <button onClick={handleDelete} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+      <div className="flex justify-between mt-4">
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handleEditPassword}>Change Password</button>
+        <div>
+          <button onClick={handleEdit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Edit</button>
+          <button onClick={handleDelete} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
+        </div>
       </div>
       {isEditModalOpen && (
         <EditProfileModal
@@ -100,7 +117,17 @@ const Profile = () => {
         onUpdate={handleUpdateUser}
       />
       )}
+
+      {isEditPasswordOpen && ( // open edit Password Modal
+        <EditPasswordModal
+        user={user}
+        isOpen={isEditPasswordOpen}
+        onClose={() => setIsEditPasswordlOpen(false)}
+        //onUpdate={handleUpdateUser} // 
+      />
+      )}
     </div>
+  </div>
   );
 };
 

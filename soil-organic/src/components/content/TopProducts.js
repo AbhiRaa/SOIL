@@ -8,19 +8,11 @@ function Products() {
   return (
     <>
       <section>
-        <h2
-          style={{
-            fontWeight: "500",
-            fontSize: "3rem",
-            color: "#207187",
-            textAlign: "center",
-            margin: "10px",
-          }}
-        >
+        <h2 className="font-medium text-4xl text-teal-700 ml-5 mt-5 flex justify-center">
           Top Products
         </h2>
       </section>    
-        <ProductList/>
+        <ProductList filterRating={4.5}/>
         
     </>
   );

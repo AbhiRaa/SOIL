@@ -91,13 +91,13 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
     if (!isOpen) return null;
 
     return (
-        <div className={`fixed inset-0 z-50 overflow-auto bg-smoke-light flex ${isOpen ? '' : 'hidden'}`}>
-            <div className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg shadow-lg">
-                <h3 className="text-xl mb-4">Card Details</h3>
+        <div className={`fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex ${isOpen ? '' : 'hidden'}`}>
+            <div className="relative p-8 bg-orange-100 w-full max-w-md m-auto flex-col flex rounded-lg shadow-lg">
+                <h3 className="text-2xl text-primary mb-4 font-medium ">Card Details</h3>
                 <form onSubmit={handleSubmit}>
                     {/* Card Type Selection */}
                     <div className="mb-4">
-                        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="cardType">
+                        <label className="block text-primary text-md font-bold mb-2" htmlFor="cardType">
                             Select Card Type
                         </label>
                         <select 
@@ -115,7 +115,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
 
                     {/* Card Number Input */}
                     <div className="mb-4">
-                        <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="cardNumber">
+                        <label className="block text-primary text-md font-bold mb-2" htmlFor="cardNumber">
                             Card Number
                         </label>
                         <input 
@@ -135,7 +135,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
                     {/* Expiry Date and CVV */}
                     <div className="flex justify-between mb-4">
                         <div className="w-full mr-2">
-                            <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="expiryDate">
+                            <label className="block text-primary text-md font-bold mb-2" htmlFor="expiryDate">
                                 Expiry Date
                             </label>
                             <input 
@@ -153,7 +153,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
                             {errorMessages.expiryDate && <p className="text-red-500 text-xs italic">{errorMessages.expiryDate}</p>}
                         </div>
                         <div className="w-full ml-2">
-                            <label className="block text-grey-darker text-sm font-bold mb-2" htmlFor="cvv">
+                            <label className="block text-primary text-md font-bold mb-2" htmlFor="cvv">
                                 CVV
                             </label>
                             <input 

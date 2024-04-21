@@ -10,7 +10,7 @@ function NavigationBar() {
     <>
       <nav>
         <header className=" container mx-auto flex items-center justify-between ">
-          <img className=" flex-none logoImage" src={logo} alt="Logo" />
+          <Link to="/"><img className=" flex-none logoImage" src={logo} alt="Logo" /></Link>
           <ul
             className="flex space-x-4 justify-center py-5 gap-5 text-xl font-bold"
           >
@@ -30,8 +30,8 @@ function NavigationBar() {
   ) : (
     <>
       <nav>
-      <header className=" container mx-auto flex items-center justify-between ">
-        <img className=" flex-none logoImage" src={logo} alt="Logo" />
+      <header className="container mx-auto flex items-center justify-between">
+        <Link to="/"><img className=" flex-none logoImage" src={logo} alt="Logo" /></Link>
         <ul
         className="flex space-x-4 justify-center py-5 gap-5 text-xl font-bold"
         >

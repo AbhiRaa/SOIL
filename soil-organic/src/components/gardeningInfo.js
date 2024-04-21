@@ -34,13 +34,13 @@ function BackyardGardeningTips() {
                         ${activeIndex === index ? 'h-auto' : 'h-0'} 
                         border border-t-0 border-green-800 bg-orange-200 rounded-b-lg text-white`}
           >
-            <div className="p-4 text-white text-lg flex gap-5">
+            <div className="p-4 text-white text-xl flex gap-5">
               {/* {tip.content} */}
               <div className="flex">
                 {tip.content}
               </div>
               <div className="flex px-10">
-                <img src={tip.image} className='rounded w-full h-full'/>
+                <img src={tip.image} className='rounded h-auto max-w-full'/>
               </div>
               </div>
           </div>

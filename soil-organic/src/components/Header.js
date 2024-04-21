@@ -15,7 +15,7 @@ function Header() {
           <Navbar />
         {/* </header> */}
         <section className="container flex-col items-center justify-center mx-auto">
-          <h1 className="flex py-1 justify-center items-center">
+          <h1 className="flex py-1 mt-3 justify-center items-center">
             WELCOME TO <br />
             SOIL.
           </h1>

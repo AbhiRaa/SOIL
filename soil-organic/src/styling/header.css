@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap');
 
 .logoImage{
-    height: 100%;
-    width:20%;
+    max-width: 50%; 
+    max-height: 50%;
+    height:auto;
+    width:auto;
+    
 }
 
 .parent-container{

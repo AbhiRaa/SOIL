@@ -11,10 +11,17 @@ module.exports = {
       },
       backgroundImage: {
         'signIn': "url('./images/backgroundSignIn.jpg')",
-        // 'cartBackground':"url('./images/cartBackground.webp')",
       },
+      animation: { // Adding new animations
+        'slide-up': 'slideUp 0.5s ease-out forwards',
+      },
+      keyframes: { // Defining the keyframes for slide-up animation
+        slideUp: {
+          '0%': { transform: 'translateY(100%)', opacity: 0 },
+          '100%': { transform: 'translateY(0)', opacity: 1 },
+        },
+        },
       
-  
     },
   },
   plugins: [],
