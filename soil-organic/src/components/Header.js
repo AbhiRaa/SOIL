@@ -1,15 +1,12 @@
 import React from "react";
-import logo from "../images/logo.png";
 import Navbar from "../components/NavigationBar";
 import "../styling/header.css";
-import { useNavigate } from "react-router-dom";
 
 /**
  * Header component displays the top section of the website, including the navigation bar and introductory text.
  * It is designed to give a warm welcome to the users while providing easy navigation through the site.
  */
 function Header() {
-  const navigate = useNavigate();
 
   return (
     <>

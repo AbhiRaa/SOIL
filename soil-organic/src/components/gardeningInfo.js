@@ -54,7 +54,7 @@ function BackyardGardeningTips() {
                 {tip.content}
               </div>
               <div className="flex px-10">
-                <img src={tip.image} className='rounded h-auto max-w-full'/>
+                <img src={tip.image} alt={"tips"}className='rounded h-auto max-w-full'/>
               </div>
               </div>
           </div>

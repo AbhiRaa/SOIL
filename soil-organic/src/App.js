@@ -9,20 +9,19 @@
  *
  * @module App
  */
-import React, { createContext, useEffect, useState } from "react";
+import React, {useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  useNavigate,
 } from "react-router-dom";
 import HomePage from "./pages/Home";
 import SignUpPage from "./pages/SignUp";
 import SignInPage from "./pages/SignIn";
 import ProfilePage from "./pages/Profile";
 import SpecialsPage from "./pages/Specials";
-import { getUser, setUser, verifyUser } from "./data/users";
+import {setUser} from "./data/users";
 import UserContext from "./hooks/context";
 import ShoppingCart from './components/ShoppingCart';
 import MealPlanningApp from "./pages/MealPlanningApp";
@@ -44,8 +43,8 @@ function App() {
   }
 
   // Handler to sign up a user, adding the user to the data store and setting the user as the current user
-  function signUp(userObject) {
-    setUser(userObject);
+  async function signUp(userObject) {
+    await setUser(userObject);
     setLoggedInUser(userObject.email);
   }
 

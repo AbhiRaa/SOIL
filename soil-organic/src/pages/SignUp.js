@@ -46,10 +46,10 @@ const SignUp = (props) => {
   };
 
   // Validates the form fields and sets error messages if any
-  const validateForm = () => {
+  const validateForm = async () => {
     let formIsValid = true;
     let newErrors = {};
-
+    const user = await findUser(formData.email)
     if (!formData.name) {
       formIsValid = false;
       newErrors["name"] = "Name is required.";
@@ -58,7 +58,8 @@ const SignUp = (props) => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       formIsValid = false;
       newErrors["email"] = "A valid email is required.";
-    } else if (findUser(formData.email)) {
+    } else if (user) {
+      console.log("FINDUSER result is ", findUser(formData.email))
       formIsValid = false;
       newErrors["email"] = "Email already exists. Please try another one.";
     }
@@ -86,7 +87,7 @@ const SignUp = (props) => {
   // Handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
+    if (await validateForm()) {
       const salt = generateSalt();
       console.log(formData);
       const hashedPassword = await generatePasswordHash(
@@ -101,9 +102,9 @@ const SignUp = (props) => {
         salt: btoa(String.fromCharCode(...salt)),
         joinDate: new Date().toISOString(), // Storing the current timestamp
         profile: {
-          age: "",
-          weight: "",
-          height: "",
+          age: null,
+          weight: null,
+          height: null,
           gender: "",
           activityLevel: "",
           dietaryPreferences: [],
@@ -111,7 +112,8 @@ const SignUp = (props) => {
         }
       };
 
-      props.signUp(user);
+      await props.signUp(user);
+      console.log("reached after props.signup(user)")
       navigate("/profile");
     }
   };

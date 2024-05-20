@@ -60,7 +60,7 @@ const SignIn = (props) => {
     e.preventDefault();
 
     if (validateForm()) {
-      const storedUserData = findUser(formData.email);
+      const storedUserData = await findUser(formData.email);
       if (storedUserData) {
         const salt = Uint8Array.from(atob(storedUserData.salt), (c) =>
           c.charCodeAt(0)

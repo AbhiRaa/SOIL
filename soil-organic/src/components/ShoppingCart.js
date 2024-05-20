@@ -11,7 +11,7 @@ function ShoppingCart() {
     const { currentloggedInUser } = useContext(UserContext);    // Access the context for the currently logged-in user
     const navigate = useNavigate();
 
-    const { cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart } = useCart();  // Custom hook to manage cart operations
+    const { cartItems, updateCartQuantity, removeFromCart, clearCart } = useCart();  // Custom hook to manage cart operations
 
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);    // State to control visibility of the checkout modal
     const [showSummaryModal, setShowSummaryModal] = useState(false);    // State to control visibility of the purchase summary modal

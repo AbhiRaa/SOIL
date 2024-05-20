@@ -32,7 +32,7 @@ const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sat
 function MealPlanningApp() {
   const { currentloggedInUser } = useContext(UserContext);
 
-  const { mealPlan, addMeal, removeMeal, clearMealPlan, saveMealPlan } = useMealPlanner();
+  const { mealPlan, clearMealPlan, saveMealPlan } = useMealPlanner();
   const [selectedDay, setSelectedDay] = useState('monday');
   const [selectedDayNutrition, setSelectedDayNutrition] = useState(null);
   const [mealPlanData, setMealPlanData] = useState(mealPlan);
@@ -69,7 +69,7 @@ function MealPlanningApp() {
         setDietPreferences(dietaryPreferences);
         console.log("Macros:", macrosData);
         console.log("Dietary Preferences:", dietaryPreferences);
-        console.log("Meal PLAN:". selectedMeals)
+        console.log("Meal PLAN:", selectedMeals)
       }
     }
     saveMealPlan(mealPlanData);

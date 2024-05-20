@@ -3,8 +3,14 @@
  * for user authentication, retrieval, and updates, simulating a simple user management
  * system in client-side storage.
  */
+
+import axios from "axios";
 const ALL_USERS = "users";  // Key in localStorage for all users data
 const CURRENT_USER = "user";  // Key in localStorage for the currently logged-in user
+
+const API_HOST = "http://localhost:4000";
+const USER_KEY = "user"
+
 
 /**
  * Retrieves all users from localStorage.
@@ -24,8 +30,10 @@ function getUsers() {
  * @param {string} email - Email of the user to find.
  * @returns {Object|null} The user object if found, otherwise null.
  */
-function findUser(email) {
-  return getUsers().find(user => user.email === email);
+async function findUser(email) {
+  //return getUsers().find(user => user.email === email);
+  const response = await axios.get(API_HOST + `/api/users/select/${email}`);
+  return response.data;
 }
 
 /**
@@ -48,7 +56,7 @@ function verifyUser(username, password) {
  * Adds a new user object to the array of stored users.
  * @param {Object} userObject - The user object to add.
  */
-function addUser(userObject) {
+async function addUser(userObject) {
   let allUsers = getUsers();
   userObject.profile = userObject.profile || {
     age: '',
@@ -58,44 +66,54 @@ function addUser(userObject) {
     dietaryPreferences: [],
     healthGoals: []
   };
-  allUsers.push(userObject);
-  localStorage.setItem(ALL_USERS, JSON.stringify(allUsers));
+  // allUsers.push(userObject);
+  // localStorage.setItem(ALL_USERS, JSON.stringify(allUsers));
+  const response = await axios.post(API_HOST + '/api/users/',userObject);
+
+  return response.data;
+
 }
 
 /**
  * Adds a new user object to the array of stored users.
  * @param {Object} userObject - The user object to add.
  */
-function updateUser(updatedUser) {
-  let users = getUsers();
-  const index = users.findIndex(user => user.email === updatedUser.email);
-  if (index !== -1) {
-    // Merge the changes instead of replacing the whole user object
-    users[index] = { ...users[index], ...updatedUser };
-    localStorage.setItem(ALL_USERS, JSON.stringify(users));
-    return true; // Indicate the update was successful
-  }
-  return false; // Indicate the update failed
+async function updateUser(updatedUser) {
+  // let users = getUsers();
+  // const index = users.findIndex(user => user.email === updatedUser.email);
+  // if (index !== -1) {
+  //   // Merge the changes instead of replacing the whole user object
+  //   users[index] = { ...users[index], ...updatedUser };
+  //   localStorage.setItem(ALL_USERS, JSON.stringify(users));
+  //   return true; // Indicate the update was successful
+  // }
+  // return false; // Indicate the update failed
+  const response = await axios.put(API_HOST + `/api/users/${updatedUser.email}`,updatedUser)
+  return response.data
 }
 
 /**
  * Deletes a user from storage.
  * @param {string} email - Email of the user to delete.
  */
-function deleteUser(email) {
+async function deleteUser(email) {
   let users = getUsers();
   users = users.filter(user => user.email !== email);
   localStorage.setItem(ALL_USERS, JSON.stringify(users));
+  const response = await axios.delete(API_HOST + `/api/users/delete/${email}`)
+  console.log(response.data)
   localStorage.removeItem(CURRENT_USER);
+  return response.data
 }
 
 /**
  * Sets the current user in localStorage.
  * @param {Object} userObject - The user object to set as currently logged in.
  */
-function setUser(userObject) {
-  addUser(userObject);
-  localStorage.setItem(CURRENT_USER, userObject.email);
+async function setUser(userObject) {
+  let res = await addUser(userObject);
+  console.log("setUser function is being called, respone is" , res.email)
+  localStorage.setItem(CURRENT_USER, res.email);
 }
 
 /**

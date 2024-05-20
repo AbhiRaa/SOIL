@@ -15,17 +15,20 @@ const Profile = () => {
 
   useEffect(() => {
     // Retrieve the user object from local storage.
-    if (currentloggedInUser) {
-      const userDetails = findUser(currentloggedInUser);
-      if (userDetails) {
-        setUser(userDetails);
-        console.log(userDetails);
+    async function fetchDetails(){
+      if (currentloggedInUser) {
+        const userDetails = await findUser(currentloggedInUser);
+        if (userDetails) {
+          setUser(userDetails);
+          console.log(userDetails);
+          } else {
+            navigate("/signin"); // Redirect to sign-in page if no user data is found
+          }
         } else {
-          navigate("/signin"); // Redirect to sign-in page if no user data is found
+          navigate("/signin"); // Redirect if not logged in
         }
-      } else {
-        navigate("/signin"); // Redirect if not logged in
-      }
+    }
+    fetchDetails();
   }, [currentloggedInUser, navigate]);
 
   const handleEdit = () => {
@@ -47,15 +50,16 @@ const Profile = () => {
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete your profile?")) {
-      deleteUser(currentloggedInUser);
-      signOut();
-      navigate("/"); // Redirect to home page after deletion
+       deleteUser(currentloggedInUser).then(()=>{
+        signOut();
+        navigate("/"); // Redirect to home page after deletion
+       });
     }
   };
 
-  const handleUpdatePassword = (newHashedPassword, userEmail) => {
+  const handleUpdatePassword = async (newHashedPassword, userEmail) => {
     // Find the current user data to update
-    const user = findUser(userEmail);
+    const user = await findUser(userEmail);
     if (!user) {
       alert('User not found.');
       return;
@@ -68,9 +72,10 @@ const Profile = () => {
     };
 
     // Update the user in local storage using the provided updateUser function
-    const updateSuccess = updateUser(updatedUser);
-    if (updateSuccess) {
-      setUser(updatedUser); // Optionally update local state if you're tracking user info locally
+    const updateSuccess = await updateUser(updatedUser);
+    console.log(updateSuccess)
+    if (updateSuccess.message==="updated user successfully") {
+      //setUser(updatedUser); // Optionally update local state if you're tracking user info locally
       alert('Password successfully updated. Please login again!');
       setIsEditPasswordlOpen(false); // Close the modal
       signOut();
@@ -103,7 +108,7 @@ const Profile = () => {
           <dl className="sm:divide-y sm:divide-gray-200">
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Full name</dt>
-              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.name}</dd>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.username}</dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Email address</dt>
@@ -119,13 +124,13 @@ const Profile = () => {
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Personal Details</dt>
               <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">
-                Age: {user?.profile?.age || "Not set"}<br />
-                Weight: {user?.profile?.weight || "Not set"} kg<br />
-                Height: {user?.profile?.height || "Not set"} cm<br />
-                Gender: {user?.profile?.gender || "Not set"}<br />
-                Activity Level: {user?.profile?.activityLevel || "Not set"}<br />
-                Dietary Preferences: {user?.profile?.dietaryPreferences.join(", ") || "None"}<br />
-                Health Goals: {user?.profile?.healthGoals.join(", ") || "None"}
+                Age: {user.Age || "Not set"}<br />
+                Weight: {user.Weight || "Not set"} kg<br />
+                Height: {user.Height || "Not set"} cm<br />
+                Gender: {user.Gender || "Not set"}<br />
+                Activity Level: {user.Activity_Level || "Not set"}<br />
+                Dietary Preferences: {user.Dietary_Preferences ? JSON.parse(user.Dietary_Preferences).join(", ") : "None"}<br />
+                Health Goals: {user.health_Goals ? JSON.parse(user.Health_Goals).join(", ") : "None"}
               </dd>
             </div>
           </dl>
