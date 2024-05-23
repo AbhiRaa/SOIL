@@ -1,148 +1,158 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const config = require("./config.js");
+  // This file will manage the database connection and initialize the database models and assocaiations.
+  const { Sequelize, DataTypes } = require("sequelize");
+  const config = require("../config/config.js");
 
-const db = {
-  Op: Sequelize.Op
-};
+  // Function to establish a database connection with retry logic
+  async function establishConnection() {
+    const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
+      host: config.HOST,
+      dialect: config.DIALECT,
+      logging: console.log,  // Enable Sequelize logging to console
+      pool: {
+        max: 10,             // Maximum number of connection in pool
+        min: 0,              // Minimum number of connection in pool
+        acquire: 30000,      // The maximum time, in milliseconds, that pool will try to get connection before throwing error
+        idle: 10000          // The maximum time, in milliseconds, that a connection can be idle before being released
+      }
+    });
 
-const products = [
-  {
-    product_quantity: "200 grams",
-    product_image: "organicMillets",
-    product_name: "Organic millets",
-    product_description: "These are organic",
-    product_rating: 4,
-    product_price: 15,
-  },
-  {
-    product_image: "organicWatermelon",
-    product_quantity: "each",
-    product_name: "Organic fruits",
-    product_description: "these are organic",
-    product_rating: 5,
-    product_price: 10,
-  },
-  {
-    product_image: "banana",
-    product_quantity: "1 kg",
-    product_name: "Organic Bananas",
-    product_description: "Fresh organic bananas",
-    product_rating: 4.5,
-    product_price: 2.5,
-  },
-  // {
-  //   product_image: strawberries,
-  //   product_quantity: "250g",
-  //   product_name: "Fresh Strawberries",
-  //   product_description: "Juicy and sweet strawberries",
-  //   product_rating: 4.8,
-  //   product_price: 3.99,
-  // },
-  // {
-  //   product_image: tomatoes,
-  //   product_quantity: "250g",
-  //   product_name: "Fresh Tomatoes",
-  //   product_description: "Organic homegrown tomatoes",
-  //   product_rating: 5,
-  //   product_price: 5,
-  // },
-  // {
-  //   product_image: bread,
-  //   product_name: "Wholemeal Bread",
-  //   product_quantity:"1 pack",
-  //   product_description: "Ovenbaked fresh bread",
-  //   product_rating: 3.8,
-  //   product_price: 4,
-  // },
-  // {
-  //   product_image: mixedBerries,
-  //   product_quantity: "250g",
-  //   product_name: "Mixed Berries",
-  //   product_description: "Juicy and sweet berries",
-  //   product_rating: 5,
-  //   product_price: 10,
-  // },
-  // {
-  //   product_image: spinach,
-  //   product_quantity: "500g",
-  //   product_name: "Local spinach",
-  //   product_description: "Green and nutritious",
-  //   product_rating: 3,
-  //   product_price: 3,
-  // },
-  // {
-  //   product_image: salmon,
-  //   product_quantity: "250g",
-  //   product_name: "Fresh Salmon",
-  //   product_description: "Ocean salmon",
-  //   product_rating: 5,
-  //   product_price: 14,
-  // },
-  // {
-  //   product_image: honey,
-  //   product_quantity: "350g",
-  //   product_name: "Organic Honey",
-  //   product_description: "Locally harvested",
-  //   product_rating: 5,
-  //   product_price: 14,
-  // },
-  // {
-  //   product_image: nuts,
-  //   product_quantity: "250g",
-  //   product_name: "Mixed Nuts",
-  //   product_description: "Pine, almonds and cashews",
-  //   product_rating: 2.5,
-  //   product_price: 4,
-  // },
-  // {
-  //   product_image: cheese,
-  //   product_quantity: "300g",
-  //   product_name: "Fresh Cheddar",
-  //   product_description: "Made with fresh milk",
-  //   product_rating: 5,
-  //   product_price: 14,
-  // },
-  // {
-  //   product_image: grapes,
-  //   product_quantity: "250g",
-  //   product_name: "Red grapes",
-  //   product_description: "Sweet and delicious",
-  //   product_rating: 5,
-  //   product_price: 14,
-  // },
-];
-// Create Sequelize.
-db.sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
-  host: config.HOST,
-  dialect: config.DIALECT
-});
-
-// Include models.
-db.product = require("../models/Product.js")(db.sequelize, DataTypes);
-db.user = require("../models/user.js")(db.sequelize, DataTypes);
-
-// Include a sync option with seed data logic included.
-db.sync = async () => {
-  // Sync schema.
-  await db.sequelize.sync();
-
-  // Can sync with force if the schema has become out of date - note that syncing with force is a destructive operation.
-  // await db.sequelize.sync({ force: true });
-  
-  await seedData();
-};
-
-async function seedData() {
-  const count = await db.product.count();
-
-  // Only seed data if necessary.
-  if(count > 0)
-    return;
-
-  for (let everyProduct of products){
-    await db.product.create(everyProduct)
+    let retries = 5;
+    while (retries) {
+      try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+        return sequelize;
+      } catch (err) {
+        console.error('Unable to connect to the database:', err);
+        retries -= 1;
+        console.log(`Retries left: ${retries}`);
+        await new Promise(res => setTimeout(res, 5000)); // wait 5 seconds before retrying
+      }
+    }
+    throw new Error('Max retries reached, exiting application');
   }
-  console.log('Data seeding completed');
-}
 
-module.exports = db;
+module.exports = async function initDb() {
+  const sequelize = await establishConnection();
+
+  const db = {
+    sequelize,
+    Sequelize,
+    models: {}
+  };
+
+  // Model imports
+  db.models.User = require('../models/User')(sequelize, DataTypes);
+  db.models.Profile = require('../models/Profile')(sequelize, DataTypes);
+  db.models.Product = require('../models/Product')(sequelize, DataTypes);
+  db.models.Review = require('../models/Review')(sequelize, DataTypes);
+  db.models.ReviewReply = require('../models/ReviewReply')(sequelize, DataTypes);
+  db.models.Cart = require('../models/Cart')(sequelize, DataTypes);
+  db.models.CartItem = require('../models/CartItem')(sequelize, DataTypes);
+  db.models.Follows = require('../models/Follows')(sequelize, DataTypes);
+
+  // Associations
+  // Users and Profiles
+  db.models.User.hasOne(db.models.Profile, {
+    foreignKey: 'user_id',
+    as: 'profile',
+    onDelete: 'CASCADE',  // Delete profile when user is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when user_id changes
+  });
+  db.models.Profile.belongsTo(db.models.User, {
+    foreignKey: 'user_id',
+    as: 'user'
+  });
+
+  // Users and Reviews
+  db.models.User.hasMany(db.models.Review, {
+    foreignKey: 'user_id',
+    as: 'reviews',
+    onDelete: 'CASCADE',  // Delete all reviews when user is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when user_id changes
+  });
+  db.models.Review.belongsTo(db.models.User, {
+    foreignKey: 'user_id',
+    as: 'author'
+  });
+
+  // Products and Reviews
+  db.models.Product.hasMany(db.models.Review, {
+    foreignKey: 'product_id',
+    as: 'reviews',
+    onDelete: 'CASCADE',  // Set foreign key to null if product is deleted
+    onUpdate: 'CASCADE'    // Update foreign key when product_id changes
+  });
+  db.models.Review.belongsTo(db.models.Product, {
+    foreignKey: 'product_id',
+    as: 'product'
+  });
+
+  // Reviews and Review Replies
+  db.models.Review.hasMany(db.models.ReviewReply, {
+    foreignKey: 'review_id',
+    as: 'replies',
+    onDelete: 'CASCADE',  // Delete replies when review is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when review_id changes
+  });
+  db.models.ReviewReply.belongsTo(db.models.Review, {
+    foreignKey: 'review_id',
+    as: 'review'
+  });
+
+  // Users and Carts
+  db.models.User.hasOne(db.models.Cart, {
+    foreignKey: 'user_id',
+    as: 'cart',
+    onDelete: 'CASCADE',  // Delete cart when user is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when user_id changes
+  });
+  db.models.Cart.belongsTo(db.models.User, {
+    foreignKey: 'user_id',
+    as: 'user'
+  });
+
+  // Cart and Cart Items
+  db.models.Cart.hasMany(db.models.CartItem, {
+    foreignKey: 'cart_id',
+    as: 'cartItems',
+    onDelete: 'CASCADE',  // Delete cart items when cart is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when cart_id changes
+  });
+  db.models.CartItem.belongsTo(db.models.Cart, {
+    foreignKey: 'cart_id',
+    as: 'cart'
+  });
+
+  // Products and Cart Items
+  db.models.Product.hasMany(db.models.CartItem, {
+    foreignKey: 'product_id',
+    as: 'cartItems',
+    onDelete: 'CASCADE ',  // Set foreign key to null if product is deleted
+    onUpdate: 'CASCADE'    // Update foreign key when product_id changes
+  });
+  db.models.CartItem.belongsTo(db.models.Product, {
+    foreignKey: 'product_id',
+    as: 'product'
+  });
+
+  // Follows (Many-to-Many relationship between Users with self-referencing)
+  db.models.User.belongsToMany(db.models.User, {
+    through: db.models.Follows,
+    as: 'followers',
+    foreignKey: 'following_id',
+    otherKey: 'follower_id',
+    onDelete: 'CASCADE',  // Remove relationship if either user is deleted
+    onUpdate: 'CASCADE'   // Update foreign keys when user_ids change
+  });
+  db.models.User.belongsToMany(db.models.User, {
+    through: db.models.Follows,
+    as: 'following',
+    foreignKey: 'follower_id',
+    otherKey: 'following_id',
+    onDelete: 'CASCADE',  // Remove relationship if either user is deleted
+    onUpdate: 'CASCADE'   // Update foreign keys when user_ids change
+  });
+
+  return db;
+};

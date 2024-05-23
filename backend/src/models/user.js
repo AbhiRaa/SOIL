@@ -1,57 +1,81 @@
-module.exports = (sequelize, DataTypes) =>
-  sequelize.define("user", {
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    // Unique identifier for the user, automatically incremented.
+    user_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    // User's email, must be unique and is required.
     email: {
       type: DataTypes.STRING(255),
-      primaryKey: true,
-      allowNull:false,
-      unique:true
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true, // Checks for email format
+      }
     },
-    username: {
+    // User's full name, required field.
+    name: {
       type: DataTypes.STRING(40),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        len: [2, 40] // Name must be between 2 and 40 characters.
+      }
     },
-    password: {
+    // Hashed password for security, required field.
+    password_hash: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
+    // Salt used in hashing the password, required for security reasons.
     salt: {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    joinDate: {
+    // Date when the user was created, default to the current time.
+    join_date: {
       type: DataTypes.DATE,
-      allowNull: false
+      defaultValue: DataTypes.NOW
     },
-    Age: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+    // Boolean indicating whether the user has administrative privileges.
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
-    Weight: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+    // Boolean indicating whether the user is blocked.
+    is_blocked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
-    Height: {
-      type: DataTypes.INTEGER,
-      allowNull: true
+    // Record of when the user was created, defaults to the current date.
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     },
-    Gender: {
-      type: DataTypes.STRING(40),
-      allowNull: true
+    // Record of the last time the user was updated.
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     },
-    Activity_Level: {
-      type: DataTypes.STRING(40),
-      allowNull: true
-    },
-    Dietary_Preferences: {
-      type: DataTypes.STRING(40),
-      allowNull: true
-    },
-    Health_Goals: {
-      type: DataTypes.STRING(40),
-      allowNull: true
+    // Email of the admin who last updated the user status.
+    updated_by: {
+      type: DataTypes.STRING(255),
+      validate: {
+        isEmail: true, // Ensure the updater identifier is an email
+      }
     }
-    
   }, {
-    // Don't add the timestamp attributes (updatedAt, createdAt).
-    timestamps: false
+    // Disabling the automatic timestamp creation as we're manually handling `created_at` and `updated_at`.
+    timestamps: false,
+    tableName: 'users',
+    indexes: [
+      {
+        unique: true,
+        fields: ['email']  // Indexing the email field for faster query performance
+      }
+    ]
   });
+
+  return User;
+};

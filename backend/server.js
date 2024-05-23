@@ -1,30 +1,9 @@
-const express = require("express");
-const cors = require("cors");
-const db = require("./src/database");
+// This file will set up and start your Express server.
+const app = require('./app');
 
+const PORT = process.env.PORT || 4000;
 
-
-// Database will be sync'ed in the background.
-db.sync();
-
-const app = express();
-
-// Parse requests of content-type - application/json.
-app.use(express.json());
-
-// Add CORS suport.
-app.use(cors());
-
-// Simple Hello World route.
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
-});
-
-// Add user routes.
-require("./src/routes/user.routes.js")(express, app);
-
-// Set port, listen for requests.
-const PORT = 4000;
+// Listen to the server here
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
