@@ -14,6 +14,7 @@ module.exports = {
       },
       animation: { // Adding new animations
         'slide-up': 'slideUp 0.5s ease-out forwards',
+        'glow-fade': 'glowFade 3s ease-in-out infinite',
       },
       keyframes: { // Defining the keyframes for slide-up animation
         slideUp: {
@@ -21,8 +22,15 @@ module.exports = {
           '100%': { transform: 'translateY(0)', opacity: 1 },
         },
         },
-      
-    },
+      boxShadow:{
+        'special-glow':'0 0 10px #4CAF50',
+      },
+      borderColor: {
+        'special-green': '#4CAF50',
+      },
+      // animation: {
+        
+      // },
   },
   plugins: [],
   // theme: {
@@ -35,4 +43,4 @@ module.exports = {
   //   },
   // },
 }
-
+}

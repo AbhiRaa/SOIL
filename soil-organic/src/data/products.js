@@ -24,6 +24,7 @@ function initProducts() {
       product_description: "These are organic",
       product_rating: 4,
       product_price: 15,
+      is_special:true
     },
     {
       product_id: 2,
@@ -33,6 +34,7 @@ function initProducts() {
       product_description: "these are organic",
       product_rating: 5,
       product_price: 10,
+      is_special:true
     },
     {
       product_id: 3,
@@ -42,6 +44,7 @@ function initProducts() {
       product_description: "Fresh organic bananas",
       product_rating: 4.5,
       product_price: 2.5,
+      is_special:true
     },
     {
       product_id: 4,
@@ -51,6 +54,7 @@ function initProducts() {
       product_description: "Juicy and sweet strawberries",
       product_rating: 4.8,
       product_price: 3.99,
+      is_special:true
     },
     {
       product_id: 5,
@@ -60,6 +64,7 @@ function initProducts() {
       product_description: "Organic homegrown tomatoes",
       product_rating: 5,
       product_price: 5,
+      is_special:true
     },
     {
       product_id: 6,
@@ -69,6 +74,7 @@ function initProducts() {
       product_description: "Ovenbaked fresh bread",
       product_rating: 3.8,
       product_price: 4,
+      is_special:true
     },
     {
       product_id: 7,
