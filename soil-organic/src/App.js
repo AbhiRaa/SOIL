@@ -38,14 +38,14 @@ function App() {
 
   // Handler to sign out a user, clearing the user from local storage and state
   function signOut() {
-    localStorage.setItem("user", null);
+    localStorage.removeItem('access_token');
     setLoggedInUser(null);
   }
 
   // Handler to sign up a user, adding the user to the data store and setting the user as the current user
   async function signUp(userObject) {
-    await setUser(userObject);
-    setLoggedInUser(userObject.email);
+    // await setUser(userObject);
+    setLoggedInUser(userObject);
   }
 
   // Handler to sign up a user, adding the user to the data store and setting the user as the current user

@@ -28,11 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    // Salt used in hashing the password, required for security reasons.
-    salt: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
     // Date when the user was created, default to the current time.
     join_date: {
       type: DataTypes.DATE,

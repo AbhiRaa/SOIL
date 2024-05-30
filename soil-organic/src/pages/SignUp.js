@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful signup
 import Navigator from "../components/NavigationBar";
-import { findUser } from "../data/users.js";
 import { isStrongPassword } from "../utils/validation.js";
+import { signUp } from "../services/userService.js";
+import Notification from '../utils/notifications';
 
 const SignUp = (props) => {
   const navigate = useNavigate();
@@ -13,43 +14,13 @@ const SignUp = (props) => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-
-  // Generates a random salt for hashing
-  const generateSalt = () => {
-    return crypto.getRandomValues(new Uint8Array(16));
-  };
-
-  // Hashes the password using PBKDF2 algorithm
-  const generatePasswordHash = async (password, salt) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const key = await crypto.subtle.importKey(
-      "raw",
-      data,
-      { name: "PBKDF2" },
-      false,
-      ["deriveBits"]
-    );
-
-    const keyBits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        salt: encoder.encode(salt),
-        iterations: 1000,
-        hash: "SHA-1",
-      },
-      key,
-      256
-    );
-
-    return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
-  };
+  const [notification, setNotification] = React.useState(''); // State for displaying notifications
 
   // Validates the form fields and sets error messages if any
   const validateForm = async () => {
     let formIsValid = true;
     let newErrors = {};
-    const user = await findUser(formData.email)
+  
     if (!formData.name) {
       formIsValid = false;
       newErrors["name"] = "Name is required.";
@@ -58,11 +29,7 @@ const SignUp = (props) => {
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       formIsValid = false;
       newErrors["email"] = "A valid email is required.";
-    } else if (user) {
-      console.log("FINDUSER result is ", findUser(formData.email))
-      formIsValid = false;
-      newErrors["email"] = "Email already exists. Please try another one.";
-    }
+    } 
 
     if (!isStrongPassword(formData.password)) {
       formIsValid = false;
@@ -87,34 +54,35 @@ const SignUp = (props) => {
   // Handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     if (await validateForm()) {
-      const salt = generateSalt();
-      console.log(formData);
-      const hashedPassword = await generatePasswordHash(
-        formData.password,
-        salt
-      );
-      // Saving user with hashed password and salt to local storage
-      const user = {
-        name: formData.name,
-        email: formData.email,
-        password: hashedPassword,
-        salt: btoa(String.fromCharCode(...salt)),
-        joinDate: new Date().toISOString(), // Storing the current timestamp
-        profile: {
-          age: null,
-          weight: null,
-          height: null,
-          gender: "",
-          activityLevel: "",
-          dietaryPreferences: [],
-          healthGoals: []
-        }
-      };
+      try {
+        const response = await signUp({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        });
+        localStorage.setItem('access_token', response.data.access_token);
 
-      await props.signUp(user);
-      console.log("reached after props.signup(user)")
-      navigate("/profile");
+        const user = {
+          userId: response.data.userId,
+          userName: response.data.userName,
+          userEmail: response.data.userEmail
+        }
+        await props.signUp(user);
+
+        setNotification(`${user.userName} registration successfull!`);
+        setTimeout(() => setNotification(''), 3000);  // Clear notification after 3 seconds
+
+        navigate("/profile"); // Redirect on successful registration
+      } catch (error) {
+        // Handle errors like email already exists here
+        if (error.response && error.response.status === 409) {
+          setErrors({ email: "Email already exists. Please try another one." });
+        } else {
+          setErrors({ form: "An unexpected error occurred. Please try again." });
+        }
+      }
     }
   };
 
@@ -241,6 +209,7 @@ const SignUp = (props) => {
         </div>
       </div>
       </div>
+      {notification && <Notification message={notification} />}
     </div>
   );
 };

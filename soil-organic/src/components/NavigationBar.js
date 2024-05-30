@@ -45,7 +45,7 @@ function NavigationBar() {
         className="flex space-x-4 justify-center py-5 gap-5 text-xl font-bold"
         >
         <li>
-          <Link to="/">Hi,{currentloggedInUser}</Link>
+          <Link to="/">Hi,{currentloggedInUser.userName}</Link>
         </li>
         <li>
           <Link to="/profile">Profile</Link>

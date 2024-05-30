@@ -2,9 +2,10 @@ import Navigator from "../components/NavigationBar";
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../hooks/context";
-import { findUser, deleteUser, updateUser } from "../data/users";
+import { findUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
 import EditPasswordModal from '../components/updatePasswordModal';
+import { getUserDetails, deleteUser } from "../services/userService.js";
 
 const Profile = () => {
   const { currentloggedInUser, signOut } = useContext(UserContext);
@@ -16,17 +17,18 @@ const Profile = () => {
   useEffect(() => {
     // Retrieve the user object from local storage.
     async function fetchDetails(){
-      if (currentloggedInUser) {
-        const userDetails = await findUser(currentloggedInUser);
-        if (userDetails) {
-          setUser(userDetails);
-          console.log(userDetails);
-          } else {
-            navigate("/signin"); // Redirect to sign-in page if no user data is found
-          }
-        } else {
-          navigate("/signin"); // Redirect if not logged in
+      if (currentloggedInUser && currentloggedInUser.userId) {
+        try {
+          const response = await getUserDetails(currentloggedInUser.userId);
+          setUser(response.data);
+          console.log(response.data);
+        } catch (error) {
+          console.error('Failed to fetch user details:', error);
+          navigate("/signin"); // Redirect to sign-in on error or unauthorized
         }
+      } else {
+        navigate("/signin"); // Redirect if not logged in or userId is missing
+      }
     }
     fetchDetails();
   }, [currentloggedInUser, navigate]);
@@ -42,7 +44,7 @@ const Profile = () => {
   };
 
   const handleUpdateUser = (updatedUser) => {
-    updateUser(updatedUser);
+    // updateUser(updatedUser);
     setUser(updatedUser); // Update local state
     setIsEditModalOpen(false);
     window.alert("Successfully updated the user's profile!")
@@ -50,7 +52,7 @@ const Profile = () => {
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete your profile?")) {
-       deleteUser(currentloggedInUser).then(()=>{
+        deleteUser(currentloggedInUser.userId).then(()=>{
         signOut();
         navigate("/"); // Redirect to home page after deletion
        });
@@ -59,7 +61,7 @@ const Profile = () => {
 
   const handleUpdatePassword = async (newHashedPassword, userEmail) => {
     // Find the current user data to update
-    const user = await findUser(userEmail);
+    // const user = await findUser(userEmail);
     if (!user) {
       alert('User not found.');
       return;
@@ -108,11 +110,11 @@ const Profile = () => {
           <dl className="sm:divide-y sm:divide-gray-200">
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Full name</dt>
-              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.username}</dd>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.userName}</dd>
             </div>
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Email address</dt>
-              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.email}</dd>
+              <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">{user.userEmail}</dd>
             </div>
             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Join date</dt>
@@ -124,13 +126,13 @@ const Profile = () => {
             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt className="font-medium text-gray-500">Personal Details</dt>
               <dd className="mt-1  text-gray-900 sm:mt-0 sm:col-span-2">
-                Age: {user.Age || "Not set"}<br />
-                Weight: {user.Weight || "Not set"} kg<br />
-                Height: {user.Height || "Not set"} cm<br />
-                Gender: {user.Gender || "Not set"}<br />
-                Activity Level: {user.Activity_Level || "Not set"}<br />
-                Dietary Preferences: {user.Dietary_Preferences ? JSON.parse(user.Dietary_Preferences).join(", ") : "None"}<br />
-                Health Goals: {user.health_Goals ? JSON.parse(user.Health_Goals).join(", ") : "None"}
+                Age: {user.age || "Not set"}<br />
+                Weight: {user.weight || "Not set"} kg<br />
+                Height: {user.height || "Not set"} cm<br />
+                Gender: {user.gender || "Not set"}<br />
+                Activity Level: {user.activityLevel || "Not set"}<br />
+                Dietary Preferences: {user.dietaryPreferences ? JSON.parse(user.dietaryPreferences).join(", ") : "None"}<br />
+                Health Goals: {user.healthGoals ? JSON.parse(user.healthGoals).join(", ") : "None"}
               </dd>
             </div>
           </dl>
@@ -163,6 +165,5 @@ const Profile = () => {
     </div>
   </div>
   );
-};
-
+}
 export default Profile;

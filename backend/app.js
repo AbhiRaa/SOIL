@@ -2,6 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 const initDb = require('./src/database');
+const { errorHandler } = require('./src/middlewares/errorHandler');
+// const userRoutes = require('./src/routes/userRoutes');
 
 const app = express();
 
@@ -22,8 +24,17 @@ async function initializeApp() {
       res.json({ message: "Hello World from SOIL Organic!" });
     });
 
-    // Add other routes setup
-    // require("./src/routes/user.routes.js")(app);
+    // All other routes setup
+    // Importing the routes function and passing db models to it
+    const setupUserRoutes = require('./src/routes/userRoutes');
+    setupUserRoutes(app, db); // Dependency injection of models
+    
+    // // Routes
+    // app.get('/', (req, res) => {
+    //   throw new Error('Something broke!'); // for errorHandler
+    // });
+
+    app.use(errorHandler);
 
   } catch (error) {
     console.error('Failed to initialize the application:', error);

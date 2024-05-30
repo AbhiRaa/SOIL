@@ -44,14 +44,14 @@ module.exports = (sequelize, DataTypes) => {
       gender: {
         type: DataTypes.STRING(50),
         validate: {
-          isIn: [['male', 'female']], // Ensures gender is one of the predefined options
+          isIn: [['', 'male', 'female']], // Ensures gender is one of the predefined options
         }
       },
       // User's daily activity level, stored as a string.
       activity_level: {
         type: DataTypes.STRING(255),
         validate: {
-          isIn: [['sedentary', 'lightly active', 'moderately active', 'very active', 'super active']], // Predefined activity levels
+          isIn: [['', 'sedentary', 'lightly active', 'moderately active', 'very active', 'super active']], // Predefined activity levels
         }
       },
       // Stores user’s dietary preferences as a JSON array.
