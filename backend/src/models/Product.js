@@ -36,9 +36,9 @@ module.exports = (sequelize, DataTypes) => {
     // URL or path to the product's image.
     product_image: {
       type: DataTypes.STRING(255),
-      validate: {
-        isUrl: true // Validates that the string is a well-formed URL.
-      }
+      // validate: {
+      //   isUrl: true // Validates that the string is a well-formed URL.
+      // }
     },
     // Minimum purchase unit, e.g., "200 grams" or "1 pack", stored as a string.
     minimum_purchase_unit: {

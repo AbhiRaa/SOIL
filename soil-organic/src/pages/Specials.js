@@ -40,7 +40,7 @@ function Specials() {
       {/* </div> */}
       </section>
       <ProductList />
-      <BackyardGardeningTips />
+      {/* <BackyardGardeningTips /> */}
       <Footer/>
     </div>
   );

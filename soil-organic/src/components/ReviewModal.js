@@ -93,6 +93,19 @@ function ReviewModal({ product, onClose }) {
             {existingReviews.map((review) => (
               <div key={review.id} className="border-b border-gray-300 py-2 flex justify-between items-start">
                 <div>
+                  <div className='flex space-x-9 items-center'>
+                    <p className="font-bold">{review.user}</p>
+                    <div className="text-lg space-x-5 items-center">
+                    {currentloggedInUser && currentloggedInUser!== review.user && (
+                      <button
+                        onClick={() => handleFollowUser(review.userId)}
+                        className="text-slate-500 underline text-sm mb-1"
+                      >
+                        Follow
+                      </button>
+                    )}
+                    </div>
+                  </div>
                   <StarRatings
                     name={`rating-${review.id}`}
                     rating={review.rating}
@@ -102,18 +115,11 @@ function ReviewModal({ product, onClose }) {
                     starDimension="20px"
                     starSpacing="2px"
                   />
-                  <p className="font-bold">{review.user}</p>
+                  
                   <p>{review.review}</p>
                 </div>
                 <div className="text-lg space-x-5 items-center">
-                  {currentloggedInUser && currentloggedInUser!== review.user && (
-                    <button
-                      onClick={() => handleFollowUser(review.userId)}
-                      className="text-slate-500 underline text-sm mb-1"
-                    >
-                      Follow
-                    </button>
-                  )}
+                  
                   {currentloggedInUser && currentloggedInUser === review.user && (
                     <>
                       <button
