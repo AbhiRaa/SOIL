@@ -30,7 +30,7 @@ function NavigationBar() {
             <Link to="/signin">Sign In</Link>
             </li>
             <li>
-            <Link to="/specials">Specials</Link>
+            <Link to="/specials">Our Products</Link>
             </li>
           </ul>
         </header>
