@@ -5,7 +5,7 @@ import UserContext from "../hooks/context";
 import { findUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
 import EditPasswordModal from '../components/updatePasswordModal';
-import { getUserDetails, deleteUser } from "../services/userService.js";
+import { getUserDetails, deleteUser, updateUserDetails } from "../services/userService.js";
 
 const Profile = () => {
   const { currentloggedInUser, signOut } = useContext(UserContext);
@@ -43,19 +43,32 @@ const Profile = () => {
     setIsEditPasswordlOpen(true);
   };
 
-  const handleUpdateUser = (updatedUser) => {
-    // updateUser(updatedUser);
-    setUser(updatedUser); // Update local state
-    setIsEditModalOpen(false);
-    window.alert("Successfully updated the user's profile!")
+  const handleUpdateUser = async (updatedUser) => {
+    try {
+      const response = await updateUserDetails(currentloggedInUser.userId, updatedUser);
+      if (response.data && response.data.updatedUser) {
+        setUser(response.data.updatedUser); // Update local state with the new user data
+        setIsEditModalOpen(false);
+        alert("Profile updated successfully!");
+      } else {
+        throw new Error('Invalid response structure');
+      }
+    } catch (error) {
+      alert("Failed to update profile. Please try again.");
+      console.error('Update Error:', error);
+    }
   };
+  
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete your profile?")) {
-        deleteUser(currentloggedInUser.userId).then(()=>{
+      try {
+        await deleteUser(currentloggedInUser.userId);
         signOut();
-        navigate("/"); // Redirect to home page after deletion
-       });
+        navigate("/");
+      } catch (error) {
+        alert("Failed to delete profile.");
+      }
     }
   };
 
@@ -95,7 +108,7 @@ const Profile = () => {
     <div className="min-h-screen bg-cyan-50">
     <Navigator />
     <div className="container bg-orange-200 rounded-lg p-3  shadow-lg mx-auto mt-10">
-      
+      {/* Profile Information Display Code */}  
       <div className="bg-orange-100 text-orange-500 flex-col border-2 rounded  overflow-hidden ">
         <div className="px-4 py-5 sm:px-6">
           <div className="flex items-center  gap-6">
@@ -131,8 +144,8 @@ const Profile = () => {
                 Height: {user.height || "Not set"} cm<br />
                 Gender: {user.gender || "Not set"}<br />
                 Activity Level: {user.activityLevel || "Not set"}<br />
-                Dietary Preferences: {user.dietaryPreferences ? JSON.parse(user.dietaryPreferences).join(", ") : "None"}<br />
-                Health Goals: {user.healthGoals ? JSON.parse(user.healthGoals).join(", ") : "None"}
+                Dietary Preferences: {Array.isArray(user.dietaryPreferences) ? user.dietaryPreferences.join(", ") : "None"}<br />
+                Health Goals: {Array.isArray(user.healthGoals) ? user.healthGoals.join(", ") : "None"}
               </dd>
             </div>
           </dl>

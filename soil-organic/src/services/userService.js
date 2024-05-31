@@ -16,6 +16,10 @@ const deleteUser = (userId) => {
     return API.delete(`/user/${userId}`);
 };
 
+const updateUserDetails = (userId, userDetails) => {
+    return API.put(`/user/update/${userId}`, userDetails);
+};
+
 // const signOut = () => {
 //   localStorage.removeItem('access_token'); // Add more cleanup as needed
 // };
@@ -24,5 +28,6 @@ export {
   signUp,
   signIn,
   getUserDetails,
-  deleteUser
+  deleteUser,
+  updateUserDetails
 };

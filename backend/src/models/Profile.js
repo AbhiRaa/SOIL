@@ -57,23 +57,29 @@ module.exports = (sequelize, DataTypes) => {
       // Stores user’s dietary preferences as a JSON array.
       dietary_preferences: {
         type: DataTypes.JSON,
+        defaultValue: '[]',
         get() {
           const rawValue = this.getDataValue('dietary_preferences');
           return rawValue ? JSON.parse(rawValue) : [];
+          // return this.getDataValue('dietary_preferences');
         },
         set(value) {
           this.setDataValue('dietary_preferences', JSON.stringify(value));
+          // this.setDataValue('dietary_preferences', value);
         }
       },
       // Stores user’s health goals as a JSON array.
       health_goals: {
         type: DataTypes.JSON,
+        defaultValue: '[]',
         get() {
           const rawValue = this.getDataValue('health_goals');
           return rawValue ? JSON.parse(rawValue) : [];
+          // return this.getDataValue('health_goals');
         },
         set(value) {
           this.setDataValue('health_goals', JSON.stringify(value));
+          // this.setDataValue('health_goals', value);
         }
       },
       // Record of the last time the profile was updated.
