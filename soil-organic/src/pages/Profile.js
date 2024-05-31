@@ -58,7 +58,6 @@ const Profile = () => {
       console.error('Update Error:', error);
     }
   };
-  
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete your profile?")) {
@@ -100,34 +99,6 @@ const Profile = () => {
     console.error('Password Update Error:', error);
   }
   };
-
-  // const handleUpdatePassword = async (newHashedPassword, userEmail) => {
-  //   // Find the current user data to update
-  //   // const user = await findUser(userEmail);
-  //   if (!user) {
-  //     alert('User not found.');
-  //     return;
-  //   }
-
-  //   // Update the user's password
-  //   const updatedUser = {
-  //     ...user,
-  //     password: newHashedPassword
-  //   };
-
-  //   // Update the user in local storage using the provided updateUser function
-  //   const updateSuccess = await updateUser(updatedUser);
-  //   console.log(updateSuccess)
-  //   if (updateSuccess.message==="updated user successfully") {
-  //     //setUser(updatedUser); // Optionally update local state if you're tracking user info locally
-  //     alert('Password successfully updated. Please login again!');
-  //     setIsEditPasswordlOpen(false); // Close the modal
-  //     signOut();
-  //     navigate("/signin");
-  //   } else {
-  //       alert('Failed to update password.');
-  //   }
-  // };
 
   if (!user) {
     return <div>Loading...</div>; // Display a loading state while the user is null
