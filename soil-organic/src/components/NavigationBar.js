@@ -51,7 +51,7 @@ function NavigationBar() {
           <Link to="/profile">Profile</Link>
         </li>
         <li>
-          <Link to="/specials">Specials</Link>
+          <Link to="/specials">Our Products</Link>
         </li>
         <li>
           <Link to="/cart">Cart</Link>

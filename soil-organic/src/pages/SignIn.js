@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful login
 import Navigator from "../components/NavigationBar";
 import { findUser } from "../data/users";
+import { signIn } from "../services/userService.js";
+import Notification from '../utils/notifications';
 
 const SignIn = (props) => {
   const navigate = useNavigate();
@@ -10,38 +12,14 @@ const SignIn = (props) => {
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
+  const [notification, setNotification] = React.useState(''); // State for displaying notifications
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrorMessage(""); // Reset error message on input change
   };
 
-  const generatePasswordHash = async (password, salt) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const importedKey = await crypto.subtle.importKey(
-      "raw",
-      data,
-      { name: "PBKDF2" },
-      false,
-      ["deriveBits"]
-    );
-
-    const keyBits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        salt: encoder.encode(salt),
-        iterations: 1000,
-        hash: "SHA-1",
-      },
-      importedKey,
-      256
-    );
-
-    return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
-  };
-
-  const validateForm = () => {
+  const validateForm = async () => {
     if (!formData.email) {
       setErrorMessage("Email is required.");
       return false;
@@ -56,32 +34,50 @@ const SignIn = (props) => {
     return true;
   };
 
+  // Handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (await validateForm()) {
+      try {
+        const response = await signIn({
+          email: formData.email,
+          password: formData.password
+        });
+        localStorage.setItem('access_token', response.data.access_token);
 
-    if (validateForm()) {
-      const storedUserData = await findUser(formData.email);
-      if (storedUserData) {
-        const salt = Uint8Array.from(atob(storedUserData.salt), (c) =>
-          c.charCodeAt(0)
-        );
-        const hashedPassword = await generatePasswordHash(
-          formData.password,
-          salt
-        );
-
-        if (hashedPassword === storedUserData.password) {
-          props.signIn(storedUserData);
-          alert("Login successful!");
-
-          console.log("Navigating to profile...");
-
-          navigate("/profile");
-        } else {
-          setErrorMessage("Incorrect password.");
+        const user = {
+          userId: response.data.userId,
+          userName: response.data.userName,
+          userEmail: response.data.userEmail
         }
-      } else {
-        setErrorMessage("User does not exist.");
+        props.signIn(user);
+        alert("Login successful!");
+
+        setNotification(`Welcome ${user.userName} to SOIL-ORGANIC!`);
+
+        console.log("Navigating to profile...");
+
+        setTimeout(() => {
+            navigate("/profile");
+        }, 1000);  // Clear notification after 1 seconds
+
+        // console.log("Navigating to profile...");
+        // navigate("/profile"); // Redirect on successful registration
+      } catch (error) {
+        if (error.response) {
+          switch (error.response.status) {
+            case 404:
+              setErrorMessage("User not found. Please try again.");
+              break;
+            case 400:
+              setErrorMessage("Incorrect email or password. Please try again.");
+              break;
+            default:
+              setErrorMessage("An unexpected error occurred. Please try again.");
+          }
+        } else {
+          setErrorMessage("Network error. Please check your connection and try again.");
+        }
       }
     }
   };
@@ -142,6 +138,7 @@ const SignIn = (props) => {
               Let's start!
             </button>
           </form>
+          {notification && <Notification message={notification} />}
           <div className="mt-6 text-center">
             <p>
               Don't have an account?{" "}

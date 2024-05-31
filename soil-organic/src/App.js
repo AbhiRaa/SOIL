@@ -32,7 +32,7 @@ function App() {
   // Handler to sign in a user, setting the user's email as the current user
   const signIn = (userObject) => {
     if (userObject !== null) {
-      setLoggedInUser(userObject.email);
+      setLoggedInUser(userObject);
     }
   };
 
@@ -44,8 +44,9 @@ function App() {
 
   // Handler to sign up a user, adding the user to the data store and setting the user as the current user
   async function signUp(userObject) {
-    // await setUser(userObject);
-    setLoggedInUser(userObject);
+    if (userObject !== null) {
+      setLoggedInUser(userObject);
+    }
   }
 
   // Handler to sign up a user, adding the user to the data store and setting the user as the current user

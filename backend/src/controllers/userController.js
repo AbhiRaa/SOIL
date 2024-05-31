@@ -78,6 +78,7 @@ module.exports = (db) => {
                                     access_token: token });
 
           } catch (error) {
+              console.error("Sign in Error:", error);
               res.status(500).json({ message: 'Something went wrong.' });
           }
       },

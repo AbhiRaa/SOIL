@@ -58,7 +58,6 @@ const SignUp = (props) => {
   // Handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     if (await validateForm()) {
       try {
         const response = await signUp({
@@ -75,10 +74,12 @@ const SignUp = (props) => {
         }
         await props.signUp(user);
 
-        setNotification(`${user.userName} registration successfull!`);
-        setTimeout(() => setNotification(''), 3000);  // Clear notification after 3 seconds
+        setNotification(`Welcome ${user.userName} to SOIL-ORGANIC!`);
+        setTimeout(() => {
+            navigate("/profile");
+        }, 1000);  // Clear notification after 1 seconds
 
-        navigate("/profile"); // Redirect on successful registration
+        // navigate("/profile"); // Redirect on successful registration
       } catch (error) {
         // Handle errors like email already exists here
         if (error.response && error.response.status === 409) {
@@ -206,6 +207,7 @@ const SignUp = (props) => {
               Sign Up
             </button>
           </form>
+          {notification && <Notification message={notification} />}
           <div className="mt-6 text-center">
             <p>
               Already have an account?{" "}
@@ -217,7 +219,6 @@ const SignUp = (props) => {
         </div>
       </div>
       </div>
-      {notification && <Notification message={notification} />}
     </div>
   );
 };
