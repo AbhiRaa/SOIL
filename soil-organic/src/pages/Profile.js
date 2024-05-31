@@ -5,14 +5,14 @@ import UserContext from "../hooks/context";
 import { findUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
 import EditPasswordModal from '../components/updatePasswordModal';
-import { getUserDetails, deleteUser, updateUserDetails } from "../services/userService.js";
+import { getUserDetails, deleteUser, updateUserDetails, changeUserPassword } from "../services/userService.js";
 
 const Profile = () => {
   const { currentloggedInUser, signOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isEditPasswordOpen, setIsEditPasswordlOpen] = useState(false);
+  const [isEditPasswordOpen, setIsEditPasswordOpen] = useState(false);
 
   useEffect(() => {
     // Retrieve the user object from local storage.
@@ -40,7 +40,7 @@ const Profile = () => {
 
   const handleEditPassword = () => {
     // Navigate to the edit password edit modal 
-    setIsEditPasswordlOpen(true);
+    setIsEditPasswordOpen(true);
   };
 
   const handleUpdateUser = async (updatedUser) => {
@@ -72,33 +72,62 @@ const Profile = () => {
     }
   };
 
-  const handleUpdatePassword = async (newHashedPassword, userEmail) => {
-    // Find the current user data to update
-    // const user = await findUser(userEmail);
+  const handleUpdatePassword = async (existingPassword, newPassword) => {
+
     if (!user) {
       alert('User not found.');
       return;
     }
 
-    // Update the user's password
-    const updatedUser = {
-      ...user,
-      password: newHashedPassword
-    };
-
-    // Update the user in local storage using the provided updateUser function
-    const updateSuccess = await updateUser(updatedUser);
-    console.log(updateSuccess)
-    if (updateSuccess.message==="updated user successfully") {
-      //setUser(updatedUser); // Optionally update local state if you're tracking user info locally
-      alert('Password successfully updated. Please login again!');
-      setIsEditPasswordlOpen(false); // Close the modal
-      signOut();
-      navigate("/signin");
+    try {
+      const response = await changeUserPassword(currentloggedInUser.userId, existingPassword, newPassword );
+      if (response.status === 200) {
+        alert('Password successfully updated. Please login again!');
+        setIsEditPasswordOpen(false);
+        signOut();
+        navigate("/signin");
+      } else {
+        throw new Error('Failed to update password.');
+      }
+    } catch (error) {
+    if (error.response && error.response.status === 400) {
+      // Specific error handling for when the current password is incorrect
+      alert(error.response.data.message);
     } else {
-        alert('Failed to update password.');
+      // General error handling for other kinds of errors
+      alert(error.message || "Failed to update password. Please try again.");
     }
+    console.error('Password Update Error:', error);
+  }
   };
+
+  // const handleUpdatePassword = async (newHashedPassword, userEmail) => {
+  //   // Find the current user data to update
+  //   // const user = await findUser(userEmail);
+  //   if (!user) {
+  //     alert('User not found.');
+  //     return;
+  //   }
+
+  //   // Update the user's password
+  //   const updatedUser = {
+  //     ...user,
+  //     password: newHashedPassword
+  //   };
+
+  //   // Update the user in local storage using the provided updateUser function
+  //   const updateSuccess = await updateUser(updatedUser);
+  //   console.log(updateSuccess)
+  //   if (updateSuccess.message==="updated user successfully") {
+  //     //setUser(updatedUser); // Optionally update local state if you're tracking user info locally
+  //     alert('Password successfully updated. Please login again!');
+  //     setIsEditPasswordlOpen(false); // Close the modal
+  //     signOut();
+  //     navigate("/signin");
+  //   } else {
+  //       alert('Failed to update password.');
+  //   }
+  // };
 
   if (!user) {
     return <div>Loading...</div>; // Display a loading state while the user is null
@@ -171,7 +200,7 @@ const Profile = () => {
         <EditPasswordModal
         user={user}
         isOpen={isEditPasswordOpen}
-        onClose={() => setIsEditPasswordlOpen(false)}
+        onClose={() => setIsEditPasswordOpen(false)}
         onUpdatePassword={handleUpdatePassword} 
       />
       )}

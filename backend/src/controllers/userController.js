@@ -219,6 +219,32 @@ module.exports = (db) => {
         console.error("Update Error:", error);
         res.status(500).json({ message: "Failed to update user details", error: error.message });
       }
-    }
+    }, 
+
+    updatePassword: async (req, res) => {
+      const { userId } = req.params;
+      const { currentPassword, newPassword } = req.body;
+  
+      try {
+          const user = await User.findByPk(userId);
+          if (!user) {
+              return res.status(404).json({ message: 'User not found.' });
+          }
+  
+          const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+          if (!isMatch) {
+              return res.status(400).json({ message: 'Current password is incorrect. Please try again.' });
+          }
+  
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(newPassword, salt);
+          user.password_hash = hashedPassword;
+          await user.save();
+  
+          res.status(200).json({ message: 'Password updated successfully.' });
+      } catch (error) {
+          res.status(500).json({ message: 'Failed to update password.', error: error.message });
+      }
+    }  
   };
 };

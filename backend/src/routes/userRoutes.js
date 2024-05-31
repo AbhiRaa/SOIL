@@ -16,4 +16,7 @@ module.exports = (app, db) => {
 
   // Route for updating user details
   app.put('/api/user/update/:userId', authenticate, userController.updateUserDetails);
+
+  // Route for updating user password
+  app.post('/api/user/update-password/:userId', authenticate, userController.updatePassword);
 };  

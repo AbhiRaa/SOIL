@@ -20,6 +20,10 @@ const updateUserDetails = (userId, userDetails) => {
     return API.put(`/user/update/${userId}`, userDetails);
 };
 
+const changeUserPassword = (userId, currentPassword, newPassword) => {
+    return API.post(`/user/update-password/${userId}`, { currentPassword, newPassword });
+};
+
 // const signOut = () => {
 //   localStorage.removeItem('access_token'); // Add more cleanup as needed
 // };
@@ -29,5 +33,6 @@ export {
   signIn,
   getUserDetails,
   deleteUser,
-  updateUserDetails
+  updateUserDetails,
+  changeUserPassword
 };

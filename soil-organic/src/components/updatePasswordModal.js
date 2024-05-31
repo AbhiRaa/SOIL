@@ -28,42 +28,11 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     setPasswords(prev => ({ ...prev, [name]: value }));
   };
 
-  // Asynchronous function to hash the password using PBKDF2
-  const generatePasswordHash = async (password, salt) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const importedKey = await crypto.subtle.importKey(
-      "raw",
-      data,
-      { name: "PBKDF2" },
-      false,
-      ["deriveBits"]
-    );
-
-    const keyBits = await crypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        salt: encoder.encode(salt),
-        iterations: 1000,
-        hash: "SHA-1",
-      },
-      importedKey,
-      256
-    );
-
-    return btoa(String.fromCharCode(...new Uint8Array(keyBits)));
-  };
-
-   // Validates the passwords entered by the user
+  // Validates the passwords entered by the user
   const validatePasswords = async () => {
     let tempErrors = {};
-    const salt = Uint8Array.from(atob(user.salt), (c) => c.charCodeAt(0));
-    const existingHashedPassword = await generatePasswordHash(passwords.existingPassword, salt);
-    // Set error messages if conditions are not met
-    if (existingHashedPassword !== user.password) {
-      tempErrors.existingPassword = "Existing password is incorrect.";
-    }
 
+    // Set error messages if conditions are not met
     if (passwords.newPassword === passwords.existingPassword) {
       tempErrors.newPassword = "New password must be different from the existing password.";
     }
@@ -83,9 +52,7 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
     const isValid = await validatePasswords();
     console.log("Form validation result:", isValid, errors);
     if (isValid) {
-      const salt = Uint8Array.from(atob(user.salt), (c) => c.charCodeAt(0)); // Use existing salt
-      const newHashedPassword = await generatePasswordHash(passwords.newPassword, salt);
-      onUpdatePassword(newHashedPassword, user.email); // Pass the hashed password and user email
+      onUpdatePassword(passwords.existingPassword, passwords.newPassword); // Pass the existing and new passwords to the update function
       console.log("Password update initiated.");
       onClose(); // Close modal after update
     } else {
