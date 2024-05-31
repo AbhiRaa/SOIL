@@ -34,7 +34,11 @@ const SignUp = (props) => {
     if (!isStrongPassword(formData.password)) {
       formIsValid = false;
       newErrors["password"] =
-        "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.";
+        "Password must be at least 8 characters,\n" +
+        "Include at least one uppercase letter,\n" +
+        "Include at least one lowercase letter,\n" +
+        "Include at least one special character,\n" +
+        "Include at least one number.";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -163,7 +167,11 @@ const SignUp = (props) => {
               />
               {errors.password && (
                 <div className="text-red-500 text-sm mt-1">
-                  {errors.password}
+                  {errors.password.split('\n').map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}<br />
+                    </React.Fragment>
+                  ))}
                 </div>
               )}
             </div>

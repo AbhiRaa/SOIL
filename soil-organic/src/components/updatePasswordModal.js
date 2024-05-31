@@ -40,7 +40,12 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
       tempErrors.confirmPassword = "Confirm password does not match new password.";
     }
     if (!isStrongPassword(passwords.newPassword)) {
-      tempErrors.newPassword = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.";
+      tempErrors.newPassword = 
+        "Password must be at least 8 characters,\n" +
+        "Include at least one uppercase letter,\n" +
+        "Include at least one lowercase letter,\n" +
+        "Include at least one special character,\n" +
+        "Include at least one number.";
     }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -76,7 +81,16 @@ function ChangePasswordModal({ user,isOpen, onClose, onUpdatePassword }) {
           <div>
             <label htmlFor="newPassword" className="block text-lg font-medium text-primary">New Password:</label>
             <input type="password" name="newPassword" value={passwords.newPassword} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-            {errors.newPassword && <p className="text-red-500 text-sm">{errors.newPassword}</p>}
+            {/* {errors.newPassword && <p className="text-red-500 text-sm">{errors.newPassword}</p>} */}
+            {errors.newPassword && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.newPassword.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}<br />
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label htmlFor="confirmPassword" className="block text-lg font-medium text-primary">Confirm New Password:</label>
