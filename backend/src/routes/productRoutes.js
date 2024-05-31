@@ -3,5 +3,8 @@ module.exports = (app, db) => {
     const authenticate = require('../middlewares/authenticate');
 
     // Retrieve all products
-    app.get('/api/products', authenticate, productController.getAllProducts);
+    app.get('/api/secure/products', authenticate, productController.getAllProducts);
+
+    //retrieve all products when not signed in
+    app.get('/api/public/products', productController.getAllProducts);
 }

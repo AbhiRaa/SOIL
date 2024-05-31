@@ -6,7 +6,7 @@ import Notification from '../utils/notifications';
 import '../index.css';
 import ReviewModal from '../components/ReviewModal';
 import StarRatings from 'react-star-ratings';
-import { getAllProducts } from "../services/productService"
+import { getAllPublicProducts, getAllSecureProducts } from "../services/productService"
 
 /**
  * Renders a list of products that can be filtered by a minimum rating.
@@ -46,14 +46,25 @@ function ProductList({filterRating}) {
 
         async function fetchProducts() {
             try {
-                const response = await getAllProducts();
-                let fetchedProducts = response.data;
-                // if (filterRating) {
-                //     fetchedProducts = fetchedProducts.filter(product => 
-                //         product.reviews.some(review => review.rating > filterRating)
-                //     );
-                // }
-                setProducts(fetchedProducts);
+
+                if (currentloggedInUser)
+                {
+                    const response = await getAllSecureProducts();
+                    let fetchedProducts = response.data;
+                    // if (filterRating) {
+                    //     fetchedProducts = fetchedProducts.filter(product => 
+                    //         product.reviews.some(review => review.rating > filterRating)
+                    //     );
+                    // }
+                    setProducts(fetchedProducts);
+                }
+                else{
+                    const response = await getAllPublicProducts();
+                    console.log(response.data)
+                    let fetchedProducts = response.data;
+                    setProducts(fetchedProducts);
+                }
+                
             } catch (error) {
                 console.error("Failed to fetch products:", error);
                 setNotification('Failed to fetch products');

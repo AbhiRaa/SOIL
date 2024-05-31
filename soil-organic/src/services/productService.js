@@ -1,19 +1,24 @@
 import API from '../utils/axiosUtil';
 
-const getAllProducts = () => {
-  return API.get('/products');
+const getAllSecureProducts = () => {
+  return API.get('/secure/products');
+};
+
+const getAllPublicProducts = () => {
+  return API.get('/public/products');
 };
 
 const getProductById = (id) => {
   return API.get(`/products/${id}`);
 };
 
-export const productService = {
-  getAllProducts,
-  getProductById
-};
+// export const productService = {
+//   getAllProducts,
+//   getProductById
+// };
 
 export{
-  getAllProducts,
-  getProductById
+  getAllSecureProducts,
+  getProductById,
+  getAllPublicProducts,
 };

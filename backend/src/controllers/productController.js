@@ -22,6 +22,6 @@ module.exports = (db) => {
                 console.error("Error fetching products:", error);
                 res.status(500).json({ message: "Server error" });
               }
-            },
-}
-    }
+            }
+          }
+        }
