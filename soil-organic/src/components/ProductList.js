@@ -123,21 +123,24 @@ function ProductList({filterRating}) {
                             starDimension="15px"
                             starSpacing="0.01px"
                         /></span></p>
-                        
-
                         {currentloggedInUser && (
-                        <>
-                        <div className='flex gap-5'>
-                            <button onClick={() => handleAddToCart(product)} className="mt-4  hover:bg-teal-300 text-primary font-bold py-2 px-4 rounded-lg border border-primary">
-                            Add to cart
-                            </button>
+                        <div className='flex gap-5 items-center'>
+                            {product.product_stock === 0 ? (
+                                <span className="mt-4 text-red-500 font-bold">Out of Stock</span>
+                            ) : (
+                                <button
+                                    onClick={() => handleAddToCart(product)}
+                                    className="mt-4 hover:bg-teal-300 text-primary font-bold py-2 px-4 rounded-lg border border-primary"
+                                >
+                                    Add to cart
+                                </button>
+                            )}
                             <button onClick={() => handleOpenReviewModal(product)} className="mt-4 text-primary underline font-bold py-2">
                             {reviewCounts[product.product_id] ? `${reviewCounts[product.product_id]} reviews` : 'No reviews'}
                             </button>
                         </div>
-                        </>
-                        
-                    )}
+                    )} 
+                    
                 </div>
             ))}
             {notification && <Notification message={notification} />}
