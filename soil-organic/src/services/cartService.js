@@ -1,24 +1,30 @@
-import API from './api';
+import API from '../utils/axiosUtil';
 
-const addToCart = (itemId, quantity) => {
-  return API.post('/cart', { itemId, quantity });
+const addItem = (userId, productId, quantity, price) => {
+  return API.post(`/cart/add/${userId}`, { productId, quantity, price });
 };
 
-const removeFromCart = (itemId) => {
-  return API.delete(`/cart/${itemId}`);
+const removeItem = (itemId, userId) => {
+  // return API.delete(`/cart/item/${userId}`, { itemId });
+  return API.delete(`/cart/item/${userId}/${itemId}`);
 };
 
-const updateCartItem = (itemId, quantity) => {
-  return API.put(`/cart/${itemId}`, { quantity });
+const updateItem = (itemId, userId, quantity) => {
+  return API.put(`/cart/item/${userId}`, { itemId, quantity });
 };
 
-const getCartItems = () => {
-  return API.get('/cart');
+const getCart = (userId) => {
+  return API.get(`/cart/${userId}`);
 };
 
-export const cartService = {
-  addToCart,
-  removeFromCart,
-  updateCartItem,
-  getCartItems
+const clearCart = (userId) => {
+  return API.delete(`/cart/clear/${userId}`);
+};
+
+export {
+  addItem,
+  removeItem,
+  updateItem,
+  getCart,
+  clearCart
 };

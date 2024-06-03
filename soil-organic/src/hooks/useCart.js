@@ -18,77 +18,66 @@
  */
 import { useState, useEffect, useContext } from 'react';
 import UserContext from "../hooks/context";
+import { getCart, addItem, removeItem, updateItem, clearCart as clearCartAPI } from "../services/cartService.js";
 
 function useCart() {
     const { currentloggedInUser } = useContext(UserContext);
     const [cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
-        const userCartKey = `cartItems_${currentloggedInUser}`;  // Suffix the cart key with the user's email
-        const items = JSON.parse(localStorage.getItem(userCartKey)) || [];
-        setCartItems(items);
+        if (currentloggedInUser && currentloggedInUser.userId) {
+            getCart(currentloggedInUser.userId)
+                .then(response => {
+                    setCartItems(response.data.cartItems || []);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch cart items:", err);
+                    setCartItems([]);
+                });
+        }
     }, [currentloggedInUser]);
 
-    const saveCartItems = (items) => {
-        const userCartKey = `cartItems_${currentloggedInUser}`;
-        localStorage.setItem(userCartKey, JSON.stringify(items));
-        setCartItems(items);
-    };
-
-    const addToCart = (item) => {
-        const existingIndex = cartItems.findIndex(cartItem => cartItem.product_id === item.product_id);
-
-        let newCartItems;
-        if (existingIndex >= 0) {
-            // If item exists, update the quantity
-            newCartItems = [...cartItems];
-            newCartItems[existingIndex] = {
-                ...newCartItems[existingIndex],
-                quantity: newCartItems[existingIndex].quantity + 1
-            };
-        } else {
-            // If item does not exist, add it
-            newCartItems = [...cartItems, { ...item, quantity: 1 }];
+    const addToCart = async (product, quantity) => {
+        try {
+            await addItem(currentloggedInUser.userId, product.product_id, quantity, product.product_price);
+            setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
+        } catch (error) {
+            console.error("Failed to add item:", error);
         }
-        saveCartItems(newCartItems);
     };
 
-    const updateCartQuantity = (item, deltaQuantity) => {
-        const existingIndex = cartItems.findIndex(cartItem => cartItem.product_id === item.product_id);
-
-        let newCartItems;
-        if (existingIndex >= 0) {
-            // If item exists, update the quantity
-            const newQuantity = cartItems[existingIndex].quantity + deltaQuantity;
-            if (newQuantity > 0) {
-                newCartItems = [...cartItems];
-                newCartItems[existingIndex] = {
-                    ...newCartItems[existingIndex],
-                    quantity: newQuantity
-                };
-            } else {
-                // Remove the item if the quantity falls to zero or below
-                newCartItems = cartItems.filter((_, index) => index !== existingIndex);
-            }
-        } else if (deltaQuantity > 0) {
-            // If item does not exist and delta is positive, add it
-            newCartItems = [...cartItems, { ...item, quantity: deltaQuantity }];
-        } else {
-            // If deltaQuantity is negative and item does not exist, do nothing
-            return;
+    const updateCartQuantity = async (itemId, quantity) => {
+        try {
+            console.log(itemId)
+            await updateItem(itemId, currentloggedInUser.userId, quantity);
+            setCartItems(prevItems =>
+                prevItems.map(item =>
+                    item.cart_item_id === itemId ? { ...item, quantity } : item
+                )
+            );
+        } catch (error) {
+            console.error("Failed to update item quantity:", error);
         }
-        saveCartItems(newCartItems);
     };
 
-    const removeFromCart = (itemId) => {
-        const updatedCartItems = cartItems.filter(item => item.product_id !== itemId);
-        saveCartItems(updatedCartItems);
+    const removeFromCart = async (itemId) => {
+        try {
+            await removeItem(itemId, currentloggedInUser.userId);
+            setCartItems(prevItems => prevItems.filter(item => item.cart_item_id !== itemId));
+        } catch (error) {
+            console.error("Failed to remove item:", error);
+        }
     };
 
-    const clearCart = () => {
-        const userCartKey = `cartItems_${currentloggedInUser}`;
-        localStorage.removeItem(userCartKey);
-        setCartItems([]);
+    const clearCart = async () => {
+        try {
+            // Call API to clear the cart
+            await clearCartAPI(currentloggedInUser.userId);
+            console.log("Clearing the cart...");
+            setCartItems([]);
+        } catch (error) {
+            console.error("Failed to clear cart:", error);
+        }
     };
 
     return { cartItems, addToCart, updateCartQuantity, removeFromCart, clearCart };

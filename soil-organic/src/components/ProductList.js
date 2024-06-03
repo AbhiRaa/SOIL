@@ -47,23 +47,26 @@ function ProductList({filterRating}) {
         async function fetchProducts() {
             try {
 
-                if (currentloggedInUser)
-                {
-                    const response = await getAllSecureProducts();
-                    let fetchedProducts = response.data;
-                    // if (filterRating) {
-                    //     fetchedProducts = fetchedProducts.filter(product => 
-                    //         product.reviews.some(review => review.rating > filterRating)
-                    //     );
-                    // }
-                    setProducts(fetchedProducts);
-                }
-                else{
-                    const response = await getAllPublicProducts();
-                    console.log(response.data)
-                    let fetchedProducts = response.data;
-                    setProducts(fetchedProducts);
-                }
+                // if (currentloggedInUser)
+                // {
+                //     const response = await getAllSecureProducts();
+                //     let fetchedProducts = response.data;
+                //     // if (filterRating) {
+                //     //     fetchedProducts = fetchedProducts.filter(product => 
+                //     //         product.reviews.some(review => review.rating > filterRating)
+                //     //     );
+                //     // }
+                //     setProducts(fetchedProducts);
+                // }
+                // else{
+                //     const response = await getAllPublicProducts();
+                //     console.log(response.data)
+                //     let fetchedProducts = response.data;
+                //     setProducts(fetchedProducts);
+                // }
+
+                const response = currentloggedInUser ? await getAllSecureProducts() : await getAllPublicProducts();
+                setProducts(response.data.filter(product => !filterRating || product.rating >= filterRating));
                 
             } catch (error) {
                 console.error("Failed to fetch products:", error);
@@ -73,17 +76,14 @@ function ProductList({filterRating}) {
         }
         fetchProducts();
 
-    }, [filterRating]);
+    }, [filterRating, currentloggedInUser]);
 
     /**
      * Handles adding a product to the cart.
      * @param {Object} product - Product to add to the cart.
      */
-    const handleAddToCart = (product) => {
-        addToCart({
-            ...product,
-            quantity: 1  // Set initial quantity to 1 when adding to cart
-        });
+    const handleAddToCart = async (product) => {
+        await addToCart(product,1);  // Set initial quantity to 1 when adding to cart
         setNotification(`Added ${product.product_name} to cart!`);
         setTimeout(() => setNotification(''), 3000);  // Clear notification after 3 seconds
     };

@@ -38,6 +38,9 @@ async function initializeApp() {
 
     const setupProductRoutes = require('./src/routes/productRoutes');
     setupProductRoutes(app, db); // Dependency injection of models
+
+    const setupCartRoutes = require('./src/routes/cartRoutes');
+    setupCartRoutes(app, db); // Dependency injection of models
     
     // // Routes
     // app.get('/', (req, res) => {

@@ -14,19 +14,38 @@
  */
 import React, { useState, useRef } from 'react';
 
-function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
+function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems, updateShippingAddress, updateCardNumber }) {
     // State for storing and updating card details entered by the user.
     const [cardDetails, setCardDetails] = useState({
         cardType: 'Visa',   // Default card type
         cardNumber: '', // User-entered card number
         expiryDate: '',  // Expiry date of the card
-        cvv: ''     // CVV number of the card
+        cvv: '',     // CVV number of the card
+        shippingAddress: ''  // Add a field for the shipping address
     });
     // State for managing validation error messages.
     const [errorMessages, setErrorMessages] = useState({});
     // Refs for managing focus transitions between form inputs.
     const expiryRef = useRef(null);
     const cvvRef = useRef(null);
+
+    // List of known invalid card numbers for demonstration purposes
+    const invalidCardNumbers = [
+        '1234-5678-9012-3456',
+        '1111-1111-1111-1111',
+        '2222-2222-2222-2222',
+        '3333-3333-3333-3333',
+        '4444-4444-4444-4444',
+        '5555-5555-5555-5555',
+        '6666-6666-6666-6666',
+        '7777-7777-7777-7777',
+        '8888-8888-8888-8888',
+        '9999-9999-9999-9999',
+        '4111-1111-1111-1111', '4000-0000-0000-0002', // Visa
+        '5555-5555-5555-4444', '5105-1051-0510-5100', // MasterCard
+        '3782-8224-6310-005', '3714-4963-539-8431',   // American Express
+        '6011-0009-9013-9424', '6011-0009-9013-0001'  // Discover
+    ];
 
     // Handles input changes and formats them based on their type (e.g., card number, expiry date).
     const handleInputChange = (e) => {
@@ -58,9 +77,25 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
         let valid = true;
         let errors = {};
 
+        // Shipping address validation
+        if (!cardDetails.shippingAddress) {
+            errors.shippingAddress = 'Shipping address is required';
+            valid = false;
+        } else if (cardDetails.shippingAddress.length < 10) {
+            errors.shippingAddress = 'Shipping address is too short';
+            valid = false;
+        } else if (!/\d/.test(cardDetails.shippingAddress)) {
+            errors.shippingAddress = 'Address must include a street number';
+            valid = false;
+        }
+
         // Remove dashes for validation purposes
         const cardNumberDigits = cardDetails.cardNumber.replace(/-/g, '');
-        if (cardNumberDigits.length !== 16) {
+        // Check for invalid card numbers
+        if (invalidCardNumbers.includes(cardDetails.cardNumber)) {
+            errors.cardNumber = 'Invalid card number provided';
+            valid = false;
+        } else if (cardNumberDigits.length !== 16) {
             errors.cardNumber = 'Card number must be 16 digits';
             valid = false;
         }
@@ -100,6 +135,8 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
         console.log('Handling submit...');
         if (isFormValid) {
             console.log('Card details are valid, processing checkout...');
+            updateShippingAddress(cardDetails.shippingAddress); // Update the shipping address in ShoppingCart
+            updateCardNumber(cardDetails.cardNumber); // Update the card number in ShoppingCart
             onCheckoutComplete();   // Callback for successful checkout.
         } else {
             console.log('Card details validation failed');
@@ -113,6 +150,24 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems }) {
             <div className="relative p-8 bg-orange-100 w-full max-w-md m-auto flex-col flex rounded-lg shadow-lg">
                 <h3 className="text-2xl text-primary mb-4 font-medium ">Card Details</h3>
                 <form onSubmit={handleSubmit}>
+                    {/* Shipping Address Input */}
+                    <div className="mb-4">
+                        <label className="block text-primary text-md font-bold mb-2" htmlFor="shippingAddress">
+                            Shipping Address
+                        </label>
+                        <input
+                            id="shippingAddress"
+                            type="text"
+                            name="shippingAddress"
+                            placeholder="Enter your shipping address"
+                            onChange={handleInputChange}
+                            value={cardDetails.shippingAddress}
+                            className="shadow appearance-none border ${errorMessages.shippingAddress ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-grey-darker"
+                            required
+                        />
+                        {errorMessages.shippingAddress && <p className="text-red-500 text-xs italic">{errorMessages.shippingAddress}</p>}
+                    </div>
+
                     {/* Card Type Selection */}
                     <div className="mb-4">
                         <label className="block text-primary text-md font-bold mb-2" htmlFor="cardType">

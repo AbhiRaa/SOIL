@@ -1,7 +1,7 @@
 module.exports = (db) => {
   const bcrypt = require('bcrypt');
   const { generateToken } = require('../utils/jwtUtils');
-  const { User, Profile } = db.models;
+  const { User, Profile, Cart } = db.models;
   const { sequelize } = db;
 
   return {
@@ -29,7 +29,7 @@ module.exports = (db) => {
                 // Create new user
                 const user = await User.create({ name, email, password_hash: hashedPassword }, { transaction: t });
 
-                // Create a corresponding profile with default values
+                // Create a corresponding profile with default values since one to one relationship
                 await Profile.create({
                     user_id: user.user_id,
                     age: null,
@@ -39,6 +39,12 @@ module.exports = (db) => {
                     activity_level: "",
                     dietary_preferences: [],
                     health_goals: []
+                }, { transaction: t });
+
+                // Create a corresponding Cart with default values since one to one relationship
+                await Cart.create({
+                  user_id: user.user_id,
+                  total: 0.00
                 }, { transaction: t });
 
                 return user;
@@ -132,6 +138,11 @@ module.exports = (db) => {
                     where: { user_id: userId },
                     transaction: t
                 });
+
+                await Cart.destroy({
+                  where: { user_id: userId },
+                  transaction: t
+              });
     
                 // Now delete the user
                 const userDeleted = await User.destroy({

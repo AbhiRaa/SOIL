@@ -33,17 +33,19 @@ function PurchaseSummaryModal({ isOpen, onClose, purchaseDetails }) {
     const purchaseDateTime = new Date().toLocaleString();
     const totalAmount = purchaseDetails.items.reduce((acc, item) => {
         // Ensure the item has the necessary properties
-        if (!item.product_price || !item.quantity) {
+        if (!item.product.product_price || !item.quantity) {
             console.error("Invalid item data", item);
             return acc; // Skip this item or handle as needed
         }
-        return acc + item.product_price * item.quantity;
+        return acc + item.product.product_price * item.quantity;
     }, 0);
 
     return (
         <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-75 flex justify-center items-center">
             <div className="bg-orange-100 p-6 rounded-lg shadow-lg max-w-2xl w-full">
                 <h2 className="text-2xl text-primary font-bold mb-4">Purchase Summary</h2>
+                <p className="text-lg">Shipping Address: {purchaseDetails.shippingAddress || 'Not provided'}</p>
+                <p className="text-lg">Card Number: **** **** **** {purchaseDetails.cardNumber || 'N/A'}</p>
                 <div className="overflow-x-auto rounded shadow-md">
                     <table className="min-w-full text-sm divide-y divide-gray-200">
                         <thead>
@@ -57,10 +59,10 @@ function PurchaseSummaryModal({ isOpen, onClose, purchaseDetails }) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {purchaseDetails.items.map((item, index) => (
                                 <tr key={index}>
-                                    <td className="px-4 py-2">{item.product_name}</td>
+                                    <td className="px-4 py-2">{item.product.product_name}</td>
                                     <td className="px-4 py-2">x{item.quantity}</td>
-                                    <td className="px-4 py-2">${item.product_price.toFixed(2)}</td>
-                                    <td className="px-4 py-2">${(item.product_price * item.quantity).toFixed(2)}</td>
+                                    <td className="px-4 py-2">${parseFloat(item.product.product_price).toFixed(2)}</td>
+                                    <td className="px-4 py-2">${(item.product.product_price * item.quantity).toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>
