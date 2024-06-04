@@ -81,7 +81,7 @@ function ShoppingCart() {
                     {cartItems.length > 0 ? (
                         cartItems.map(item => (
                             <div key={item.product.product_id} className="mb-6 p-4 rounded border-primary border-2">
-                                <div className="flex items-start">
+                                <div className="flex items-start gap-2">
                                     <img src={"http://localhost:4000/"+item.product.product_image} alt={item.product.product_name} className="w-24 h-24 object-cover mr-4" />
                                     <div className="flex flex-col justify-between">
                                         <div>
@@ -97,6 +97,7 @@ function ShoppingCart() {
                                             <button onClick={() => handleRemoveItem(item.cart_item_id)} className="ml-4 text-sm text-red-500">Remove</button>
                                         </div>
                                     </div>
+                                    {item.product.is_special && <span className="text-white font-bold bg-green-500 rounded-md p-1">Special</span>}
                                     <span className="ml-auto text-lg font-bold">${parseFloat(item.price_at_time).toFixed(2)}</span>
                                 </div>
                             </div>
