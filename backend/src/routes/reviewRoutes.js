@@ -1,0 +1,15 @@
+const authenticate = require('../middlewares/authenticate');
+
+module.exports = (app, db) => {
+    const reviewController = require('../controllers/reviewController')(db);  // Passing models to the controller
+
+
+    //add a review
+    app.post('/api/review', authenticate, reviewController.addReview);
+
+    //fetch reviews for a product
+    app.get('/api/review/:productId', authenticate, reviewController.fetchReviews);
+
+    //update a review
+    app.put('/api/review/update/:reviewId', authenticate, reviewController.updateReview);
+}

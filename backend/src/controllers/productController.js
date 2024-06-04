@@ -1,8 +1,6 @@
 
 
 module.exports = (db) => {
-    const bcrypt = require('bcrypt');
-    const { generateToken } = require('../utils/jwtUtils');
     const { Product, Review } = db.models;
     // const { sequelize } = db;
 

@@ -1,163 +1,345 @@
 // src/components/ReviewModal.jsx
 
-import React, { useState, useEffect, useRef , useContext} from 'react';
-import StarRatings from 'react-star-ratings';
-import AddReviewModal from './AddReviewModal';
+import React, { useState, useEffect, useRef, useContext } from "react";
+import StarRatings from "react-star-ratings";
+import AddReviewModal from "./AddReviewModal";
 import UserContext from "../hooks/context";
-import EditReviewModal from './EditReviewModal';
+import EditReviewModal from "./EditReviewModal";
+import { addReview } from "../services/reviewService";
+// import ReplyComponent from "./replyComponent";
+import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
+import { FaReply } from "react-icons/fa";
+import { fetchReviews , updateReview} from "../services/reviewService";
 
 function ReviewModal({ product, onClose }) {
-    const { currentloggedInUser } = useContext(UserContext);
-    const [isAddReviewModalOpen, setIsAddReviewModalOpen] = useState(false);
-    const [isEditReviewModalOpen, setIsEditReviewModalOpen] = useState(false);
-    const [existingReviews, setExistingReviews] = useState([]);
-    const [reviewToEdit, setReviewToEdit] = useState(null);
-    const reviewsRef = useRef(null);
+  const { currentloggedInUser } = useContext(UserContext);
+  const [isAddEditReviewModalOpen, setIsAddEditReviewModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [existingReviews, setExistingReviews] = useState([]);
+  const [reviewToEdit, setReviewToEdit] = useState(null);
+  const reviewsRef = useRef(null);
+  const [expandedReviewId, setExpandedReviewId] = useState(null); // to expand reviews to see replies
+  const [replies, setReplies] = useState([]); //
+  const [followingUsers, setFollowingUsers] = useState([]);
 
   // Simulate fetching existing reviews for the product
   useEffect(() => {
-    // This should be replaced with actual data fetching logic
-    const fetchedReviews = [
-      { id: 1, user: 'John Doe', rating: 4, review: 'Great product!' },
-      { id: 2, user: 'Jane Smith', rating: 5, review: 'Absolutely love it!' },
-      // Add more reviews here to test scrolling
-    ];
-    setExistingReviews(fetchedReviews);
+    const fetchReviewsforProduct= async(product)=>{
+      try {
+        const response = await fetchReviews(product.product_id);
+        const filteredReviews = response.data.reviews.map(review => ({
+          review_id: review.review_id,
+          userId: review.user_id,
+          rating: review.rating,
+          content: review.content,
+          userName: review.author.name,
+          productId: review.product_id,
+          created_at: review.created_at,
+        }));
+        setExistingReviews(filteredReviews);
+
+        // Check if current user has already reviewed
+        const userReview = filteredReviews.find(r => r.userId === currentloggedInUser.userId);
+        console.log(userReview)
+        if (userReview) {
+          setIsEditMode(true);
+          setReviewToEdit(userReview);
+        }
+
+      } catch (error) {
+        console.error("Failed to fetch reviews", error);
+        // Optionally handle error state in UI
+      }
+    }
+    fetchReviewsforProduct(product)
+    // Simulate fetching following users
+    const fetchedFollowingUsers = [1]; // Example: assuming the user is following user with ID 1
+    setFollowingUsers(fetchedFollowingUsers);
+
   }, [product]);
 
-  const handleOpenAddReviewModal = () => {
-    setIsAddReviewModalOpen(true);
+  const handleReviewButton = () => {
+    setIsAddEditReviewModalOpen(true);
+    if (!isEditMode) {
+      // Prepare to add a new review
+      setReviewToEdit(null);
+    }
   };
 
-  const handleCloseAddReviewModal = () => {
-    setIsAddReviewModalOpen(false);
+  const toggleReplySection = (reviewId) => {
+    if (expandedReviewId !== reviewId) {
+      setExpandedReviewId(reviewId);
+      // Simulate fetching replies or integrate with an API
+      const fetchedReplies = [
+        { id: 1, text: "Thanks!", user: "Alice" },
+        { id: 2, text: "How long have you had it?", user: "Bob" },
+      ];
+      setReplies(fetchedReplies);
+    }
   };
 
-  const handleOpenEditReviewModal = (review) => {
-    setReviewToEdit(review);
-    setIsEditReviewModalOpen(true);
+  const closeReplySection = () => {
+    setExpandedReviewId(null);
   };
 
-  const handleCloseEditReviewModal = () => {
-    setIsEditReviewModalOpen(false);
-    setReviewToEdit(null);
+  const addReply = (reviewId, replyText) => {
+    const newReply = { user: "Current User", text: replyText };
+    setReplies([...replies, newReply]);
+    // Optionally, make an API call here to save the reply to the backend
   };
 
-  const handleAddReview = (newReview) => {
-    // Add the new review to the existing reviews
-    setExistingReviews([...existingReviews, newReview]);
+
+  const handleReviewSubmission = async (newReview) => {
+
+    //adding the product_id to the review before api call
+    // newReview["product_id"] = product.product_id;
+    if(isEditMode){
+      console.log(reviewToEdit.reviewId)
+    }
+   
+    let response
+    if (isEditMode && reviewToEdit) {
+      // Update existing review
+      // newReview.review_id = reviewToEdit.reviewId;  // Ensure you have the reviewId
+      console.log("this is inside update review call, review is",newReview)
+      response = await updateReview(newReview);  // Assuming updateReview is an API method you have
+      
+    } else {
+      // Add new review
+      response = await addReview(newReview);
+      
+    }
+    // Extracting the full review data including the author details from the response
+    const reviewResponse  = response.data.review;
+    console.log(reviewResponse)
+
+    
+      // Assuming response.data contains the updated or new review
+      const updatedReviewList = isEditMode ?
+      existingReviews.map(review => review.review_id === reviewResponse.review_id ? {...review,
+        content: reviewResponse.content,
+        rating: reviewResponse.rating
+      } : review) :
+      [...existingReviews, {
+        
+        userName: reviewResponse.author.name, // Display the author's name
+        userId: reviewResponse.user_id,
+        review_id: reviewResponse.review_id, // This should match the property name used in your component state
+        rating: reviewResponse.rating,
+        content: reviewResponse.content,
+        author: reviewResponse.author,// You might store the whole author object if needed elsewhere
+        created_at: reviewResponse.created_at,
+      }];
+      console.log(updatedReviewList)
+
+      setExistingReviews(updatedReviewList)
+    
+    
+    console.log("review response after review is",response.data.review  )
+    setReviewToEdit(response.data.review);
+    setIsEditMode(true);
+    console.log("reviewToEdit after add is",reviewToEdit)
+    setIsAddEditReviewModalOpen(false);
+   
+
+    
   };
 
-  const handleEditReview = (updatedReview) => {
-    const updatedReviews = existingReviews.map(review =>
-      review.id === updatedReview.id ? updatedReview : review
+  const handleDeleteReview = (reviewId) => {
+    const updatedReviews = existingReviews.filter(
+      (review) => review.id !== reviewId
     );
     setExistingReviews(updatedReviews);
   };
 
-  const handleDeleteReview = (reviewId) => {
-    const updatedReviews = existingReviews.filter(review => review.id !== reviewId);
-    setExistingReviews(updatedReviews);
+  const handleFollowUser = (userId) => {        //temporary logic to understand handle following flow
+    if (followingUsers.includes(userId)) {
+      // Unfollow logic
+      setFollowingUsers(followingUsers.filter(id => id !== userId));
+      console.log(`Unfollowed user with ID: ${userId}`);
+    } else {
+      // Follow logic
+      setFollowingUsers([...followingUsers, userId]);
+      console.log(`Following user with ID: ${userId}`);
+    }
   };
 
-  const handleFollowUser = (userId) => {
-    console.log(`Following user with ID: ${userId}`);
-    // Add follow logic here
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return `${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg w-2/3 relative">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50 ">
+      <div className="p-6 rounded shadow-lg w-2/3 relative bg-orange-100 text-orange-600 text-xl h-[80vh] overflow-y-scroll">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          className="absolute top-2 right-2 text-gray-1000 hover:text-gray-800 text-4xl "
         >
           &times;
         </button>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 mt-3 p-2">
           <div className="flex items-center space-x-3 align-middle">
-            <img src={product.product_image} alt={product.product_name} className="w-16 h-16 object-cover rounded mr-4" />
-            <h2 className="text-xl font-bold space-x-2">{product.product_name}</h2>
-            {product.is_special && <span className="text-white font-bold bg-green-500 rounded-md p-1">Special</span>}
+            <img
+              src={"http://localhost:4000/"+product.product_image}
+              alt={product.product_name}
+              className="w-20 h-20 object-cover rounded mr-4"
+            />
+            <h2 className="text-4xl font-bold space-x-2">
+              {product.product_name}
+            </h2>
+            {product.is_special && (
+              <span className="text-white font-bold bg-green-500 rounded-md p-1">
+                Special
+              </span>
+            )}
           </div>
           <button
-            onClick={handleOpenAddReviewModal}
-            className="bg-teal-500 text-white px-2 py-1 rounded text-sm"
+            onClick={handleReviewButton}
+            className="bg-teal-500 text-white px-2 py-1 rounded text-xl"
           >
-            Add Review
+            {isEditMode ? "Edit Review" : "Add Review"}
           </button>
         </div>
         <div className="mt-4">
-          <h3 className="text-lg font-bold">User Reviews</h3>
-          <div ref={reviewsRef} className="mt-2 h-64 overflow-y-scroll">
+          <div className="mx-4">
+            <h3 className="text-3xl font-bold">User Reviews</h3>
+          </div>
+          <div ref={reviewsRef} className="mt-2   px-5">
             {existingReviews.map((review) => (
-              <div key={review.id} className="border-b border-gray-300 py-2 flex justify-between items-start">
-                <div>
-                  <div className='flex space-x-9 items-center'>
-                    <p className="font-bold">{review.user}</p>
-                    <div className="text-lg space-x-5 items-center">
-                    {currentloggedInUser && currentloggedInUser!== review.user && (
-                      <button
-                        onClick={() => handleFollowUser(review.userId)}
-                        className="text-slate-500 underline text-sm mb-1"
-                      >
-                        Follow
-                      </button>
-                    )}
+              <div
+                key={review.review_id}
+                className=" border-b py-2 flex-col justify-between items-start border-black"
+              >
+                <div className="userreviewRatingDiv">
+                  <div className="userratingNameDiv">
+                    <div className="flex space-x-9 items-end">
+                      <div className="flex items-center gap-4">
+                        <p className="font-bold text-2xl">{review.userName}</p>
+                        <p className="createdAt font-thin  text-sm">{formatDate(review.created_at)}</p>
+                      </div> 
+                      <div className="text-lg space-x-5 items-center flex justify-between">
+                        {currentloggedInUser &&
+                          currentloggedInUser.userId !== review.userId && (
+                            <>
+                              <button
+                                onClick={() => handleFollowUser(review.userId)}
+                                className="text-slate-500 underline text-sm mb-1"
+                              >
+                                {followingUsers.includes(review.userId) ? ( // conditional  rendering to show different buttons depending on followed or want to unfollow
+                                  <SlUserFollowing size={22} />
+                                ) : (
+                                  <SlUserFollow size={22} />
+                                )}
+                              </button>
+                              <button
+                              onClick={() => toggleReplySection(review.reviewId)}
+                              className="text-slate-500 underline text-sm mt-1"
+                              >
+                              <FaReply  size={23}/>
+                              </button>
+                            </>
+                          )}
+                        <div className="text-lg space-x-5 items-center">
+                          {currentloggedInUser &&
+                            currentloggedInUser.userId === review.userId && (
+                              <>
+                                {/* <button
+                                  onClick={() =>
+                                    handleOpenEditReviewModal(review)
+                                  }
+                                  className="underline text-sm mb-1 text-slate-500 mr-2 p-2"
+                                >
+                                  Edit
+                                </button> */}
+                                <button
+                                  onClick={() => handleDeleteReview(review.reviewId)}
+                                  className="text-red-500 underline text-sm"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
+                          
+                        </div>
+                      </div>
                     </div>
+                    <StarRatings
+                      name={`rating-${review.review_id}`}
+                      rating={review.rating}
+                      starCount={5}
+                      starRatedColor="gold"
+                      editing={false}
+                      starDimension="20px"
+                      starSpacing="2px"
+                    />
                   </div>
-                  <StarRatings
-                    name={`rating-${review.id}`}
-                    rating={review.rating}
-                    starCount={5}
-                    starRatedColor="gold"
-                    editing={false}
-                    starDimension="20px"
-                    starSpacing="2px"
-                  />
-                  
-                  <p>{review.review}</p>
+                  <p>{review.content}</p>
                 </div>
-                <div className="text-lg space-x-5 items-center">
-                  
-                  {currentloggedInUser && currentloggedInUser === review.user && (
-                    <>
-                      <button
-                        onClick={() => handleOpenEditReviewModal(review)}
-                        className="underline text-sm mb-1 text-slate-500 mr-2 p-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteReview(review.id)}
-                        className="text-red-500 underline text-sm"
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                  <button className="text-slate-500 underline text-sm mt-1">Reply</button>
-                </div>
+                {expandedReviewId === review.review_id && (
+                  <div className="mt-2 w-full bg-gray-100 p-3 rounded-lg">
+                    <h4 className="text-lg font-semibold mb-2">Replies</h4>
+                    {replies.map((reply) => (
+                      <div key={reply.id} className="border-b py-2">
+                        <p className="font-bold">{reply.user}</p>
+                        <p>{reply.text}</p>
+                      </div>
+                    ))}
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const replyText = e.target.elements.replyText.value;
+                        addReply(review.review_id, replyText);
+                        e.target.reset();
+                      }}
+                      className="mt-4"
+                    >
+                      <input
+                        type="text"
+                        name="replyText"
+                        className="border p-2 rounded w-full"
+                        placeholder="Add a reply..."
+                      />
+                      <div className="flex gap-10">
+                        <button
+                          type="submit"
+                          className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                        >
+                          Reply
+                        </button>
+                        <button
+                        onClick={closeReplySection}
+                        className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+                        >
+                        Close
+                        </button>
+                      </div>
+                    </form>
+                    
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </div>
-      {isAddReviewModalOpen && (
+      {isAddEditReviewModalOpen && (
         <AddReviewModal
           product={product}
-          onClose={handleCloseAddReviewModal}
-          onSubmit={handleAddReview}
+          existingReview={reviewToEdit}
+          onClose={() => setIsAddEditReviewModalOpen(false)}
+          onSubmit={handleReviewSubmission}
+          isEditMode={isEditMode}
         />
       )}
-      {isEditReviewModalOpen && reviewToEdit && (
+      {/* {isEditReviewModalOpen && reviewToEdit && (
         <EditReviewModal
           product={product}
           review={reviewToEdit}
           onClose={handleCloseEditReviewModal}
           onSubmit={handleEditReview}
         />
-      )}
+      )} */}
     </div>
   );
 }

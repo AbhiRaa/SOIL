@@ -5,19 +5,26 @@ import StarRatings from 'react-star-ratings';
 import UserContext from "../hooks/context";
 
 function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
-    const [review, setReview] = useState(existingReview ? existingReview.review : '');
+    const [review, setReview] = useState(existingReview ? existingReview.content : '');
     const [rating, setRating] = useState(existingReview ? existingReview.rating : 0);
     const { currentloggedInUser } = useContext(UserContext);  // Context to access the currently logged-in user
   
     const handleSubmit = () => {
       if (currentloggedInUser) {
         // Create the review object including the user information
+        console.log(review)
         const newReview = {
-          user: currentloggedInUser,  // Assuming the user context has a 'name' property
+          product_id:product.product_id,
+          user_id: currentloggedInUser.userId,  // Assuming the user context has a 'name' property
           rating,
-          review,
+          content:review,
         };
-  
+        
+        // Only add review_id if it's an update operation
+        if (existingReview && existingReview.review_id) {
+          newReview.reviewId = existingReview.review_id;
+        }
+
         // Submit the review (e.g., save it to the database or state)
         onSubmit(newReview);
   
@@ -44,7 +51,7 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
             &times;
           </button>
           <h2 className="text-xl font-bold mb-4">{existingReview ? "Edit Your Review" : "Add Your Review"}</h2>
-          <p className="font-bold mb-2">{currentloggedInUser ? `${currentloggedInUser}'s Review` : "Your Review"}</p>
+          <p className="font-bold mb-2">{currentloggedInUser.userName ? `${currentloggedInUser.userName}'s Review` : "Your Review"}</p>
           <StarRatings
             rating={rating}
             starRatedColor="gold"
