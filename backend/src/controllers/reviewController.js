@@ -1,5 +1,5 @@
 module.exports = (db) => {
-  const { Review, User, Product } = db.models;
+  const { Review, User, Product, ReviewReply } = db.models;
   // const { sequelize } = db;
 
   return {
@@ -86,6 +86,81 @@ module.exports = (db) => {
         }catch (error) {
             res.status(500).send({ message: "Error updating review", error: error.message });
         }
-    }
+    },
+
+    addReply : async (req, res) => {
+        const { reviewId } = req.params;
+        const { user_id, content } = req.body;
+        console.log(req.body)
+    
+        if (!user_id || !content) {
+            return res.status(400).send({ message: 'Missing user ID or content for the reply.' });
+        }
+    
+        try {
+                // Create a reply
+                const newReply = await ReviewReply.create({
+                review_id:reviewId,
+                user_id,
+                content
+                });
+
+                
+                // Since you only need the reply ID and content, there's no need to fetch it again
+                res.json({
+                  message: 'Reply added successfully',
+                  reply: {
+                    reply_id: newReply.reply_id,
+                    content: newReply.content,
+                  }
+            });
+
+        } catch (error) {
+            console.error('Error adding reply:', error);
+            return res.status(500).send({ message: 'Internal server error' });
+        }
+    },
+
+    fetchReplies:async (req, res) => {
+        try {
+            const { reviewId } = req.params;
+            const replies = await ReviewReply.findAll({
+                where: { review_id: reviewId },
+                
+            });
+            
+            if (!replies) {
+                return res.json({ message: 'No replies found', replies });
+            }
+            
+
+            // Collect user IDs from replies
+        const userIds = replies.map(reply => reply.user_id);
+        // Fetch users using collected user IDs
+        const users = await User.findAll({
+            where: { user_id: userIds },
+            attributes: ['user_id', 'name'] // assuming 'name' is the field for the username
+        });
+
+        // Map user data to an object for quick lookup
+        const userMap = users.reduce((map, user) => {
+            map[user.user_id] = user.name;
+            return map;
+        }, {});
+
+        // Add username to each reply based on user ID
+        const repliesWithUsernames = replies.map(reply => ({
+            ...reply.dataValues, // spread existing reply properties
+            userName: userMap[reply.user_id] || 'Unknown' // add username or 'Unknown' if not found
+        }));
+
+
+        return res.json({ message: 'Replies found', replies: repliesWithUsernames });
+        
+        } catch (error) {
+            res.status(500).json({ message: 'Error retrieving cart', error });
+        }
+    },
+
   }
 };

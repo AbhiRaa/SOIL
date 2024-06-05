@@ -8,8 +8,26 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
     const [review, setReview] = useState(existingReview ? existingReview.content : '');
     const [rating, setRating] = useState(existingReview ? existingReview.rating : 0);
     const { currentloggedInUser } = useContext(UserContext);  // Context to access the currently logged-in user
+    const [errors, setErrors] = useState({});  // State to hold error messages
   
     const handleSubmit = () => {
+      let errorMessages = {};
+      // Validate review content
+      if (!review.trim()) {
+        errorMessages.review = "Review content is required.";
+      }
+
+      // Validate rating
+      if (rating === 0) {
+        errorMessages.rating = "Please select a rating.";
+      }
+
+      if (Object.keys(errorMessages).length > 0) {
+        setErrors(errorMessages);
+        return;  // Stop the submission if there are errors
+      }
+
+
       if (currentloggedInUser) {
         // Create the review object including the user information
         console.log(review)
@@ -38,6 +56,9 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
     };
   
     const changeRating = (newRating) => {
+      if (newRating > 0) {
+        setErrors(prev => ({ ...prev, rating: null }));  // Clear rating error if a valid rating is selected
+      }
       setRating(newRating);
     };
   
@@ -61,12 +82,19 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
             starDimension="30px"
             starSpacing="5px"
           />
+          {errors.rating && <p className="text-red-500">{errors.rating}</p>}
           <textarea
             value={review}
-            onChange={(e) => setReview(e.target.value)}
+            onChange={(e) => {
+              setReview(e.target.value);
+              if (e.target.value.trim()) {
+                setErrors(prev => ({ ...prev, review: null }));  // Clear review error if valid content is provided
+              }
+            }}
             className="w-full h-32 p-2 border rounded mt-4"
             placeholder="Write your review here..."
           />
+          {errors.review && <p className="text-red-500">{errors.review}</p>}
           <div className="flex justify-end mt-4">
             <button
               onClick={onClose}

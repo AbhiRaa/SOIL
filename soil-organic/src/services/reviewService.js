@@ -13,8 +13,18 @@ const updateReview = (review)=>{
     return API.put(`/review/update/${review.reviewId}`, review);
 }
 
+const addReply = (reviewId,reply)=>{
+    return API.post(`/reply/${reviewId}`, reply);
+}
+
+const fetchReplies = (reviewId)=>{
+    return API.get(`/replies/${reviewId}`)
+}
+
 export{
     addReview,
     fetchReviews,
-    updateReview
+    updateReview,
+    addReply,
+    fetchReplies
 }

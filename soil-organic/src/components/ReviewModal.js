@@ -9,7 +9,7 @@ import { addReview } from "../services/reviewService";
 // import ReplyComponent from "./replyComponent";
 import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
 import { FaReply } from "react-icons/fa";
-import { fetchReviews , updateReview} from "../services/reviewService";
+import { fetchReviews , updateReview,addReply, fetchReplies} from "../services/reviewService";
 
 function ReviewModal({ product, onClose }) {
   const { currentloggedInUser } = useContext(UserContext);
@@ -67,14 +67,23 @@ function ReviewModal({ product, onClose }) {
   };
 
   const toggleReplySection = (reviewId) => {
+    console.log(reviewId)
+    const fetchAllReplies = async(reviewId)=>{
+      try{
+        const response = await fetchReplies(reviewId)
+        const allReplies  = response.data.replies
+        console.log(allReplies)
+        setReplies(allReplies);
+      }
+      catch (error) {
+        console.error("Failed to fetch replies", error);
+        // Optionally handle error state in UI
+      }
+    }
     if (expandedReviewId !== reviewId) {
       setExpandedReviewId(reviewId);
-      // Simulate fetching replies or integrate with an API
-      const fetchedReplies = [
-        { id: 1, text: "Thanks!", user: "Alice" },
-        { id: 2, text: "How long have you had it?", user: "Bob" },
-      ];
-      setReplies(fetchedReplies);
+
+      fetchAllReplies(reviewId)
     }
   };
 
@@ -82,15 +91,35 @@ function ReviewModal({ product, onClose }) {
     setExpandedReviewId(null);
   };
 
-  const addReply = (reviewId, replyText) => {
-    const newReply = { user: "Current User", text: replyText };
-    setReplies([...replies, newReply]);
+  const handleAddReply = async (reviewId, replyText) => {
+    // const newReply = { user: "Current User", text: replyText };
+    // setReplies([...replies, newReply]);
     // Optionally, make an API call here to save the reply to the backend
+
+    try {
+      console.log(reviewId)
+      console.log(currentloggedInUser.userId)
+      const reply = {
+          user_id: currentloggedInUser.userId, // Assuming you have user_id in the context
+          content: replyText,
+      };
+      console.log(reply)
+      const response = await addReply(reviewId, reply);
+      const result = response.data.reply
+      result.userName = currentloggedInUser.userName
+      console.log(result)
+
+      // Assuming the backend returns the added reply, you append it to the correct review.
+      setReplies(prevReplies => [...prevReplies, result]);
+  } catch (error) {
+      console.error('Error adding reply:', error.message);
+  }
+
   };
 
 
   const handleReviewSubmission = async (newReview) => {
-
+    try{
     //adding the product_id to the review before api call
     // newReview["product_id"] = product.product_id;
     if(isEditMode){
@@ -99,9 +128,7 @@ function ReviewModal({ product, onClose }) {
    
     let response
     if (isEditMode && reviewToEdit) {
-      // Update existing review
-      // newReview.review_id = reviewToEdit.reviewId;  // Ensure you have the reviewId
-      console.log("this is inside update review call, review is",newReview)
+
       response = await updateReview(newReview);  // Assuming updateReview is an API method you have
       
     } else {
@@ -114,25 +141,25 @@ function ReviewModal({ product, onClose }) {
     console.log(reviewResponse)
 
     
-      // Assuming response.data contains the updated or new review
-      const updatedReviewList = isEditMode ?
-      existingReviews.map(review => review.review_id === reviewResponse.review_id ? {...review,
-        content: reviewResponse.content,
-        rating: reviewResponse.rating
-      } : review) :
-      [...existingReviews, {
-        
-        userName: reviewResponse.author.name, // Display the author's name
-        userId: reviewResponse.user_id,
-        review_id: reviewResponse.review_id, // This should match the property name used in your component state
-        rating: reviewResponse.rating,
-        content: reviewResponse.content,
-        author: reviewResponse.author,// You might store the whole author object if needed elsewhere
-        created_at: reviewResponse.created_at,
-      }];
-      console.log(updatedReviewList)
+    // Assuming response.data contains the updated or new review
+    const updatedReviewList = isEditMode ?
+    existingReviews.map(review => review.review_id === reviewResponse.review_id ? {...review,
+      content: reviewResponse.content,
+      rating: reviewResponse.rating
+    } : review) :
+    [...existingReviews, {
+      
+      userName: reviewResponse.author.name, // Display the author's name
+      userId: reviewResponse.user_id,
+      review_id: reviewResponse.review_id, // This should match the property name used in your component state
+      rating: reviewResponse.rating,
+      content: reviewResponse.content,
+      author: reviewResponse.author,// You might store the whole author object if needed elsewhere
+      created_at: reviewResponse.created_at,
+    }];
+    console.log(updatedReviewList)
 
-      setExistingReviews(updatedReviewList)
+    setExistingReviews(updatedReviewList)
     
     
     console.log("review response after review is",response.data.review  )
@@ -141,7 +168,11 @@ function ReviewModal({ product, onClose }) {
     console.log("reviewToEdit after add is",reviewToEdit)
     setIsAddEditReviewModalOpen(false);
    
+  }
+  catch (error) {
+    console.error("Failed to add/update reviews", error);
 
+  }
     
   };
 
@@ -206,7 +237,10 @@ function ReviewModal({ product, onClose }) {
             <h3 className="text-3xl font-bold">User Reviews</h3>
           </div>
           <div ref={reviewsRef} className="mt-2   px-5">
-            {existingReviews.map((review) => (
+          {existingReviews.length === 0 ? (
+            <p className="text-center text-lg mt-4">No reviews available.</p>
+          ) :
+            existingReviews.map((review) => (
               <div
                 key={review.review_id}
                 className=" border-b py-2 flex-col justify-between items-start border-black"
@@ -233,7 +267,7 @@ function ReviewModal({ product, onClose }) {
                                 )}
                               </button>
                               <button
-                              onClick={() => toggleReplySection(review.reviewId)}
+                              onClick={() => toggleReplySection(review.review_id)}
                               className="text-slate-500 underline text-sm mt-1"
                               >
                               <FaReply  size={23}/>
@@ -280,16 +314,16 @@ function ReviewModal({ product, onClose }) {
                   <div className="mt-2 w-full bg-gray-100 p-3 rounded-lg">
                     <h4 className="text-lg font-semibold mb-2">Replies</h4>
                     {replies.map((reply) => (
-                      <div key={reply.id} className="border-b py-2">
-                        <p className="font-bold">{reply.user}</p>
-                        <p>{reply.text}</p>
+                      <div key={reply.reply_id} className="border-b py-2">
+                        <p className="font-bold">{reply.userName}</p>
+                        <p>{reply.content}</p>
                       </div>
                     ))}
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
                         const replyText = e.target.elements.replyText.value;
-                        addReply(review.review_id, replyText);
+                        handleAddReply(review.review_id, replyText);
                         e.target.reset();
                       }}
                       className="mt-4"
