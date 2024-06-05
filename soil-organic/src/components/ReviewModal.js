@@ -9,7 +9,7 @@ import { addReview } from "../services/reviewService";
 // import ReplyComponent from "./replyComponent";
 import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
 import { FaReply } from "react-icons/fa";
-import { fetchReviews , updateReview,addReply, fetchReplies} from "../services/reviewService";
+import { fetchReviews , updateReview,addReply, fetchReplies, deleteReview} from "../services/reviewService";
 import { followUser, fetchFollowing, unfollowUser } from "../services/userService";
 import Notification from '../utils/notifications';
 
@@ -191,11 +191,30 @@ function ReviewModal({ product, onClose }) {
     
   };
 
-  const handleDeleteReview = (reviewId) => {
-    const updatedReviews = existingReviews.filter(
-      (review) => review.id !== reviewId
-    );
-    setExistingReviews(updatedReviews);
+  const handleDeleteReview = async (reviewId) => {
+    try{
+      const response = await deleteReview(reviewId)
+      if(response.status==201){
+        const updatedReviews = existingReviews.filter(
+          (review) => review.review_id !== reviewId
+        );
+        setExistingReviews(updatedReviews);
+
+        // Check if the deleted review was the user's review
+        if (reviewToEdit && reviewId === reviewToEdit.review_id) {
+          setReviewToEdit(null);
+          setIsEditMode(false); // Reset edit mode
+        }
+        // Optionally, display a notification message
+        setNotification('Review deleted successfully.');
+        setTimeout(() => setNotification(''), 3000);
+      }
+      else{
+        throw new Error(`couldn't delete review`)
+      }
+    }catch(error){
+      console.error("Failed to delete review", error);
+    }
   };
 
   const handleFollowUser = async (userId,reviewerName) => {        //temporary logic to understand handle following flow
@@ -307,6 +326,9 @@ function ReviewModal({ product, onClose }) {
                                   <SlUserFollow size={22} />
                                 )}
                               </button>
+                            </>
+                              )}
+                            <>
                               <button
                               onClick={() => toggleReplySection(review.review_id)}
                               className="text-slate-500 underline text-sm mt-1"
@@ -314,7 +336,7 @@ function ReviewModal({ product, onClose }) {
                               <FaReply  size={23}/>
                               </button>
                             </>
-                          )}
+                          
                         <div className="text-lg space-x-5 items-center">
                           {currentloggedInUser &&
                             currentloggedInUser.userId === review.userId && (
@@ -328,7 +350,7 @@ function ReviewModal({ product, onClose }) {
                                   Edit
                                 </button> */}
                                 <button
-                                  onClick={() => handleDeleteReview(review.reviewId)}
+                                  onClick={() => handleDeleteReview(review.review_id)}
                                   className="text-red-500 underline text-sm"
                                 >
                                   Delete

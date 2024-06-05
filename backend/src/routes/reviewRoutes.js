@@ -14,7 +14,7 @@ module.exports = (app, db) => {
     app.put('/api/review/update/:reviewId', authenticate, reviewController.updateReview);
 
     //delete a review
-
+    app.delete('/api/review/:reviewId',authenticate,reviewController.deleteReview)
 
     //add a reply
     app.post('/api/reply/:reviewId',authenticate,reviewController.addReply)

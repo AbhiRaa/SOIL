@@ -23,6 +23,8 @@ function ProductList({filterRating}) {
     const [isReviewModalOpen, setIsReviewModalOpen] = React.useState(false);
     const [selectedProduct, setSelectedProduct] = React.useState(null);
     const [reviewCounts, setReviewCounts] = React.useState({}); // State to store review counts
+    const [averageRatings, setAverageRatings] = React.useState({}); // State for average ratings
+
 
 
     // Effect to fetch products and apply rating filter
@@ -66,7 +68,22 @@ function ProductList({filterRating}) {
                 // }
 
                 const response = currentloggedInUser ? await getAllSecureProducts() : await getAllPublicProducts();
+                console.log(response.data)
                 setProducts(response.data.filter(product => !filterRating || product.rating >= filterRating));
+                // Calculate review counts and average ratings
+                const counts = {};
+                const averages = {};
+                response.data.forEach(product => {
+                    counts[product.product_id] = product.reviews.length;
+                    if (product.reviews.length > 0) {
+                        const totalRating = product.reviews.reduce((acc, review) => acc + review.rating, 0);
+                        averages[product.product_id] = totalRating / product.reviews.length;
+                    } else {
+                        averages[product.product_id] = 0;
+                    }
+                });
+                setReviewCounts(counts);
+                setAverageRatings(averages);
                 
             } catch (error) {
                 console.error("Failed to fetch products:", error);
@@ -115,7 +132,7 @@ function ProductList({filterRating}) {
                         <p className="text-md text-primary">{product.product_description}</p>
                         <p className="text-md font-bold">Quantity: {product.minimum_purchase_unit}</p>
                         <p className="text-md font-bold">Rating:<span> <StarRatings
-                            rating={product.reviews.rating?product.review.rating:0}
+                            rating={averageRatings[product.product_id]}
                             starRatedColor="gold"
                             // changeRating={changeRating}
                             numberOfStars={5}

@@ -88,6 +88,24 @@ module.exports = (db) => {
         }
     },
 
+    deleteReview: async(req,res)=>{
+      const { reviewId } = req.params;
+      try {
+        const result = await Review.destroy({
+            where: { review_id: reviewId }
+        });
+
+        if (result === 0) {
+            return res.status(404).json({ message: 'Review not found or already deleted.' });
+        }
+
+        res.status(201).json({ message: 'Review deleted successfully.' });
+        } catch (error) {
+        console.error('Error deleting review:', error);
+        res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
     addReply : async (req, res) => {
         const { reviewId } = req.params;
         const { user_id, content } = req.body;

@@ -18,7 +18,11 @@ const addReply = (reviewId,reply)=>{
 }
 
 const fetchReplies = (reviewId)=>{
-    return API.get(`/replies/${reviewId}`)
+    return API.get(`/replies/${reviewId}`);
+}
+
+const deleteReview = (reviewId)=>{
+    return API.delete(`/review/${reviewId}`)
 }
 
 export{
@@ -26,5 +30,6 @@ export{
     fetchReviews,
     updateReview,
     addReply,
-    fetchReplies
+    fetchReplies,
+    deleteReview,
 }
