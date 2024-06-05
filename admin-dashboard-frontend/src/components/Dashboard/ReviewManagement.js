@@ -28,7 +28,12 @@ const ReviewManagement = () => {
       <h1>Review Management</h1>
       {data && data.reviews.map(review => (
         <div key={review.review_id} style={{ background: isProfane(review.content) ? '#ffdddd' : 'transparent', margin: '10px', padding: '10px' }}>
-          <p>{review.content} (Rating: {review.rating})</p>
+          <p>
+            <strong>Review ID:</strong> {review.review_id} <br/>
+            <strong>User ID:</strong> {review.user_id} <br/>
+            <strong>Product ID:</strong> {review.product_id} <br/>
+            <strong>Content:</strong> {review.content} (Rating: {review.rating} star)
+          </p>
           {isProfane(review.content) && <p style={{ color: 'red' }}>Review flagged for moderation</p>}
           <button onClick={() => toggleVisibility(review.review_id, review.is_visible)}>
             {review.is_visible ? 'Hide' : 'Show'}

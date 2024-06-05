@@ -19,6 +19,19 @@ const UserManagement = () => {
     onError: (err) => setErrorMessage('Failed to unblock user: ' + err.message),
     onCompleted: () => setErrorMessage('')
   });
+  
+  const formatDate = (timestamp) => {
+    // Convert the string timestamp to a number and create a new Date object
+    const date = new Date(Number(timestamp));
+    return date.toLocaleString("en-US", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
 
   if (loading) return <p>Loading users...</p>;
   if (error) return <p>Error loading users :(</p>;
@@ -28,8 +41,13 @@ const UserManagement = () => {
       <h1>User Management</h1>
       {errorMessage && <p className="error">{errorMessage}</p>}
       {data && data.users.map((user) => (
-        <div key={user.user_id}>
-          <p>{user.name} - {user.is_blocked ? 'Blocked' : 'Active'}</p>
+        <div key={user.user_id} style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
+          <p>
+            <strong>Name:</strong> {user.name} <br />
+            <strong>Email:</strong> {user.email} <br />
+            <strong>Status:</strong> {user.is_blocked ? 'Blocked' : 'Active'} <br />
+            <strong>Join Date:</strong> {formatDate(user.join_date)}
+          </p>
           <button onClick={() => blockUser({ variables: { id: user.user_id } }).catch(e => {})}>
             Block
           </button>
