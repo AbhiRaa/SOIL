@@ -7,10 +7,10 @@ import MealCard from '../components/MealCard';
 import { fetchMeals, generateMealPlan } from '../assets/api';
 import useMealPlanner from '../hooks/useMealPlanner';
 import UserContext from "../hooks/context";
-import { findUser } from "../data/users";
 import { calculateBMR, calculateTDEE } from '../utils/calorieCalculator';
 import { calculateMacros } from '../utils/macrosCalculator';
 import NutritionChart from '../components/NutritionChart';
+import { getUserDetails } from "../services/userService.js";
 
 const intoleranceOptions = [
   { label: "Dairy", value: "dairy" },
@@ -56,22 +56,29 @@ function MealPlanningApp() {
   }, [currentloggedInUser, navigate]);
 
   useEffect(() => {
-    if (currentloggedInUser) {
-      const userDetails = findUser(currentloggedInUser);
-      if (userDetails && userDetails.profile) {
-        const { weight, height, age, gender, activityLevel, healthGoals, dietaryPreferences } = userDetails.profile;
-        const bmr = calculateBMR(weight, height, age, gender);
-        const tdee = calculateTDEE(bmr, activityLevel);
-        const macrosData = calculateMacros(tdee, healthGoals);
-        setDailyCalories(bmr); // Optionally show BMR
-        setTDEE(tdee);
-        setMacros(macrosData);
-        setDietPreferences(dietaryPreferences);
-        console.log("Macros:", macrosData);
-        console.log("Dietary Preferences:", dietaryPreferences);
-        console.log("Meal PLAN:", selectedMeals)
+    async function fetchDetails() {
+      if (currentloggedInUser && currentloggedInUser.userId) {
+        try {
+          const userDetails = await getUserDetails(currentloggedInUser.userId);
+          if (userDetails) {
+            const { weight, height, age, gender, activityLevel, healthGoals, dietaryPreferences } = userDetails.data;
+            const bmr = calculateBMR(weight, height, age, gender);
+            const tdee = calculateTDEE(bmr, activityLevel);
+            const macrosData = calculateMacros(tdee, healthGoals);
+            setDailyCalories(bmr); // Optionally show BMR
+            setTDEE(tdee);
+            setMacros(macrosData);
+            setDietPreferences(dietaryPreferences);
+            console.log("Macros:", macrosData);
+            console.log("Dietary Preferences:", dietaryPreferences);
+            console.log("Meal PLAN:", selectedMeals)
+          }
+        } catch (error) {
+          console.error('Failed to fetch user details:', error);
+        }
       }
     }
+    fetchDetails();
     saveMealPlan(mealPlanData);
   }, [mealPlanData, currentloggedInUser]);
 
@@ -239,7 +246,7 @@ function MealPlanningApp() {
           {/* Multi-select dropdown for dietary restrictions */}
           <div className="w-full flex-col gap-3">
             <label htmlFor="intolerances" className="block text-2xl font-bold text-primary  mb-1">Select Dietary Restrictions:</label>
-            <p className="text-primary text-sm">*press Ctrl for multiple selections</p>
+            <p className="text-primary text-sm">*press Ctrl for multiple selections which will add restrictions on both meal generation and search</p>
             <select multiple id="intolerances" name="intolerances" value={intolerances} onChange={handleChangeIntolerance} className="form-multiselect bg-orange-50 block w-full mt-1 pl-3 pr-10 py-2 text-primary text-xl border-gray-300 focus:outline-none focus:ring-primary focus:border-primary  rounded-md">
               {intoleranceOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -299,7 +306,7 @@ function MealPlanningApp() {
           <div className="flex justify-between items-center">
             <div>
             <h1 className="text-5xl mt-5 text-primary text-bold">Find Your Favourite Recipes</h1>
-            <p className="text-sm text-primary">*enter any recipe you desire in the search bar</p>
+            <p className="text-sm text-primary">*enter any recipe you desire in the search bar and directly add the meal from search to the selected day meal plan </p>
             </div>
             <div className="searchbox">
             <MealSearch onSearch={handleMealSearch} />  

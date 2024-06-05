@@ -16,7 +16,7 @@ const Profile = () => {
 
   useEffect(() => {
     // Retrieve the user object from local storage.
-    async function fetchDetails(){
+    async function fetchDetails() {
       if (currentloggedInUser && currentloggedInUser.userId) {
         try {
           const response = await getUserDetails(currentloggedInUser.userId);

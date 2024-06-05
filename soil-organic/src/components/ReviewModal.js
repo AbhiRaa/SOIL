@@ -30,7 +30,8 @@ function ReviewModal({ product, onClose }) {
     const fetchReviewsforProduct= async(product)=>{
       try {
         const response = await fetchReviews(product.product_id);
-        const filteredReviews = response.data.reviews.map(review => ({
+        const reviews = response.data.reviews.filter(review => review.is_visible || review.user_id === currentloggedInUser.userId);
+        const filteredReviews = reviews.map(review => ({
           review_id: review.review_id,
           userId: review.user_id,
           rating: review.rating,
@@ -40,6 +41,13 @@ function ReviewModal({ product, onClose }) {
           created_at: review.created_at,
         }));
         setExistingReviews(filteredReviews);
+
+        // Handle notifications for non-visible reviews
+        reviews.forEach(review => {
+          if (!review.is_visible && review.user_id === currentloggedInUser.userId) {
+            handleNotificationCycle(review);
+          }
+        });
 
         // Check if current user has already reviewed
         const userReview = filteredReviews.find(r => r.userId === currentloggedInUser.userId);
@@ -71,7 +79,24 @@ function ReviewModal({ product, onClose }) {
     }
     fetchFollowingList()
 
-  }, [product]);
+  }, [product, currentloggedInUser.userId]);
+
+  const handleNotificationCycle = (review) => {
+    let count = 0;
+    const interval = setInterval(() => {
+      if (count < 5) {
+        setNotification(`Your review on ${product.product_name} has been deleted by the admin.`);
+        setTimeout(() => setNotification(''), 1000);  // Show the notification for 1 second
+        count++;
+      } else {
+        clearInterval(interval); // Stop the interval after 5 cycles
+        deleteReview(review.review_id).then(() => {
+          setExistingReviews(currentReviews => currentReviews.filter(r => r.review_id !== review.review_id));
+          console.log(`Review ${review.review_id} deleted after 5 notifications`);
+        }).catch(error => console.error("Failed to delete review", error));
+      }
+    }, 1500);  // Interval of 1.5 seconds for each cycle of notification
+  };
 
   const handleReviewButton = () => {
     setIsAddEditReviewModalOpen(true);
