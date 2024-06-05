@@ -19,4 +19,15 @@ module.exports = (app, db) => {
 
   // Route for updating user password
   app.post('/api/user/update-password/:userId', authenticate, userController.updatePassword);
+
+
+  //Route to follow a user
+  app.post('/api/user/follow/:followerId',authenticate,userController.followUser);
+
+  //route to fetch following
+  app.get('/api/user/following/:followerId',authenticate,userController.fetchFollowing);
+
+  //route to unfollow a user
+  app.post('/api/user/unfollow/:followerId',authenticate,userController.unfollowUser);
+
 };  

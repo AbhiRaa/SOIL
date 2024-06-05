@@ -1,7 +1,7 @@
 module.exports = (db) => {
   const bcrypt = require('bcrypt');
   const { generateToken } = require('../utils/jwtUtils');
-  const { User, Profile, Cart } = db.models;
+  const { User, Profile, Cart, Follows } = db.models;
   const { sequelize } = db;
 
   return {
@@ -257,6 +257,75 @@ module.exports = (db) => {
       } catch (error) {
           res.status(500).json({ message: 'Failed to update password.', error: error.message });
       }
-    }  
-  };
+    },
+    
+    followUser:async (req,res) =>{
+      const{followingId} = req.body
+      const {followerId} = req.params
+
+      try {
+        // Prevent users from following themselves
+        if (parseInt(followerId) === followingId) {
+            return res.status(400).json({ message: "You cannot follow yourself." });
+        }
+
+        // Create follow relationship
+        const [follow, created] = await Follows.findOrCreate({
+          where: { follower_id: followerId, following_id: followingId },
+          defaults: { follower_id: followerId, following_id: followingId }
+        });
+
+        if (!created) {
+          return res.status(409).json({ message: "You are already following this user." });
+        }
+
+        res.status(201).json({ message: "Successfully followed the user." });
+        } catch (error) {
+          console.error("Error in following user: ", error);
+          res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    fetchFollowing : async (req, res) => {
+      const {followerId} = req.params;
+      try {
+        const followingIds = await db.models.Follows.findAll({
+            where: { follower_id: followerId },
+            attributes: ['following_id'], // Select only the following_id column
+        });
+
+        // Map to extract just the following_id values
+        const ids = followingIds.map(follow => follow.following_id);
+
+        if (ids.length === 0) {
+          res.json({ message: "No following found.", followingIds: [] });
+        } else {
+          res.json({ message: "Following IDs retrieved successfully.", followingIds: ids });
+        }
+      } catch (error) {
+        console.error("Error retrieving following IDs: ", error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    },
+
+    unfollowUser: async(req,res)=>{
+      const {followerId} = req.params
+      const{followingId} = req.body
+      try {
+        const result = await Follows.destroy({
+            where: { follower_id: followerId, following_id: followingId }
+        });
+
+        if (result === 0) {
+            return res.status(404).json({ message: "You are not following this user." });
+        }
+
+        res.status(201).json({ message: "Successfully unfollowed the user." });
+        } catch (error) {
+        console.error("Error in unfollowing user: ", error);
+          res.status(500).json({ message: 'Internal server error' });
+        }
+    }
+
+}
 };

@@ -10,6 +10,8 @@ import { addReview } from "../services/reviewService";
 import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
 import { FaReply } from "react-icons/fa";
 import { fetchReviews , updateReview,addReply, fetchReplies} from "../services/reviewService";
+import { followUser, fetchFollowing, unfollowUser } from "../services/userService";
+import Notification from '../utils/notifications';
 
 function ReviewModal({ product, onClose }) {
   const { currentloggedInUser } = useContext(UserContext);
@@ -21,6 +23,7 @@ function ReviewModal({ product, onClose }) {
   const [expandedReviewId, setExpandedReviewId] = useState(null); // to expand reviews to see replies
   const [replies, setReplies] = useState([]); //
   const [followingUsers, setFollowingUsers] = useState([]);
+  const [notification, setNotification] = useState(''); // State for displaying notifications
 
   // Simulate fetching existing reviews for the product
   useEffect(() => {
@@ -52,9 +55,21 @@ function ReviewModal({ product, onClose }) {
       }
     }
     fetchReviewsforProduct(product)
+
+
     // Simulate fetching following users
-    const fetchedFollowingUsers = [1]; // Example: assuming the user is following user with ID 1
-    setFollowingUsers(fetchedFollowingUsers);
+    // const fetchedFollowingUsers = [1]; // Example: assuming the user is following user with ID 1
+    const fetchFollowingList = async()=>{
+      try{
+        const response = await fetchFollowing(currentloggedInUser.userId)
+        const followingList = response.data.followingIds
+        console.log(followingList)
+        setFollowingUsers(followingList);
+      }catch(error){
+        console.log("failed to ffetch followers",error)
+      }
+    }
+    fetchFollowingList()
 
   }, [product]);
 
@@ -183,14 +198,40 @@ function ReviewModal({ product, onClose }) {
     setExistingReviews(updatedReviews);
   };
 
-  const handleFollowUser = (userId) => {        //temporary logic to understand handle following flow
+  const handleFollowUser = async (userId,reviewerName) => {        //temporary logic to understand handle following flow
+    
     if (followingUsers.includes(userId)) {
       // Unfollow logic
+      try{
+        const response = await unfollowUser(currentloggedInUser.userId, userId)
+        if(response.status==201){
+          setFollowingUsers(followingUsers.filter(id => id !== userId));
+          setNotification(`Successfully unfollowed ${reviewerName}`);
+          setTimeout(() => setNotification(''), 3000);
+        }
+        else{
+          throw new Error("couldn't follow user")
+        }
+      }catch (error) {
+        console.error("Failed to follow/unfollow", error);
+      }
       setFollowingUsers(followingUsers.filter(id => id !== userId));
       console.log(`Unfollowed user with ID: ${userId}`);
     } else {
       // Follow logic
-      setFollowingUsers([...followingUsers, userId]);
+      try{
+        const response = await followUser(currentloggedInUser.userId, userId)
+        if(response.status==201){
+          setFollowingUsers([...followingUsers, userId]);
+          setNotification(`Successfully followed ${reviewerName}`);
+          setTimeout(() => setNotification(''), 3000);
+        }
+        else{
+          throw new Error("couldn't follow user")
+        }
+      }catch (error) {
+        console.error("Failed to follow/unfollow", error);
+      }
       console.log(`Following user with ID: ${userId}`);
     }
   };
@@ -257,7 +298,7 @@ function ReviewModal({ product, onClose }) {
                           currentloggedInUser.userId !== review.userId && (
                             <>
                               <button
-                                onClick={() => handleFollowUser(review.userId)}
+                                onClick={() => handleFollowUser(review.userId,review.userName)}
                                 className="text-slate-500 underline text-sm mb-1"
                               >
                                 {followingUsers.includes(review.userId) ? ( // conditional  rendering to show different buttons depending on followed or want to unfollow
@@ -366,6 +407,7 @@ function ReviewModal({ product, onClose }) {
           isEditMode={isEditMode}
         />
       )}
+      {notification && <Notification message={notification} />}
       {/* {isEditReviewModalOpen && reviewToEdit && (
         <EditReviewModal
           product={product}
