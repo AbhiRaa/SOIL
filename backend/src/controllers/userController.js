@@ -71,6 +71,11 @@ module.exports = (db) => {
                   return res.status(404).json({ message: 'User not found.' });
               }
 
+              // Check if the user is blocked
+              if (user.is_blocked) {
+                  return res.status(403).json({ message: 'Account is blocked. Please contact support.' });
+              }
+
               const isMatch = await bcrypt.compare(password, user.password_hash);
               if (!isMatch) {
                   return res.status(400).json({ message: 'Invalid credentials.' });
@@ -87,7 +92,7 @@ module.exports = (db) => {
               console.error("Sign in Error:", error);
               res.status(500).json({ message: 'Something went wrong.' });
           }
-      },
+      },  
 
       getUserDetails: async (req, res) => {
         const { userId } = req.params;

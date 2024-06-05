@@ -41,6 +41,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems, updateS
         '7777-7777-7777-7777',
         '8888-8888-8888-8888',
         '9999-9999-9999-9999',
+        '0000-0000-0000-0000',
         '4111-1111-1111-1111', '4000-0000-0000-0002', // Visa
         '5555-5555-5555-4444', '5105-1051-0510-5100', // MasterCard
         '3782-8224-6310-005', '3714-4963-539-8431',   // American Express
@@ -182,6 +183,7 @@ function CheckoutModal({ isOpen, onClose, onCheckoutComplete, cartItems, updateS
                         >
                             <option value="Visa">Visa</option>
                             <option value="MasterCard">MasterCard</option>
+                            <option value="AmericanExpress">AmericanExpress</option>
                             
                         </select>
                     </div>

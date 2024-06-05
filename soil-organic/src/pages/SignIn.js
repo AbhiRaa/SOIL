@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting after successful login
 import Navigator from "../components/NavigationBar";
-import { findUser } from "../data/users";
 import { signIn } from "../services/userService.js";
 import Notification from '../utils/notifications';
 
@@ -71,6 +70,9 @@ const SignIn = (props) => {
               break;
             case 400:
               setErrorMessage("Incorrect email or password. Please try again.");
+              break;
+            case 403:
+              setNotification(`Account is blocked. Please contact support at admin@soil.com.`);
               break;
             default:
               setErrorMessage("An unexpected error occurred. Please try again.");

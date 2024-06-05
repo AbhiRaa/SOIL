@@ -132,8 +132,16 @@ module.exports = (db) => {
                 });
 
                 await Promise.all(cartItems.map(async item => {
+                    // Calculate new stock value
                     const newStock = item.product.product_stock - item.quantity;
-                    await Product.update({ product_stock: newStock }, { where: { product_id: item.product_id } });
+                    
+                    // Update stock only if newStock is non-negative
+                    if (newStock >= 0) {
+                        await Product.update({ product_stock: newStock }, { where: { product_id: item.product_id } });
+                    } else {
+                        // Optionally, log or handle the case when stock cannot be reduced
+                        console.log(`Cannot reduce stock for product ${item.product_id}: stock would become negative.`);
+                    }
                 }));
 
                 await CartItem.destroy({ where: { cart_id: cart.cart_id } });
