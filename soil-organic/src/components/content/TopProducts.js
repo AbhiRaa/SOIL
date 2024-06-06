@@ -16,7 +16,7 @@ function Products() {
     <>
       <section>
         <h2 className="font-medium text-4xl text-teal-700 ml-5 mt-5 flex justify-center">
-          Top Products
+          Top Rated Products
         </h2>
       </section>    
         <ProductList topRatedLimit={5}/>
