@@ -1,20 +1,17 @@
 /**
  * TopProducts.js
  * 
- * This file defines the `Products` component that displays a curated list of top-rated products
- * within the application. It leverages the `ProductList` component to render products that meet a
- * specific rating threshold. The component initializes product data upon rendering and showcases
- * products with a rating of 4.5 or higher.
+ * This file defines the `Products` component that displays a curated list of top 5-rated products
+ * within the application. It leverages the `ProductList` component to render products that are top rated.
+ * The component initializes product data upon rendering and showcases top 5 rated products.
  * 
  * Imports:
  * - initProducts: A function from `../../data/products` that initializes the product dataset.
  * - ProductList: A component that renders a list of products based on provided filtering criteria.
  */
-import { initProducts } from "../../data/products";
 import ProductList from "../ProductList";
 
 function Products() {
-  initProducts();   // Initialize products at the start. This function could be fetching or setting up data.
   return (
     <>
       <section>
@@ -22,7 +19,7 @@ function Products() {
           Top Products
         </h2>
       </section>    
-        <ProductList filterRating={4.5}/>
+        <ProductList topRatedLimit={5}/>
         
     </>
   );

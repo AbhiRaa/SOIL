@@ -1,5 +1,4 @@
 import React, { useEffect,useContext } from 'react';
-import { initProducts, getProducts } from '../data/products';
 import useCart from '../hooks/useCart';
 import UserContext from "../hooks/context";
 import Notification from '../utils/notifications';
@@ -9,13 +8,12 @@ import StarRatings from 'react-star-ratings';
 import { getAllPublicProducts, getAllSecureProducts } from "../services/productService"
 
 /**
- * Renders a list of products that can be filtered by a minimum rating.
+ * Renders a list of products that can be filtered by a topRatedLimit product by review .
  * It allows users to add products to a shopping cart.
  * 
- * @param {Object} props - Component props
- * @param {number} props.filterRating - Minimum rating to filter products.
+ * @param {number} props.topRatedLimit - Top - X to filter products.
  */
-function ProductList({filterRating}) {
+function ProductList({ topRatedLimit }) {
     const { addToCart } = useCart();    // Hook to interact with the shopping cart
     const [products, setProducts] = React.useState([]); // Local state to store products
     let { currentloggedInUser } = useContext(UserContext);  // Context to access the currently logged-in user
@@ -25,65 +23,43 @@ function ProductList({filterRating}) {
     const [reviewCounts, setReviewCounts] = React.useState({}); // State to store review counts
     const [averageRatings, setAverageRatings] = React.useState({}); // State for average ratings
 
-
-
     // Effect to fetch products and apply rating filter
     useEffect(() => {
-        // initProducts();  // Initialize products in local storage if not already initialized
-        // setProducts(getProducts());  // Load products from local storage into state
-        // let fetchedProducts = getProducts();
-        // if(filterRating){
-        //     // Apply the rating filter if specified
-        //     fetchedProducts = fetchedProducts.filter(product => product.product_rating > filterRating);
-        // }
-        // setProducts(fetchedProducts);
-
-        // Fetch review counts for each product
-        // const counts = {};
-        // fetchedProducts.forEach(product => {
-        //     const reviews = getReviewsForProduct(product.product_id);
-        //     counts[product.product_id] = reviews.length;
-        // });
-        // setReviewCounts(counts);
-
         async function fetchProducts() {
             try {
-
-                // if (currentloggedInUser)
-                // {
-                //     const response = await getAllSecureProducts();
-                //     let fetchedProducts = response.data;
-                //     // if (filterRating) {
-                //     //     fetchedProducts = fetchedProducts.filter(product => 
-                //     //         product.reviews.some(review => review.rating > filterRating)
-                //     //     );
-                //     // }
-                //     setProducts(fetchedProducts);
-                // }
-                // else{
-                //     const response = await getAllPublicProducts();
-                //     console.log(response.data)
-                //     let fetchedProducts = response.data;
-                //     setProducts(fetchedProducts);
-                // }
-
                 const response = currentloggedInUser ? await getAllSecureProducts() : await getAllPublicProducts();
-                console.log(response.data)
-                setProducts(response.data.filter(product => !filterRating || product.rating >= filterRating));
-                // Calculate review counts and average ratings
+
+                // Calculate average ratings for Top Rated Products section
+                const ratedProducts = response.data.map(product => {
+                    const visibleReviews = product.reviews.filter(review => review.is_visible);
+                    const averageRating = visibleReviews.reduce((acc, review) => acc + review.rating, 0) / (visibleReviews.length || 1);
+                    return { ...product, averageRating };
+                });
+                if (topRatedLimit) {
+                    ratedProducts.sort((a, b) => b.averageRating - a.averageRating);
+                    ratedProducts.length = Math.min(ratedProducts.length, topRatedLimit);
+                }
+                setProducts(ratedProducts);
+                setAverageRatings(ratedProducts.reduce((acc, product) => ({ ...acc, [product.product_id]: product.averageRating }), {}));
+
+
+                // Calculate review counts and average ratings for Our Products page
                 const counts = {};
                 const averages = {};
                 response.data.forEach(product => {
-                    counts[product.product_id] = product.reviews.length;
-                    if (product.reviews.length > 0) {
-                        const totalRating = product.reviews.reduce((acc, review) => acc + review.rating, 0);
-                        averages[product.product_id] = totalRating / product.reviews.length;
+                    // Filter reviews to count only those that are visible  
+                    const visibleReviews = product.reviews.filter(review => review.is_visible);
+                    counts[product.product_id] = visibleReviews.length;
+
+                    if (visibleReviews.length > 0) {
+                        const totalRating = visibleReviews.reduce((acc, review) => acc + review.rating, 0);
+                        averages[product.product_id] = totalRating / visibleReviews.length;
                     } else {
                         averages[product.product_id] = 0;
                     }
-                });
+                }); 
                 setReviewCounts(counts);
-                setAverageRatings(averages);
+                setAverageRatings(averages);    
                 
             } catch (error) {
                 console.error("Failed to fetch products:", error);
@@ -93,7 +69,21 @@ function ProductList({filterRating}) {
         }
         fetchProducts();
 
-    }, [filterRating, currentloggedInUser]);
+    }, [topRatedLimit, currentloggedInUser]);
+
+    const updateReviewCounts = (productId, newCount) => {
+        setReviewCounts(prevCounts => ({
+            ...prevCounts,
+            [productId]: newCount
+        }));
+    };
+    
+    const updateAverageRatings = (productId, newAverageRating) => {
+        setAverageRatings(prevRatings => ({
+            ...prevRatings,
+            [productId]: newAverageRating
+        }));
+    };    
 
     /**
      * Handles adding a product to the cart.
@@ -116,7 +106,7 @@ function ProductList({filterRating}) {
     };
 
     const handleSubmitReview = ({ review, rating }) => {
-        // Handle the review submission logic here (e.g., save it to the database or state)
+        // Handle the review submission logic
         console.log(`Review for ${selectedProduct.product_name}: ${review}`);
         console.log(`Rating for ${selectedProduct.product_name}: ${rating} stars`);
     };
@@ -165,6 +155,8 @@ function ProductList({filterRating}) {
                 <ReviewModal
                     product={selectedProduct}
                     onClose={handleCloseReviewModal}
+                    updateReviewCounts={updateReviewCounts} // Pass the update function as a prop for review counts
+                    updateAverageRatings={updateAverageRatings} // Pass the update function as a prop for avg ratings
                     onSubmit={handleSubmitReview}
                 />
             )}

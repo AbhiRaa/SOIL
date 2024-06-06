@@ -11,7 +11,7 @@ module.exports = (db) => {
                   include: [{
                     model: Review,
                     as: 'reviews',
-                    attributes: ['review_id', 'content', 'rating', 'created_at']
+                    attributes: ['review_id', 'content', 'rating', 'is_visible', 'created_at']
                   }]
                 });
         

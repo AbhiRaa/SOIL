@@ -1,5 +1,3 @@
-// src/components/ReviewModal.jsx
-
 import React, { useState, useEffect, useRef, useContext } from "react";
 import StarRatings from "react-star-ratings";
 import AddReviewModal from "./AddReviewModal";
@@ -9,11 +7,11 @@ import { addReview } from "../services/reviewService";
 // import ReplyComponent from "./replyComponent";
 import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
 import { FaReply } from "react-icons/fa";
-import { fetchReviews , updateReview,addReply, fetchReplies, deleteReview} from "../services/reviewService";
+import { fetchReviews, updateReview, addReply, fetchReplies, deleteReview} from "../services/reviewService";
 import { followUser, fetchFollowing, unfollowUser } from "../services/userService";
 import Notification from '../utils/notifications';
 
-function ReviewModal({ product, onClose }) {
+function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRatings }) {
   const { currentloggedInUser } = useContext(UserContext);
   const [isAddEditReviewModalOpen, setIsAddEditReviewModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -42,7 +40,7 @@ function ReviewModal({ product, onClose }) {
         }));
         setExistingReviews(filteredReviews);
 
-        // Handle notifications for non-visible reviews
+        // Handle notifications for non-visible/hidden reviews for currentloggedInUser - MODERATED BY ADMIN.
         reviews.forEach(review => {
           if (!review.is_visible && review.user_id === currentloggedInUser.userId) {
             handleNotificationCycle(review);
@@ -58,11 +56,20 @@ function ReviewModal({ product, onClose }) {
         }
 
       } catch (error) {
-        console.error("Failed to fetch reviews", error);
-        // Optionally handle error state in UI
-      }
+          if (error.response && error.response.status === 404) {
+            // Handle the 'no reviews' case without logging as an error
+            setNotification("No reviews found for this product");
+            setTimeout(() => setNotification(''), 3000);
+            setExistingReviews([]);  // Ensure no reviews are set in state
+          } else {
+            // Handle other types of errors more severely
+            console.error("Failed to fetch reviews", error);
+            setNotification("Error fetching reviews");
+            setTimeout(() => setNotification(''), 3000);
+          }
+        }
     }
-    fetchReviewsforProduct(product)
+    fetchReviewsforProduct(product);
 
 
     // Simulate fetching following users
@@ -77,7 +84,7 @@ function ReviewModal({ product, onClose }) {
         console.log("failed to ffetch followers",error)
       }
     }
-    fetchFollowingList()
+    fetchFollowingList();
 
   }, [product, currentloggedInUser.userId]);
 
@@ -131,6 +138,11 @@ function ReviewModal({ product, onClose }) {
     setExpandedReviewId(null);
   };
 
+  const recalculateAverageRating = (reviews) => {
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return reviews.length ? totalRating / reviews.length : 0;
+  };
+
   const handleAddReply = async (reviewId, replyText) => {
     // const newReply = { user: "Current User", text: replyText };
     // setReplies([...replies, newReply]);
@@ -151,75 +163,71 @@ function ReviewModal({ product, onClose }) {
 
       // Assuming the backend returns the added reply, you append it to the correct review.
       setReplies(prevReplies => [...prevReplies, result]);
-  } catch (error) {
-      console.error('Error adding reply:', error.message);
-  }
-
+    } catch (error) {
+        console.error('Error adding reply:', error.message);
+    }
   };
 
-
   const handleReviewSubmission = async (newReview) => {
-    try{
-    //adding the product_id to the review before api call
-    // newReview["product_id"] = product.product_id;
-    if(isEditMode){
-      console.log(reviewToEdit.reviewId)
+    try {
+      //adding the product_id to the review before api call
+      // newReview["product_id"] = product.product_id;
+      if(isEditMode){
+        console.log(reviewToEdit.reviewId)
+      }
+    
+      let response
+      if (isEditMode && reviewToEdit) {
+        response = await updateReview(newReview);  // Assuming updateReview is an API method you have
+      } else {
+        // Add new review
+        response = await addReview(newReview);
+      }
+      // Extracting the full review data including the author details from the response
+      const reviewResponse  = response.data.review;
+      console.log(reviewResponse)
+
+      
+      // Assuming response.data contains the updated or new review
+      const updatedReviewList = isEditMode ?
+      existingReviews.map(review => review.review_id === reviewResponse.review_id ? {...review,
+        content: reviewResponse.content,
+        rating: reviewResponse.rating
+      } : review) :
+      [...existingReviews, {
+        userName: reviewResponse.author.name, // Display the author's name
+        userId: reviewResponse.user_id,
+        review_id: reviewResponse.review_id, // This should match the property name used in your component state
+        rating: reviewResponse.rating,
+        content: reviewResponse.content,
+        author: reviewResponse.author,// You might store the whole author object if needed elsewhere
+        created_at: reviewResponse.created_at,
+      }];
+      console.log(updatedReviewList)
+
+      setExistingReviews(updatedReviewList)
+      console.log("review response after review is",response.data.review  )
+      setReviewToEdit(response.data.review);
+      setIsEditMode(true);
+      console.log("reviewToEdit after add is",reviewToEdit)
+      setIsAddEditReviewModalOpen(false);
+
+      // Update the review count in ProductList
+      updateReviewCounts(product.product_id, updatedReviewList.length);
+
+      // Calculate and update the average rating
+      const newAverageRating = recalculateAverageRating(updatedReviewList);
+      updateAverageRatings(product.product_id, newAverageRating);
+      
+    } catch (error) {
+      console.error("Failed to add/update reviews", error);
     }
-   
-    let response
-    if (isEditMode && reviewToEdit) {
-
-      response = await updateReview(newReview);  // Assuming updateReview is an API method you have
-      
-    } else {
-      // Add new review
-      response = await addReview(newReview);
-      
-    }
-    // Extracting the full review data including the author details from the response
-    const reviewResponse  = response.data.review;
-    console.log(reviewResponse)
-
-    
-    // Assuming response.data contains the updated or new review
-    const updatedReviewList = isEditMode ?
-    existingReviews.map(review => review.review_id === reviewResponse.review_id ? {...review,
-      content: reviewResponse.content,
-      rating: reviewResponse.rating
-    } : review) :
-    [...existingReviews, {
-      
-      userName: reviewResponse.author.name, // Display the author's name
-      userId: reviewResponse.user_id,
-      review_id: reviewResponse.review_id, // This should match the property name used in your component state
-      rating: reviewResponse.rating,
-      content: reviewResponse.content,
-      author: reviewResponse.author,// You might store the whole author object if needed elsewhere
-      created_at: reviewResponse.created_at,
-    }];
-    console.log(updatedReviewList)
-
-    setExistingReviews(updatedReviewList)
-    
-    
-    console.log("review response after review is",response.data.review  )
-    setReviewToEdit(response.data.review);
-    setIsEditMode(true);
-    console.log("reviewToEdit after add is",reviewToEdit)
-    setIsAddEditReviewModalOpen(false);
-   
-  }
-  catch (error) {
-    console.error("Failed to add/update reviews", error);
-
-  }
-    
   };
 
   const handleDeleteReview = async (reviewId) => {
-    try{
+    try {
       const response = await deleteReview(reviewId)
-      if(response.status==201){
+      if(response.status === 201) {
         const updatedReviews = existingReviews.filter(
           (review) => review.review_id !== reviewId
         );
@@ -233,22 +241,28 @@ function ReviewModal({ product, onClose }) {
         // Optionally, display a notification message
         setNotification('Review deleted successfully.');
         setTimeout(() => setNotification(''), 3000);
+
+        // Update the Avg review in ProductList
+        const newAverageRating = recalculateAverageRating(updatedReviews);
+        updateAverageRatings(product.product_id, newAverageRating);
+
+        // Update the count in ProductList
+        updateReviewCounts(product.product_id, updatedReviews.length);
+      } else {
+        throw new Error(`Couldn't delete review`)
       }
-      else{
-        throw new Error(`couldn't delete review`)
-      }
-    }catch(error){
+    } catch(error){
       console.error("Failed to delete review", error);
     }
   };
 
-  const handleFollowUser = async (userId,reviewerName) => {        //temporary logic to understand handle following flow
+  const handleFollowUser = async (userId,reviewerName) => {
     
     if (followingUsers.includes(userId)) {
       // Unfollow logic
       try{
         const response = await unfollowUser(currentloggedInUser.userId, userId)
-        if(response.status==201){
+        if(response.status === 201){
           setFollowingUsers(followingUsers.filter(id => id !== userId));
           setNotification(`Successfully unfollowed ${reviewerName}`);
           setTimeout(() => setNotification(''), 3000);
@@ -265,7 +279,7 @@ function ReviewModal({ product, onClose }) {
       // Follow logic
       try{
         const response = await followUser(currentloggedInUser.userId, userId)
-        if(response.status==201){
+        if(response.status === 201){
           setFollowingUsers([...followingUsers, userId]);
           setNotification(`Successfully followed ${reviewerName}`);
           setTimeout(() => setNotification(''), 3000);
