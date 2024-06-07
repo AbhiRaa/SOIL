@@ -16,7 +16,7 @@ const typeDefs = mergeTypeDefs([userSchema, productSchema, reviewSchema]);
 const resolvers = mergeResolvers([userResolvers, productResolvers, reviewResolvers]);
 
 // Export a function that takes models as an argument and returns the Apollo Server instance
-module.exports = (models, httpServer, serverCleanup) => {
+module.exports = (models, httpServer, onCleanup) => {
   // Create executable schema
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   return new ApolloServer({
@@ -30,9 +30,9 @@ module.exports = (models, httpServer, serverCleanup) => {
         {
           async serverWillStart() {
             return {
-              // async drainServer() {
-              //   await serverCleanup.dispose();
-              // }
+              async drainServer() {
+                await onCleanup();
+              }
             };
           }
         }

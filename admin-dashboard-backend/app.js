@@ -40,22 +40,21 @@ async function initializeApp() {
     // Create an HTTP server
     const httpServer = http.createServer(app);
 
-    // Integrate Apollo Server with Express using the models
-    const apolloServer = createApolloServer(db.models, httpServer); // Pass models to the server
-    await apolloServer.start();  // Start Apollo Server before applying middleware
-    apolloServer.applyMiddleware({ app });
-
     // Create a WebSocket server
     const wsServer = new WebSocketServer({
       server: httpServer,
-      path: apolloServer.graphqlPath,
+      path: '/graphql',
     });
 
     // Use graphql-ws to handle WebSocket connections
     const serverCleanup = useServer({ schema: makeExecutableSchema({ typeDefs, resolvers }) }, wsServer);
 
-    console.log(`WebSocket Server set up at path: ${apolloServer.graphqlPath}`);
+    // Integrate Apollo Server with Express using the models and handle proper dispose
+    const apolloServer = createApolloServer(db.models, httpServer, () => serverCleanup.dispose()); // Pass models to the server
+    await apolloServer.start();  // Start Apollo Server before applying middleware
+    apolloServer.applyMiddleware({ app });
 
+    console.log(`WebSocket Server set up at path: ${apolloServer.graphqlPath}`);
 
     app.get("/", (req, res) => {
       res.json({ message: "Hello World from SOIL Organic Admin portal!" });

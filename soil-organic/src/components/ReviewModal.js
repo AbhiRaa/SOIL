@@ -100,6 +100,14 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
         deleteReview(review.review_id).then(() => {
           setExistingReviews(currentReviews => currentReviews.filter(r => r.review_id !== review.review_id));
           console.log(`Review ${review.review_id} deleted after 5 notifications`);
+
+          // Reset the states
+          setReviewToEdit(null);
+          setIsEditMode(false); // Reset edit mode
+          // Display a notification message
+          setNotification('You review is hidden permanently, contact support at admin@soil.com.');
+          setTimeout(() => setNotification(''), 3000);
+
         }).catch(error => console.error("Failed to delete review", error));
       }
     }, 1500);  // Interval of 1.5 seconds for each cycle of notification

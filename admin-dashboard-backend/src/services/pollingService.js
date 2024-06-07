@@ -5,9 +5,9 @@ const LATEST_REVIEWS_FETCHED = 'LATEST_REVIEWS_FETCHED';
 const PRODUCT_ENGAGEMENT_UPDATED = 'PRODUCT_ENGAGEMENT_UPDATED';
 const PRODUCT_STOCK_UPDATED = 'PRODUCT_STOCK_UPDATED';
 
-const POLL_REVIEW_INTERVAL = 10000; // Poll every 10 seconds for home page widget
-const POLL_PRODUCT_INTERVAL = 10000; // Poll every 10 seconds for product's reviews updates
-const POLL_STOCK_INTERVAL = 10000; // Poll every 10 seconds for stock updates
+const POLL_REVIEW_INTERVAL = 1000; // Poll every second for home page widget
+const POLL_PRODUCT_INTERVAL = 2000; // Poll every 2 seconds for product's reviews updates
+const POLL_STOCK_INTERVAL = 2000; // Poll every 2 seconds for stock updates
 
 async function pollReviews() {
   setInterval(async () => {

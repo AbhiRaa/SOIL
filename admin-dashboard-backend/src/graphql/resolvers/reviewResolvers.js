@@ -7,7 +7,7 @@ const reviewResolvers = {
     reviews: async (_, args, { models }) => {
       try {
         return await models.Review.findAll({
-          where: { is_visible: true }, // Optionally, only fetch visible reviews
+          // where: { is_visible: true }, // Only fetch visible reviews
           include: [
             { model: models.User, as: 'author', attributes: ["user_id", "name", "email"] },
             { model: models.Product, as: 'product', attributes: ["product_id", "product_name"] }
