@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
-export const FETCH_REVIEW_LIST = gql`
-  query FetchReviewList {
-    reviews {
+export const LATEST_REVIEWS_FETCHED = gql`
+  subscription LatestReviewsFetched {
+    latestReviewsFetched {
       review_id
       product_id
       user_id

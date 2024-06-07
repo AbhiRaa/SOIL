@@ -10,6 +10,7 @@ filter.addWords(...additionalProfanities); // Adding the custom words to the fil
 
 const ReviewManagement = () => {
   const { data, loading, error } = useQuery(FETCH_REVIEW_LIST);
+  console.log(data)
   const [updateVisibility] = useMutation(UPDATE_REVIEW_VISIBILITY, {
     refetchQueries: [{ query: FETCH_REVIEW_LIST }], // Refetch reviews after update
   });
@@ -28,12 +29,9 @@ const ReviewManagement = () => {
       <h1>Review Management</h1>
       {data && data.reviews.map(review => (
         <div key={review.review_id} style={{ background: isProfane(review.content) ? '#ffdddd' : 'transparent', margin: '10px', padding: '10px' }}>
-          <p>
-            <strong>Review ID:</strong> {review.review_id} <br/>
-            <strong>User ID:</strong> {review.user_id} <br/>
-            <strong>Product ID:</strong> {review.product_id} <br/>
-            <strong>Content:</strong> {review.content} (Rating: {review.rating} star)
-          </p>
+          <p><strong>Review by {review.author.name} ({review.author.email}) on {review.product.product_name}:</strong></p>
+          <p>{review.content} (Rating: {review.rating} star)</p>
+          
           {isProfane(review.content) && <p style={{ color: 'red' }}>Review flagged for moderation</p>}
           <button onClick={() => toggleVisibility(review.review_id, review.is_visible)}>
             {review.is_visible ? 'Hide' : 'Show'}

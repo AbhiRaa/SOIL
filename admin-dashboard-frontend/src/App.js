@@ -6,6 +6,7 @@ import Footer from './components/common/Footer';
 import UserManagement from './components/Dashboard/UserManagement';
 import ProductManagement from './components/Dashboard/ProductManagement';
 import ReviewManagement from './components/Dashboard/ReviewManagement';
+import MetricsDisplay from './components/Dashboard/MetricsDisplay';
 import Home from './components/Home';
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
             <Route path="/users" element={<UserManagement />} />  {/* User Management route */}
             <Route path="/products" element={<ProductManagement />} />  {/* Product Management route */}
             <Route path="/reviews" element={<ReviewManagement />} />  {/* Review Management route */}
-            {/* Additional routes can be added here */}
+            <Route path="/metrics" element={<MetricsDisplay />} />  {/* Metrics Display route */}
           </Routes>
         </main>
         <Footer />

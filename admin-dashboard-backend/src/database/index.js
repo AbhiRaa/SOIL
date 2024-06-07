@@ -46,5 +46,30 @@ module.exports = async function initDb() {
   db.models.Product = require('../models/Product')(sequelize, DataTypes);
   db.models.Review = require('../models/Review')(sequelize, DataTypes);
 
+  // Associations
+  // Users and Reviews
+  db.models.User.hasMany(db.models.Review, {
+    foreignKey: 'user_id',
+    as: 'reviews',
+    onDelete: 'CASCADE',  // Delete all reviews when user is deleted
+    onUpdate: 'CASCADE'   // Update foreign key when user_id changes
+  });
+  db.models.Review.belongsTo(db.models.User, {
+    foreignKey: 'user_id',
+    as: 'author'
+  });
+
+  // Products and Reviews
+  db.models.Product.hasMany(db.models.Review, {
+    foreignKey: 'product_id',
+    as: 'reviews',
+    onDelete: 'CASCADE',  // Set foreign key to null if product is deleted
+    onUpdate: 'CASCADE'    // Update foreign key when product_id changes
+  });
+  db.models.Review.belongsTo(db.models.Product, {
+    foreignKey: 'product_id',
+    as: 'product'
+  });
+
   return db;
 };

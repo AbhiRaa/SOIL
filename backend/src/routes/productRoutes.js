@@ -7,4 +7,7 @@ module.exports = (app, db) => {
 
     //retrieve all products when not signed in
     app.get('/api/public/products', productController.getAllProducts);
+
+    // Retrieve all products with stock updates
+    app.get('/api/products/stockUpdates', productController.fetchProductStockUpdates);
 }

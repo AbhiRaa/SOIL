@@ -1,6 +1,35 @@
 const { gql } = require('apollo-server-express');
 
 const productSchema = gql`
+  type ReviewsAggregate {
+    count: Int!
+    averageRating: String!
+  }
+
+  type ProductEngagement {
+    product_id: ID!
+    product_name: String!
+    is_special: Boolean!
+    reviewsAggregate: ReviewsAggregate
+  }
+  
+  type ProductStockUpdate {
+    product_id: ID!
+    product_name: String!
+    product_price: String!
+    minimum_purchase_unit: String!
+    is_special: Boolean!
+    product_stock: Int!
+  }
+
+  extend type Subscription {
+    productStockUpdated: [ProductStockUpdate]
+  }
+
+  extend type Subscription {
+    productEngagementUpdated: [ProductEngagement]
+  }
+
   type Product {
     product_id: ID!
     product_name: String!

@@ -21,4 +21,8 @@ module.exports = (app, db) => {
 
     //fetch replies
     app.get('/api/replies/:reviewId',authenticate,reviewController.fetchReplies)
+
+    app.get('/api/reviews/latest', reviewController.fetchLatestReviews)
+
+    app.get('/api/products/engagement', reviewController.fetchProductEngagement);
 }

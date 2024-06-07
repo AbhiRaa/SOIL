@@ -1,6 +1,6 @@
 module.exports = (db) => {
   const { Review, User, Product, ReviewReply } = db.models;
-  // const { sequelize } = db;
+  const { Sequelize } = db;
 
   return {
     addReview: async (req, res) => {
@@ -180,5 +180,76 @@ module.exports = (db) => {
         }
     },
 
+    fetchLatestReviews: async (req, res) => {
+      try {
+        const latestReviews = await Review.findAll({
+          limit: 3,
+          order: [['created_at', 'DESC']],
+          include: [
+            {
+              model: User,
+              as: "author",
+              attributes: ["user_id", "name", "email"], // Only fetch necessary fields
+            },
+            {
+              model: Product,
+              as: "product",
+              attributes: ["product_id", "product_name"] // Assuming you want to show product info
+            }
+          ]
+        });
+    
+        res.json({
+          message: "Latest reviews fetched successfully",
+          reviews: latestReviews
+        });
+      } catch (error) {
+        console.error("Error fetching latest reviews:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    },
+    
+    fetchProductEngagement: async (req, res) => {
+      try {
+        const products = await Product.findAll({
+          include: [{
+            model: Review,
+            as: 'reviews',
+            attributes: [],
+            where: {
+              is_visible: true
+            },
+            required: false
+          }],
+          attributes: [
+            'product_id',
+            'product_name',
+            'is_special',
+            [Sequelize.fn('COUNT', Sequelize.col('reviews.review_id')), 'count'], // Correct usage of Sequelize.col
+            [Sequelize.fn('AVG', Sequelize.col('reviews.rating')), 'averageRating']
+          ],
+          group: ['Product.product_id', 'Product.product_name', 'Product.is_special'],
+          order: [[Sequelize.fn('AVG', Sequelize.col('reviews.rating')), 'DESC']] // Optionally order by average rating
+        });
+
+        const formattedProducts = products.map(product => ({
+          product_id: product.product_id,
+          product_name: product.product_name,
+          is_special: product.is_special,
+          reviewsAggregate: {
+            count: product.dataValues.count,
+            averageRating: parseFloat(product.dataValues.averageRating).toFixed(1)
+          }
+        }));
+
+        res.json({
+          message: "Product engagement data fetched successfully",
+          products: formattedProducts
+        });
+      } catch (error) {
+        console.error("Error fetching product engagement:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }
   }
 };

@@ -1,3 +1,8 @@
+const pubsub = require('../../config/pubsub.js');
+
+const PRODUCT_ENGAGEMENT_UPDATED = 'PRODUCT_ENGAGEMENT_UPDATED';
+const PRODUCT_STOCK_UPDATED = 'PRODUCT_STOCK_UPDATED';
+
 const productResolvers = {
   Query: {
     // Fetch all products
@@ -80,6 +85,15 @@ const productResolvers = {
       } catch (error) {
         throw new Error('Error deleting product: ' + error.message);
       }
+    }
+  }, 
+  
+  Subscription: {
+    productEngagementUpdated: {
+      subscribe: () => pubsub.asyncIterator(PRODUCT_ENGAGEMENT_UPDATED)
+    },
+    productStockUpdated: {
+      subscribe: () => pubsub.asyncIterator(PRODUCT_STOCK_UPDATED)
     }
   }
 };

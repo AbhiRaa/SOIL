@@ -1,16 +1,22 @@
+const pubsub = require('../../config/pubsub.js');
+
+const LATEST_REVIEWS_FETCHED = 'LATEST_REVIEWS_FETCHED';
+
 const reviewResolvers = {
   Query: {
-    // Fetch all reviews
     reviews: async (_, args, { models }) => {
       try {
         return await models.Review.findAll({
-          where: { is_visible: true } // Optionally, only fetch visible reviews
+          where: { is_visible: true }, // Optionally, only fetch visible reviews
+          include: [
+            { model: models.User, as: 'author', attributes: ["user_id", "name", "email"] },
+            { model: models.Product, as: 'product', attributes: ["product_id", "product_name"] }
+          ] // Eager loading of author and product
         });
       } catch (error) {
         throw new Error('Failed to fetch reviews: ' + error.message);
       }
     },
-    // Fetch a single review by ID
     review: async (_, { id }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -25,7 +31,6 @@ const reviewResolvers = {
   },
 
   Mutation: {
-    // Update review visibility (hide/unhide)
     updateReviewVisibility: async (_, { id, isVisible }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -41,8 +46,6 @@ const reviewResolvers = {
         throw new Error('Error updating review visibility: ' + error.message);
       }
     },
-
-    // Delete a review
     deleteReview: async (_, { id }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -55,7 +58,21 @@ const reviewResolvers = {
         throw new Error('Error deleting review: ' + error.message);
       }
     }
+  },
+
+  Subscription: {
+    latestReviewsFetched: {
+        subscribe: () => {
+            try {
+                return pubsub.asyncIterator(LATEST_REVIEWS_FETCHED);
+            } catch (error) {
+                console.error("Subscription error:", error);
+                throw error;
+            }
+        }
+    }
   }
 };
 
-module.exports = reviewResolvers;
+module.exports = reviewResolvers; 
+
