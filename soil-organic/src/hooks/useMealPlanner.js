@@ -3,7 +3,7 @@
  * This hook leverages localStorage to persist meal plans on a per-user basis,
  * utilizing the current logged-in user's context to differentiate between users.
  * 
- * The hook exposes methods to add meals to a specific day, remove meals, clear the entire meal plan,
+ * The hook exposes methods to add meals to a specific day of week, remove meals, clear the entire meal plan,
  * and manually save an updated meal plan. This allows for flexible integration within components
  * that require meal planning functionalities.
  *

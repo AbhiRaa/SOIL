@@ -2,7 +2,7 @@
  * Provides a custom hook for managing shopping cart operations in a React application.
  *
  * This hook integrates with the UserContext to handle user-specific cart data, 
- * leveraging the browser's localStorage to persist cart items across sessions. 
+ * leveraging the cart service to persist cart items across sessions from the DB. 
  * It provides functionalities to add items to the cart, update item quantities, 
  * remove items, and clear the cart entirely.
  *

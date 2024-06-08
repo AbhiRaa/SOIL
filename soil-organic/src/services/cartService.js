@@ -5,7 +5,6 @@ const addItem = (userId, productId, quantity, price) => {
 };
 
 const removeItem = (itemId, userId) => {
-  // return API.delete(`/cart/item/${userId}`, { itemId });
   return API.delete(`/cart/item/${userId}/${itemId}`);
 };
 

@@ -24,7 +24,6 @@ const changeUserPassword = (userId, currentPassword, newPassword) => {
     return API.post(`/user/update-password/${userId}`, { currentPassword, newPassword });
 };
 
-
 //follow a user
 const followUser =(followerId,followingId)=>{         //user to be followed by follower is inside the request body
     return API.post(`/user/follow/${followerId}`,{followingId})
@@ -39,10 +38,6 @@ const fetchFollowing = (followerId)=>{
 const unfollowUser = (followerId,followingId)=>{
     return API.post(`/user/unfollow/${followerId}`,{followingId})
 }
-
-// const signOut = () => {
-//   localStorage.removeItem('access_token'); // Add more cleanup as needed
-// };
 
 export {
   signUp,
