@@ -2,6 +2,11 @@
 
 The Admin Dashboard Frontend for the SOIL Organic website serves as the management interface for administrators. It provides functionalities such as user management, product management, review moderation, and metric visualization.
 
+### Notes 
+Port is set to 3001 in package.json
+- For mac user, will work as it is:  "start": "PORT=3001 react-scripts start"
+- For window user, change to: "start": "set PORT=3001 && react-scripts start"
+
 ## Features
 
 ### Dashboard Components
