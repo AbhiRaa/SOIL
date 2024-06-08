@@ -11,6 +11,7 @@ import { calculateBMR, calculateTDEE } from '../utils/calorieCalculator';
 import { calculateMacros } from '../utils/macrosCalculator';
 import NutritionChart from '../components/NutritionChart';
 import { getUserDetails } from "../services/userService.js";
+import Footer from "../components/Footer.js";
 
 const intoleranceOptions = [
   { label: "Dairy", value: "dairy" },
@@ -226,7 +227,7 @@ function MealPlanningApp() {
   return (
     <div className="bg-cyan-50">
       <Navigator />
-      <div className="max-w-full mx-auto mt-6 p-6 bg-orange-50 border-t-2 shadow-md">
+      <div className="max-w-full mx-auto mt-6 p-6 bg-orange-50 border-t-2 shadow-md ">
         <h2 className="text-5xl font-semibold mb-4 text-primary flex justify-center">Meal Planner</h2>
         <div className="flex gap-5 justify-evenly mt-4 p-4">
         <h2 className="text-2xl font-bold mb-4 text-primary">Daily Calorie Target: {dailyCalories.toFixed(0)} kcal (BMR)</h2>
@@ -318,6 +319,7 @@ function MealPlanningApp() {
         {/* <MealPlanner selectedMeals={selectedMeals} onRemove={handleRemoveMeal} /> */}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }

@@ -51,32 +51,41 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <span className="close" onClick={onClose}>&times;</span>
-        <form onSubmit={handleSubmit} className="product-modal-form">
-          <label htmlFor="product_name">Product Name:</label>
-          <input id="product_name" type="text" name="product_name" value={productData.product_name} onChange={handleChange} required />
-
-          <label htmlFor="product_description">Product Description:</label>
-          <textarea id="product_description" name="product_description" value={productData.product_description} onChange={handleChange} required />
-
-          <label htmlFor="product_price">Product Price:</label>
-          <input id="product_price" type="number" name="product_price" value={productData.product_price} onChange={handleChange} required min="0.01" step="0.01" />
-
-          <label htmlFor="product_image">Product Image Path:</label>
-          <input id="product_image" type="text" name="product_image" value={productData.product_image} onChange={handleChange} />
-
-          <label htmlFor="minimum_purchase_unit">Minimum Purchase Unit:</label>
-          <input id="minimum_purchase_unit" type="text" name="minimum_purchase_unit" value={productData.minimum_purchase_unit} onChange={handleChange} required />
-
-          <label htmlFor="product_stock">Product Stock:</label>
-          <input id="product_stock" type="number" name="product_stock" value={productData.product_stock} onChange={handleChange} required min="0" />
-
-          <label htmlFor="is_special">Is Special:</label>
-          <input id="is_special" type="checkbox" name="is_special" checked={productData.is_special} onChange={handleChange} />
-
-          <button type="submit">Save Product</button>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+      <div className="modal-content bg-white rounded-lg shadow-xl p-6">
+        <span className="close text-gray-600 hover:text-gray-900 cursor-pointer" onClick={onClose}>&times;</span>
+        <form onSubmit={handleSubmit} className="space-y-4 font-bold">
+          <div>
+            <label htmlFor="product_name" className="block text-sm font-medium text-gray-700">Product Name:</label>
+            <input id="product_name" type="text" name="product_name" value={productData.product_name} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div>
+            <label htmlFor="product_description" className="block text-sm font-medium text-gray-700">Product Description:</label>
+            <textarea id="product_description" name="product_description" value={productData.product_description} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+          </div>
+          <div>
+            <label htmlFor="product_price" className="block text-sm font-medium text-gray-700">Product Price:</label>
+            <input id="product_price" type="number" name="product_price" value={productData.product_price} onChange={handleChange} required min="0.01" step="0.01" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div>
+            <label htmlFor="product_image" className="block text-sm font-medium text-gray-700">Product Image Path:</label>
+            <input id="product_image" type="text" name="product_image" value={productData.product_image} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div>
+            <label htmlFor="minimum_purchase_unit" className="block text-sm font-medium text-gray-700">Minimum Purchase Unit:</label>
+            <input id="minimum_purchase_unit" type="text" name="minimum_purchase_unit" value={productData.minimum_purchase_unit} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div>
+            <label htmlFor="product_stock" className="block text-sm font-medium text-gray-700">Product Stock:</label>
+            <input id="product_stock" type="number" name="product_stock" value={productData.product_stock} onChange={handleChange} required min="0" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div className="flex items-center">
+            <label htmlFor="is_special" className="block text-sm font-medium text-gray-700 mr-2">Is Special:</label>
+            <input id="is_special" type="checkbox" name="is_special" checked={productData.is_special} onChange={handleChange} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+          </div>
+          <div>
+            <button type="submit" className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Product</button>
+          </div>
         </form>
       </div>
     </div>

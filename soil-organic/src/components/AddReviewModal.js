@@ -64,14 +64,14 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
   
     return (
       <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
-        <div className="bg-white p-6 rounded shadow-lg w-1/3 relative">
+        <div className="bg-orange-100 p-6 rounded shadow-lg w-1/3 relative">
           <button
             onClick={onClose}
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
           >
             &times;
           </button>
-          <h2 className="text-xl font-bold mb-4">{existingReview ? "Edit Your Review" : "Add Your Review"}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-orange-500">{existingReview ? "Edit Your Review" : "Add Your Review"}</h2>
           <p className="font-bold mb-2">{currentloggedInUser.userName ? `${currentloggedInUser.userName}'s Review` : "Your Review"}</p>
           <StarRatings
             rating={rating}
@@ -91,8 +91,9 @@ function AddReviewModal({ product, existingReview, onClose, onSubmit }) {
                 setErrors(prev => ({ ...prev, review: null }));  // Clear review error if valid content is provided
               }
             }}
+            maxLength={1000}
             className="w-full h-32 p-2 border rounded mt-4"
-            placeholder="Write your review here..."
+            placeholder="Write your review under 100 words"
           />
           {errors.review && <p className="text-red-500">{errors.review}</p>}
           <div className="flex justify-end mt-4">

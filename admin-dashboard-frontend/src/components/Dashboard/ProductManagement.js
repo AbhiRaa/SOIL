@@ -83,37 +83,56 @@ const ProductManagement = () => {
   if (error) return <p>Error loading products :(</p>;
 
   return (
-    <div>
-      <h1>Product Management</h1>
-      {errorMessage && <p className="error">{errorMessage}</p>}
-      <button onClick={handleOpenModalForAdd}>Add New Product</button>
-      {data && data.products.map((product) => (
-        <div key={product.product_id} style={{ margin: '20px', padding: '20px', border: '1px solid #ccc' }}>
-          <h2>{product.product_name} - ${product.product_price}</h2>
-          <img src={product.product_image ? `http://localhost:4001/${product.product_image}` : 'images/product-default.jpeg'} alt={product.product_name} style={{ width: '100px', height: '100px' }} />
-          <p><strong>Description:</strong> {product.product_description}</p>
-          <p><strong>Minimum Purchase Unit:</strong> {product.minimum_purchase_unit}</p>
-          <p><strong>Stock:</strong> {product.product_stock}</p>
-          <p><strong>Special:</strong> {product.is_special ? 'Yes' : 'No'}</p>
-          <p><strong>Created At:</strong> {formatDate(product.created_at)}</p>
-          <p><strong>Updated At:</strong> {formatDate(product.updated_at)}</p>
-          <p><strong>Updated By:</strong> {product.updated_by}</p>
-          <button onClick={() => handleOpenModalForEdit(product)}>Edit</button>
-          <button onClick={() => deleteProduct({ variables: { id: product.product_id } })}>
-            Delete
-          </button>
-        </div>
-      ))}
-      {modalOpen && (
-        <ProductModal 
-          isOpen={modalOpen} 
-          onClose={handleCloseModal} 
-          product={currentProduct} 
-          onSave={handleSaveProduct}
-        />
-      )}
+    <div className="container mx-auto px-4">
+    
+    {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+    <div className='flex justify-between items-center p-4'>
+      <h1 className="text-3xl font-bold my-2 flex-grow text-center">Product Management</h1>
+      <div className='ml-5'>
+        <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={handleOpenModalForAdd}>
+          Add New Product
+        </button>
+      </div>
     </div>
-  );
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 p-4">
+      {data && data.products.map((product) => (
+        <div key={product.product_id} className="flex border rounded shadow-lg p-4 bg-slate-100 text-black m-1">
+          <div className="w-1/3">
+            <img src={product.product_image ? `http://localhost:4001/${product.product_image}` : 'images/product-default.jpeg'} alt={product.product_name} className="w-32 h-32 object-cover mt-2" />
+          </div>
+          <div className="w-2/3 pl-4 flex flex-col justify-between">
+          <div className='text-left'>
+            <h2 className="text-2xl font-bold text-orange-500">{product.product_name} - ${product.product_price}</h2>
+            <p className="text-lg mt-2"><strong>Description:</strong> {product.product_description}</p>
+            <p className="text-lg"><strong>Minimum Purchase Unit:</strong> {product.minimum_purchase_unit}</p>
+            <p className="text-lg"><strong>Stock:</strong> {product.product_stock}</p>
+            <p className="text-lg"><strong>Special:</strong> {product.is_special ? 'Yes' : 'No'}</p>
+            <p className="text-lg"><strong>Created At:</strong> {formatDate(product.created_at)}</p>
+            <p className="text-lg"><strong>Updated At:</strong> {formatDate(product.updated_at)}</p>
+            <p className="text-lg"><strong>Updated By:</strong> {product.updated_by}</p>
+          </div>
+          <div className="flex justify-start gap-3 mt-4">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => handleOpenModalForEdit(product)}>
+              Edit
+            </button>
+            <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onClick={() => deleteProduct({ variables: { id: product.product_id } })}>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      ))}
+    </div>
+    {modalOpen && (
+      <ProductModal 
+        isOpen={modalOpen} 
+        onClose={handleCloseModal} 
+        product={currentProduct} 
+        onSave={handleSaveProduct}
+      />
+    )}
+  </div>
+);
 };
 
 export default ProductManagement;

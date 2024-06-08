@@ -187,9 +187,14 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
       let response
       if (isEditMode && reviewToEdit) {
         response = await updateReview(newReview);  // Assuming updateReview is an API method you have
+        setNotification('Your review has been updated successfully!');
+        setTimeout(() => setNotification(''), 3000);
+        
       } else {
         // Add new review
         response = await addReview(newReview);
+        setNotification('Your review has been added successfully!');
+        setTimeout(() => setNotification(''), 3000);
       }
       // Extracting the full review data including the author details from the response
       const reviewResponse  = response.data.review;
@@ -442,7 +447,9 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
                         type="text"
                         name="replyText"
                         className="border p-2 rounded w-full"
-                        placeholder="Add a reply..."
+                        placeholder="Add a reply under 100 words"
+                        required
+                        maxLength={1000}
                       />
                       <div className="flex gap-10">
                         <button

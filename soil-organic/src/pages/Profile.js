@@ -6,6 +6,7 @@ import { findUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
 import EditPasswordModal from '../components/updatePasswordModal';
 import { getUserDetails, deleteUser, updateUserDetails, changeUserPassword } from "../services/userService.js";
+import Footer from "../components/Footer.js";
 
 const Profile = () => {
   const { currentloggedInUser, signOut } = useContext(UserContext);
@@ -107,7 +108,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-cyan-50">
     <Navigator />
-    <div className="container bg-orange-200 rounded-lg p-3  shadow-lg mx-auto mt-10">
+    <div className="container bg-orange-200 rounded-lg p-3  shadow-lg mx-auto mt-10 mb-20">
       {/* Profile Information Display Code */}  
       <div className="bg-orange-100 text-orange-500 flex-col border-2 rounded  overflow-hidden ">
         <div className="px-4 py-5 sm:px-6">
@@ -176,6 +177,7 @@ const Profile = () => {
       />
       )}
     </div>
+    <Footer/>
   </div>
   );
 }

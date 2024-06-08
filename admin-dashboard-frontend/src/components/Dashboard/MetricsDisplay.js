@@ -141,20 +141,20 @@ const MetricsDisplay = () => {
   if (errorEngagement || errorStock) return <p>Error loading metrics: {errorEngagement?.message || errorStock?.message}</p>;
 
   return (
-    <div>
-      <h2>Product Engagement and Stock Metrics</h2>
-      <p>The metrics displayed reflect which products are receiving the most engagement based on the number of reviews and ratings.</p>
-      <p>Products marked as 'Special' are featured items on our platform.</p>
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-bold text-gray-800 mt-4 mb-4">Product Engagement and Stock Metrics</h2>
+      <p className="text-gray-600 text-xl p-2">The metrics displayed reflect which products are receiving the most engagement based on the number of reviews and ratings.</p>
+      <p className="text-gray-600 text-xl pb-4">Products marked as 'Special' are featured items on our platform.</p>
       {chartData.labels?.length > 0 ? (
         <Bar data={chartData} options={engagementOptions} />
       ) : (
-        <p>No engagement data available for the chart.</p>
+        <p className="text-gray-500">No engagement data available for the chart.</p>
       )}
-      <p>The metrics displayed shows tracking of stock updates of products which could indeed offer valuable insights into user-product engagement.</p>
+      <p  className="text-gray-600 mt-10 mb-6 text-2xl font-bold">The metrics displayed shows tracking of stock updates of products which could indeed offer valuable insights into user-product engagement.</p>
       {stockData.labels?.length > 0 ? (
         <Line data={stockData} options={stockOptions} />
       ) : (
-        <p>No stock data available for the chart.</p>
+        <p className="text-gray-500">No stock data available for the chart.</p>
       )}
     </div>
   );
