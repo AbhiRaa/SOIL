@@ -1,3 +1,12 @@
+/**
+ * graphql/index.js
+ * 
+ * Configures and exports the Apollo Server instance. This file is responsible for
+ * merging GraphQL type definitions (schemas) and resolvers, and integrating these
+ * with the Apollo Server. It also sets up server lifecycle plugins to handle server
+ * events such as shutdown.
+ */
+
 const { ApolloServer } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { mergeTypeDefs, mergeResolvers } = require('@graphql-tools/merge');
@@ -15,7 +24,14 @@ const reviewResolvers = require('./resolvers/reviewResolvers.js');
 const typeDefs = mergeTypeDefs([userSchema, productSchema, reviewSchema]);
 const resolvers = mergeResolvers([userResolvers, productResolvers, reviewResolvers]);
 
-// Export a function that takes models as an argument and returns the Apollo Server instance
+/**
+ * Creates and returns an Apollo Server instance configured with schema, context, and server plugins.
+ * 
+ * @param {Object} models - The models object for accessing the database via Sequelize.
+ * @param {Object} httpServer - The HTTP server on which Apollo Server will be mounted.
+ * @param {Function} onCleanup - A cleanup function to be called when the server is shutting down.
+ * @returns {ApolloServer} An instance of ApolloServer configured for the application.
+ */
 module.exports = (models, httpServer, onCleanup) => {
   // Create executable schema
   const schema = makeExecutableSchema({ typeDefs, resolvers });
@@ -31,7 +47,12 @@ module.exports = (models, httpServer, onCleanup) => {
           async serverWillStart() {
             return {
               async drainServer() {
-                await onCleanup();
+                // Perform any custom cleanup such as disposing of web socket connections
+                try {
+                  await onCleanup();
+                } catch (error) {
+                  console.error('Error during server shutdown:', error);
+                }
               }
             };
           }

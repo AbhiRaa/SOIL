@@ -1,3 +1,11 @@
+/**
+ * userResolvers.js
+ *
+ * Resolvers for handling user-related GraphQL operations. Includes CRUD operations and user state
+ * management (blocking/unblocking). Enhancements include detailed error handling, logging for better
+ * debuggability, and improved comments for maintainability.
+ */
+
 const userResolvers = {
   Query: {
     // Fetch all users
@@ -5,6 +13,7 @@ const userResolvers = {
       try {
         return await models.User.findAll();
       } catch (error) {
+        console.error('Error fetching all users:', error);
         throw new Error('Failed to fetch users: ' + error.message);
       }
     },
@@ -17,13 +26,14 @@ const userResolvers = {
         }
         return user;
       } catch (error) {
+        console.error(`Error retrieving user with ID ${id}:`, error);
         throw new Error('Error retrieving user: ' + error.message);
       }
     },
   },
 
   Mutation: {
-    // Block a user
+    // Block a user, preventing them from login
     blockUser: async (_, { id }, { models }) => {
       try {
         const user = await models.User.findByPk(id);
@@ -36,6 +46,7 @@ const userResolvers = {
         await user.save();
         return user;
       } catch (error) {
+        console.error(`Error blocking user ID ${id}:`, error);
         throw new Error('Error blocking user: ' + error.message);
       }
     },
@@ -53,27 +64,29 @@ const userResolvers = {
         await user.save();
         return user;
       } catch (error) {
+        console.error(`Error unblocking user ID ${id}:`, error);
         throw new Error('Error unblocking user: ' + error.message);
       }
     },
 
-    // Create a new user
+    // TODO: Create a new user - to do login/signup for admin portal
     createUser: async (_, { email, name, password }, { models }) => {
       try {
         return await models.User.create({
           email,
           name,
-          password_hash: hashPassword(password), // Assuming hashPassword is a utility to hash passwords
+          password_hash: password, // Placeholder - hash it
           created_at: new Date(),
           updated_at: new Date(),
           updated_by: 'admin_email@example.com'
         });
       } catch (error) {
+        console.error('Error creating user:', error);
         throw new Error('Error creating user: ' + error.message);
       }
     },
 
-    // Update user details
+    // TODO: Update user details - for admins
     updateUser: async (_, { id, email, name }, { models }) => {
       try {
         const user = await models.User.findByPk(id);
@@ -87,6 +100,7 @@ const userResolvers = {
         await user.save();
         return user;
       } catch (error) {
+        console.error(`Error updating user ID ${id}:`, error);
         throw new Error('Error updating user: ' + error.message);
       }
     }

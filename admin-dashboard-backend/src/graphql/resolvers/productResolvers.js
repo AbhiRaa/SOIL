@@ -1,3 +1,12 @@
+/**
+ * productResolvers.js
+ * 
+ * Resolvers for product-related GraphQL operations. This file defines resolver functions for queries,
+ * mutations, and subscriptions related to products. Each resolver function includes error handling
+ * to manage common issues like database connectivity errors and ensures that operations such as 
+ * adding, updating, or deleting a product are handled properly.
+ */
+
 const pubsub = require('../../config/pubsub.js');
 
 const PRODUCT_ENGAGEMENT_UPDATED = 'PRODUCT_ENGAGEMENT_UPDATED';
@@ -10,6 +19,7 @@ const productResolvers = {
       try {
         return await models.Product.findAll();
       } catch (error) {
+        console.error('Error fetching all products:', error);
         throw new Error('Failed to fetch products: ' + error.message);
       }
     },
@@ -22,6 +32,7 @@ const productResolvers = {
         }
         return product;
       } catch (error) {
+        console.error(`Error retrieving product with ID ${id}:`, error);
         throw new Error('Error retrieving product: ' + error.message);
       }
     },
@@ -69,6 +80,7 @@ const productResolvers = {
         await product.save();
         return product;
       } catch (error) {
+        console.error(`Error updating product with ID ${id}:`, error);
         throw new Error('Error updating product: ' + error.message);
       }
     },
@@ -83,6 +95,7 @@ const productResolvers = {
         await product.destroy();
         return { message: "Product successfully deleted." };
       } catch (error) {
+        console.error(`Error deleting product with ID ${id}:`, error);
         throw new Error('Error deleting product: ' + error.message);
       }
     }

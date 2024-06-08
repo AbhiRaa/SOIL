@@ -1,11 +1,21 @@
+/**
+ * productSchema.js
+ * 
+ * Defines GraphQL schema for products including types for products, product engagements,
+ * stock updates, and the associated mutations and queries. This schema is part of the
+ * GraphQL API which allows clients to interact with product data.
+ */
+
 const { gql } = require('apollo-server-express');
 
 const productSchema = gql`
+  # Type definitions for aggregating reviews data
   type ReviewsAggregate {
     count: Int!
     averageRating: String!
   }
 
+  # Type definitions for product engagement data
   type ProductEngagement {
     product_id: ID!
     product_name: String!
@@ -13,6 +23,7 @@ const productSchema = gql`
     reviewsAggregate: ReviewsAggregate
   }
   
+  # Type definitions for product stock updates
   type ProductStockUpdate {
     product_id: ID!
     product_name: String!
@@ -22,14 +33,17 @@ const productSchema = gql`
     product_stock: Int!
   }
 
+  # Subscriptions to track product stock updates
   extend type Subscription {
     productStockUpdated: [ProductStockUpdate]
   }
 
+  # Subscriptions to track product engagement updates
   extend type Subscription {
     productEngagementUpdated: [ProductEngagement]
   }
 
+  # Primary product type definition
   type Product {
     product_id: ID!
     product_name: String!
@@ -55,18 +69,20 @@ const productSchema = gql`
     is_special: Boolean
   }
 
+  # Queries to fetch products
   type Query {
     products: [Product]
     product(id: ID!): Product
   }
 
+  # Mutations to manage products
   type Mutation {
     addProduct(productInput: ProductInput!): Product
     editProduct(id: ID!, productInput: ProductInput!): Product
     deleteProduct(id: ID!): Message
   }
 
-  # Simple message type to confirm actions like deletions
+  # Simple message type for feedback on mutations
   type Message {
     message: String!
   }

@@ -1,9 +1,21 @@
+/**
+ * reviewResolvers.js
+ *
+ * This module defines GraphQL resolvers for operations related to reviews. These include queries to
+ * fetch reviews, mutations to manage review visibility and deletion, and a subscription for real-time
+ * updates when new reviews are fetched. Robust error handling and meaningful logging are integrated
+ * for better maintenance and troubleshooting.
+ */
+
 const pubsub = require('../../config/pubsub.js');
 
 const LATEST_REVIEWS_FETCHED = 'LATEST_REVIEWS_FETCHED';
 
 const reviewResolvers = {
   Query: {
+    /**
+     * Fetch all reviews, including associated author and product information.
+     */
     reviews: async (_, args, { models }) => {
       try {
         return await models.Review.findAll({
@@ -14,9 +26,14 @@ const reviewResolvers = {
           ] // Eager loading of author and product
         });
       } catch (error) {
+        console.error('Error fetching reviews:', error);
         throw new Error('Failed to fetch reviews: ' + error.message);
       }
     },
+
+    /**
+     * Fetch a specific review by its ID.
+     */
     review: async (_, { id }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -25,12 +42,16 @@ const reviewResolvers = {
         }
         return review;
       } catch (error) {
+        console.error(`Error retrieving review with ID ${id}:`, error);
         throw new Error('Error retrieving review: ' + error.message);
       }
     },
   },
 
   Mutation: {
+    /**
+     * Update the visibility of a review.
+     */
     updateReviewVisibility: async (_, { id, isVisible }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -43,9 +64,14 @@ const reviewResolvers = {
         await review.save();
         return review;
       } catch (error) {
+        console.error(`Error updating visibility for review ID ${id}:`, error);
         throw new Error('Error updating review visibility: ' + error.message);
       }
     },
+
+    /**
+     * Delete a review by its ID.
+     */
     deleteReview: async (_, { id }, { models }) => {
       try {
         const review = await models.Review.findByPk(id);
@@ -55,6 +81,7 @@ const reviewResolvers = {
         await review.destroy();
         return { message: "Review successfully deleted." };
       } catch (error) {
+        console.error(`Error deleting review ID ${id}:`, error);
         throw new Error('Error deleting review: ' + error.message);
       }
     }

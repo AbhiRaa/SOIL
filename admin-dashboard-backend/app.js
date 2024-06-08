@@ -1,3 +1,8 @@
+/**
+ * app.js
+ * Sets up the Express server integrated with Apollo Server for GraphQL API.
+ * Configures middleware, database synchronization, and WebSocket for real-time communication.
+ */
 const express = require('express');
 const cors = require('cors');
 const initDb = require('./src/database');
@@ -8,7 +13,7 @@ const http = require('http');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { mergeTypeDefs, mergeResolvers } = require('@graphql-tools/merge');
 
-// Import type definitions and resolvers
+// Import type definitions and resolvers for GraphQL schema
 const userSchema = require('./src/graphql/schemas/userSchema.js');
 const productSchema = require('./src/graphql/schemas/productSchema.js');
 const reviewSchema = require('./src/graphql/schemas/reviewSchema.js');
@@ -16,54 +21,56 @@ const userResolvers = require('./src/graphql/resolvers/userResolvers.js');
 const productResolvers = require('./src/graphql/resolvers/productResolvers.js');
 const reviewResolvers = require('./src/graphql/resolvers/reviewResolvers.js');
 
-// Merge all schemas and resolvers
+// Merge GraphQL schemas and resolvers
 const typeDefs = mergeTypeDefs([userSchema, productSchema, reviewSchema]);
 const resolvers = mergeResolvers([userResolvers, productResolvers, reviewResolvers]);
 
 async function initializeApp() {
   const app = express();
 
-  // Serve images, CSS files, JavaScript files, etc.
+  // Static middleware for serving images, CSS, and JavaScript files
   app.use('/images', express.static('src/images'));
 
-  // Add CORS suport.
+  // CORS middleware to allow cross-origin requests
   app.use(cors());
 
-  // Parse requests of content-type - application/json.
+  // Middleware to parse JSON requests
   app.use(express.json());
 
   try {
-    const db = await initDb();  // Ensure DB is initialized here
-    await db.sequelize.sync();  // Ensure DB is synced here
-    console.log('Database synced!');
+    // Initialize database and synchronize schemas
+    const db = await initDb();
+    await db.sequelize.sync();
+    console.log('Database synced successfully.');
 
-    // Create an HTTP server
+    // Create an HTTP server for the app
     const httpServer = http.createServer(app);
 
-    // Create a WebSocket server
+    // Setup WebSocket server for real-time GraphQL subscriptions
     const wsServer = new WebSocketServer({
       server: httpServer,
       path: '/graphql',
     });
 
-    // Use graphql-ws to handle WebSocket connections
+    // Apply GraphQL-WS to handle WebSocket connections
     const serverCleanup = useServer({ schema: makeExecutableSchema({ typeDefs, resolvers }) }, wsServer);
 
     // Integrate Apollo Server with Express using the models and handle proper dispose
-    const apolloServer = createApolloServer(db.models, httpServer, () => serverCleanup.dispose()); // Pass models to the server
+    const apolloServer = createApolloServer(db.models, httpServer, () => serverCleanup.dispose());
     await apolloServer.start();  // Start Apollo Server before applying middleware
     apolloServer.applyMiddleware({ app });
 
     console.log(`WebSocket Server set up at path: ${apolloServer.graphqlPath}`);
 
+    // Basic route for health check or API welcome
     app.get("/", (req, res) => {
       res.json({ message: "Hello World from SOIL Organic Admin portal!" });
     });
 
-    return { app, httpServer, apolloServer, serverCleanup }; // Return both app and server  
+    return { app, httpServer, apolloServer, serverCleanup };
   } catch (error) {
-    console.error('Failed to initialize the application:', error);
-    throw error;  // Errors are propagated
+    console.error('Initialization failed:', error);
+    throw error;  // Rethrow to handle the error upstream
   }
 }
 

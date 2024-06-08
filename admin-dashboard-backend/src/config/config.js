@@ -1,3 +1,5 @@
+// DataBase config
+
 module.exports = {
   HOST: "rmit.australiaeast.cloudapp.azure.com",
   USER: "s3977487_fsd_a2",

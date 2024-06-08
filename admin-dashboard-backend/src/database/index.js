@@ -1,8 +1,21 @@
-  // This file will manage the database connection and initialize the database models and assocaiations.
+/**
+ * index.js
+ * 
+ * Manages database connections and initializes Sequelize models and associations.
+ * This module sets up the Sequelize connection to the database using configurations
+ * from `config/config.js` and defines relationships between models.
+ */
+  
   const { Sequelize, DataTypes } = require("sequelize");
   const config = require("../config/config.js");
 
-  // Function to establish a database connection with retry logic
+  /**
+   * Establishes a database connection with retry logic.
+   * Tries to connect multiple times if the first attempt fails, with a delay between attempts.
+   * 
+   * @returns {Object} The Sequelize instance connected to the database.
+   * @throws {Error} If connection fails after maximum retries.
+   */
   async function establishConnection() {
     const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
       host: config.HOST,
@@ -32,6 +45,11 @@
     throw new Error('Max retries reached, exiting application');
   }
 
+/**
+ * Initializes the database by setting up models and their associations.
+ * 
+ * @returns {Object} An object containing the Sequelize instance and models.
+ */
 module.exports = async function initDb() {
   const sequelize = await establishConnection();
 
@@ -46,13 +64,13 @@ module.exports = async function initDb() {
   db.models.Product = require('../models/Product')(sequelize, DataTypes);
   db.models.Review = require('../models/Review')(sequelize, DataTypes);
 
-  // Associations
+  // Define model associations
   // Users and Reviews
   db.models.User.hasMany(db.models.Review, {
     foreignKey: 'user_id',
     as: 'reviews',
-    onDelete: 'CASCADE',  // Delete all reviews when user is deleted
-    onUpdate: 'CASCADE'   // Update foreign key when user_id changes
+    onDelete: 'CASCADE',  // Deletes all associated reviews when a user is deleted.
+    onUpdate: 'CASCADE'   // Updates foreign key when user_id changes.
   });
   db.models.Review.belongsTo(db.models.User, {
     foreignKey: 'user_id',
