@@ -2,18 +2,19 @@ import Navigator from "../components/NavigationBar";
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../hooks/context";
-import { findUser, updateUser } from "../data/users";
 import EditProfileModal from '../components/EditProfileModal';
 import EditPasswordModal from '../components/updatePasswordModal';
 import { getUserDetails, deleteUser, updateUserDetails, changeUserPassword } from "../services/userService.js";
 import Footer from "../components/Footer.js";
+import Notification from '../utils/notifications';
 
-const Profile = () => {
-  const { currentloggedInUser, signOut } = useContext(UserContext);
+const Profile = (props) => {
+  const { currentloggedInUser,  signOut } = useContext(UserContext);
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditPasswordOpen, setIsEditPasswordOpen] = useState(false);
+  const [notification, setNotification] = useState(''); // State for displaying notifications
 
   useEffect(() => {
     // Retrieve the user object from local storage.
@@ -49,13 +50,21 @@ const Profile = () => {
       const response = await updateUserDetails(currentloggedInUser.userId, updatedUser);
       if (response.data && response.data.updatedUser) {
         setUser(response.data.updatedUser); // Update local state with the new user data
+        props.updateUserContext({
+          userId: response.data.updatedUser.userId,
+          userName: response.data.updatedUser.userName,
+          userEmail: response.data.updatedUser.userEmail
+        }); // Update the context as well if username is updated
+        
         setIsEditModalOpen(false);
-        alert("Profile updated successfully!");
+        setNotification('Profile updated successfully!');
+        setTimeout(() => setNotification(''), 3000);
       } else {
         throw new Error('Invalid response structure');
       }
     } catch (error) {
-      alert("Failed to update profile. Please try again.");
+      setNotification('Failed to update profile. Please try again.');
+      setTimeout(() => setNotification(''), 3000);
       console.error('Update Error:', error);
     }
   };
@@ -65,37 +74,40 @@ const Profile = () => {
       try {
         await deleteUser(currentloggedInUser.userId);
         signOut();
-        navigate("/");
       } catch (error) {
-        alert("Failed to delete profile.");
+        setNotification('Failed to delete profile.');
+        setTimeout(() => setNotification(''), 3000);
       }
     }
   };
 
   const handleUpdatePassword = async (existingPassword, newPassword) => {
-
     if (!user) {
-      alert('User not found.');
+      setNotification('User not found.');
+      setTimeout(() => setNotification(''), 3000);
       return;
     }
-
     try {
       const response = await changeUserPassword(currentloggedInUser.userId, existingPassword, newPassword );
       if (response.status === 200) {
-        alert('Password successfully updated. Please login again!');
+        setNotification('Password successfully updated. Please login again!');
+        setTimeout(() => signOut(), 1000);
         setIsEditPasswordOpen(false);
-        signOut();
-        navigate("/signin");
+        // signOut();
+
       } else {
         throw new Error('Failed to update password.');
       }
     } catch (error) {
     if (error.response && error.response.status === 400) {
-      // Specific error handling for when the current password is incorrect
-      alert(error.response.data.message);
+      // Show notification when the current password is incorrect
+      setNotification(error.response.data.message);
+      setTimeout(() => setNotification(''), 3000);
+
     } else {
       // General error handling for other kinds of errors
-      alert(error.message || "Failed to update password. Please try again.");
+      setNotification(error.message || "Failed to update password. Please try again!");
+      setTimeout(() => setNotification(''), 3000);
     }
     console.error('Password Update Error:', error);
   }
@@ -177,6 +189,7 @@ const Profile = () => {
       />
       )}
     </div>
+    {notification && <Notification message={notification} />}
     <Footer/>
   </div>
   );

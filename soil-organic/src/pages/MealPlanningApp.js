@@ -247,7 +247,7 @@ function MealPlanningApp() {
           {/* Multi-select dropdown for dietary restrictions */}
           <div className="w-full flex-col gap-3">
             <label htmlFor="intolerances" className="block text-2xl font-bold text-primary  mb-1">Select Dietary Restrictions:</label>
-            <p className="text-primary text-sm">*press Ctrl for multiple selections which will add restrictions on both meal generation and search</p>
+            <p className="text-primary text-sm">*press Ctrl for multiple selections to add restrictions on both meal generation and search</p>
             <select multiple id="intolerances" name="intolerances" value={intolerances} onChange={handleChangeIntolerance} className="form-multiselect bg-orange-50 block w-full mt-1 pl-3 pr-10 py-2 text-primary text-xl border-gray-300 focus:outline-none focus:ring-primary focus:border-primary  rounded-md">
               {intoleranceOptions.map(option => (
                 <option key={option.value} value={option.value}>{option.label}</option>

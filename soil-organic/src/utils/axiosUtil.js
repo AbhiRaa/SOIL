@@ -1,4 +1,7 @@
 import axios from 'axios';
+import EventEmitter from 'events';
+
+export const eventEmitter = new EventEmitter();
 
 const API_HOST = "http://localhost:4000/api";
 
@@ -21,10 +24,7 @@ API.interceptors.response.use(
   response => response, // Simply return the response if there is no error
   error => {
     if (error.response && error.response.status === 401) {
-      // Token is either expired or user is unauthorized
-      localStorage.removeItem('access_token'); // Clear the stored token
-      alert('Your session has expired. Please log in again.'); // Notify user
-      window.location.href = '/signin';
+      eventEmitter.emit('unauthorized');  // Emit an event when unauthorized
     }
     return Promise.reject(error);
   }

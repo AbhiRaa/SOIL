@@ -6,6 +6,7 @@ import UserContext from "../hooks/context";
 import CheckoutModal from "../components/CheckoutModal";
 import PurchaseSummaryModal from '../components/PurchaseSummaryModal';
 import cartBackground from '../images/cartBackground.png';
+import Notification from '../utils/notifications';
 
 function ShoppingCart() {
     const { currentloggedInUser } = useContext(UserContext);    // Access the context for the currently logged-in user
@@ -18,6 +19,7 @@ function ShoppingCart() {
 
     const [shippingAddress, setShippingAddress] = useState('');
     const [cardNumber, setCardNumber] = useState('');
+    const [notification, setNotification] = useState(''); // State for displaying notifications
 
     // Redirect to signup if no user is logged in
     useEffect(() => {
@@ -130,8 +132,6 @@ function ShoppingCart() {
                 isOpen={isCheckoutOpen}
                 onClose={() => setIsCheckoutOpen(false)}
                 onCheckoutComplete={() => {
-                    alert('Purchase successful! Thank you for your order.');
-                    // clearCart();
                     setIsCheckoutOpen(false); // Close Checkout Modal
                     setShowSummaryModal(true); // Show Purchase Summary Modal
                 }}
@@ -143,13 +143,18 @@ function ShoppingCart() {
                 isOpen={showSummaryModal}
                 onClose={() => {
                     clearCart();
-                    setShowSummaryModal(false)}}
+                    setShowSummaryModal(false);
+
+                    setNotification('Purchase successful! Thank you for your order.');
+                    setTimeout(() => setNotification(''), 3000);
+                }}
                 purchaseDetails={{ 
                     items: cartItems,
                     shippingAddress: shippingAddress,
                     cardNumber: cardNumber.slice(-4)  // Only pass the last four digits
                 }} 
             />
+            {notification && <Notification message={notification} />}
         </div>
     );
 }

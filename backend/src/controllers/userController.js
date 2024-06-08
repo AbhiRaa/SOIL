@@ -105,7 +105,7 @@ module.exports = (db) => {
                     as: 'profile',  // Make sure 'profile' is the correct alias used in the association
                     attributes: ['age', 'weight', 'height', 'gender', 'activity_level', 'dietary_preferences', 'health_goals']
                 }],
-                attributes: ['name', 'email', 'join_date']
+                attributes: ['user_id', 'name', 'email', 'join_date']
             });
 
             if (!user) {
@@ -113,6 +113,7 @@ module.exports = (db) => {
             }
 
             const userProfile = {
+                userId: user.user_id,
                 userName: user.name,
                 userEmail: user.email,
                 joinDate: user.join_date,
@@ -209,7 +210,7 @@ module.exports = (db) => {
               as: 'profile',
               attributes: ['age', 'weight', 'height', 'gender', 'activity_level', 'dietary_preferences', 'health_goals']
           }],
-          attributes: ['name', 'email', 'join_date']
+          attributes: ['user_id', 'name', 'email', 'join_date']
         });
 
         if (!updatedUserData) {
@@ -218,6 +219,7 @@ module.exports = (db) => {
         }
 
         const updatedUser = {
+          userId: updatedUserData.user_id,
           userName: updatedUserData.name,
           userEmail: updatedUserData.email,
           joinDate: updatedUserData.join_date,

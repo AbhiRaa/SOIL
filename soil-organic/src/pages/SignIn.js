@@ -50,9 +50,8 @@ const SignIn = (props) => {
           userEmail: response.data.userEmail
         }
         props.signIn(user);
-        alert("Login successful!");
 
-        setNotification(`Welcome ${user.userName} to SOIL-ORGANIC!`);
+        setNotification(`Login successful. Welcome ${user.userName} to SOIL-ORGANIC!`);
 
         console.log("Navigating to profile...");
 

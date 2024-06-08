@@ -25,7 +25,7 @@ function useMealPlanner() {
     const [mealPlan, setMealPlan] = useState(() => {
         // Attempt to load the initial meal plan from local storage on hook initialization
         if (currentloggedInUser) {
-            const storageKey = `mealplan_${currentloggedInUser}`;
+            const storageKey = `mealplan_${currentloggedInUser.userEmail}`;
             const storedPlan = localStorage.getItem(storageKey);
             return storedPlan ? JSON.parse(storedPlan) : {};
         }
@@ -35,7 +35,7 @@ function useMealPlanner() {
     useEffect(() => {
         // React only when currentloggedInUser changes and is defined
         if (currentloggedInUser) {
-            const storageKey = `mealplan_${currentloggedInUser}`;
+            const storageKey = `mealplan_${currentloggedInUser.userEmail}`;
             console.log('Attempting to fetch meal plan for:', storageKey);
 
             const storedPlan = localStorage.getItem(storageKey);
@@ -55,7 +55,7 @@ function useMealPlanner() {
     useEffect(() => {
         // Persist the meal plan to local storage whenever it changes, but only if there is a logged-in user
         if (currentloggedInUser && mealPlan) {
-            const storageKey = `mealplan_${currentloggedInUser}`;
+            const storageKey = `mealplan_${currentloggedInUser.userEmail}`;
             console.log('Saving meal plan for:', storageKey);
             localStorage.setItem(storageKey, JSON.stringify(mealPlan));
         }
@@ -77,7 +77,7 @@ function useMealPlanner() {
 
     const clearMealPlan = () => {
         if (currentloggedInUser) {
-            const storageKey = `mealplan_${currentloggedInUser}`;
+            const storageKey = `mealplan_${currentloggedInUser.userEmail}`;
             console.log('Clearing meal plan from local storage:', storageKey);
             localStorage.removeItem(storageKey);
         }
