@@ -160,7 +160,7 @@ This will start the Express server on the port defined in your environment varia
 - Individual test : npm test -- reviewController.test.js, npm test -- cartController.test.js
 
 1. reviewController.test.js
-- Overview
+- Overview: 
 The reviewController.test.js is designed to rigorously test the functionality of the reviewController, which handles operations related to managing reviews within an application. This testing suite is built using jest for mocking and assertions, and supertest for making HTTP requests to the express application. These tests ensure that the review management features of the application function correctly under various scenarios.
 - Test Setup
 * Module Imports: Necessary modules like supertest for HTTP requests and express for creating an express application are imported.
@@ -177,11 +177,11 @@ Assertions
 Each test case uses assertions to verify:
 * HTTP Status Codes: Each response's status code is checked to match the expected outcome (e.g., 200 for success, 201 for creation).
 * Response Body: The content of the HTTP response is checked to ensure that it contains the correct data structures and messages expected from the operation.
-- Conclusion
+- Conclusion: 
 The test suite in reviewController.test.js is crucial for ensuring that the review management functionality of the application is robust, performs as expected, and handles edge cases gracefully. By mocking database interactions and simulating authenticated sessions, these tests can run quickly and reliably without side effects, making them an essential part of the development process for maintaining high-quality code and functionality.
 
 2. cartController.test.js
-- Overview
+- Overview: 
 The cartController.test.js is a comprehensive testing suite for the Cart Controller functionalities within an Express application. This suite uses Jest for function mocking and assertions, and Supertest for making HTTP requests. The tests are designed to validate the correctness of CRUD operations on the shopping cart under a simulated user authentication scenario.
 - Testing Strategy
 * Authentication Simulation: Authentication is mocked to bypass actual login mechanisms, assuming the user is always authenticated. This setup focuses the tests on the cart functionalities without dependencies on the authentication logic.
@@ -218,6 +218,6 @@ The cartController.test.js is a comprehensive testing suite for the Cart Control
     * Assertions:
         * HTTP status should be 404 Not Found.
         * The error message should indicate that the cart does not exist, confirming the system's robust handling of such cases.
-- Conclusion
+- Conclusion: 
 The cartController.test.js ensures that the cart management functionalities of the application are robust, correctly implemented, and secure from common issues. By isolating the application logic from external dependencies such as the actual database and authentication system, these tests provide a reliable and efficient means to continuously validate the business logic and error handling of the cart operations. This approach greatly enhances the development process, providing quick feedback and assurance of feature correctness during development cycles.
 
