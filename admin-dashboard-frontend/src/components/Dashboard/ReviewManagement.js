@@ -50,14 +50,14 @@ const ReviewManagement = () => {
               <td className="py-3 px-6 text-left">
                 {review.content}
               </td>
-              <td className="py-3 px-6 text-center">
+              <td className="py-3 px-6 text-center w-[175px]">
                 <StarRatings
                   rating={review.rating}
                   starRatedColor="orange"
                   numberOfStars={5}
                   name='rating'
-                  starDimension="15px"
-                  starSpacing="0.5px"
+                  starDimension="20px"
+                  starSpacing="2px"
                 />
               </td>
               <td className="py-3 px-6 text-left whitespace-nowrap">

@@ -16,7 +16,6 @@ async function pollReviews() {
       const latestReviews = await response.json();
 
       if (latestReviews && latestReviews.reviews) {
-        console.log("Publishing latest reviews:", latestReviews.reviews);
         pubsub.publish(LATEST_REVIEWS_FETCHED, { latestReviewsFetched: latestReviews.reviews });
       }
     } catch (error) {
@@ -32,7 +31,6 @@ async function pollProductEngagement() {
       const productEngagementData = await response.json();
 
       if (productEngagementData && productEngagementData.products) {
-        console.log("Publishing product engagement data:", productEngagementData.products);
         pubsub.publish(PRODUCT_ENGAGEMENT_UPDATED, { productEngagementUpdated: productEngagementData.products });
       }
     } catch (error) {
@@ -48,7 +46,6 @@ async function pollProductStock() {
       const stockData = await response.json();
 
       if (stockData && stockData.products) {
-        console.log("Publishing product stock updates:", stockData.products);
         pubsub.publish(PRODUCT_STOCK_UPDATED, { productStockUpdated: stockData.products });
       }
     } catch (error) {
