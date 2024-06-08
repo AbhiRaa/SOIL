@@ -1,10 +1,20 @@
-
+/**
+ * Product Controller: Handles all product-related operations.
+ * Provides functionality for retrieving all products and specific product stock updates.
+ * Each product includes associated reviews.
+ */
 
 module.exports = (db) => {
     const { Product, Review } = db.models;
     // const { sequelize } = db;
 
     return {
+        /**
+         * Retrieves all products from the database including their associated reviews.
+         * Reviews are included as a nested object within each product.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+         */
         getAllProducts: async (req, res) => {
         try {
           const products = await Product.findAll({
@@ -22,6 +32,12 @@ module.exports = (db) => {
         }
       }, 
 
+      /**
+       * Fetches the latest stock updates for all products.
+       * This can be useful for admin front-end components that need to display the most current stock information.
+       * @param {Object} req - The HTTP request object.
+       * @param {Object} res - The HTTP response object.
+      */
       fetchProductStockUpdates: async (req, res) => {
         try {
             const products = await Product.findAll({
@@ -37,5 +53,5 @@ module.exports = (db) => {
             res.status(500).json({ message: "Internal server error" });
         }
       }
-    }
-  }
+    };
+  };

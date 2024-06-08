@@ -1,55 +1,50 @@
-// This is the main Express application file.
+/**
+ * This module sets up the core Express application for the SOIL Organic platform.
+ * It initializes the database, configures middleware, and sets up routes. This
+ * module is responsible for initializing the application environment, configuring middleware,
+ * static files, CORS settings, JSON parsing, and database seeding if necessary.
+ * 
+ * @module app
+ */
+
 const express = require('express');
 const cors = require('cors');
 const initDb = require('./src/database');
 const { errorHandler } = require('./src/middlewares/errorHandler');
 const {products} = require('./src/database/productsData')
-// const userRoutes = require('./src/routes/userRoutes');
 
 const app = express();
 
-
-// Serve images, CSS files, JavaScript files, etc.
+// Middleware to serve static images
 app.use('/images', express.static('src/database/images'));
 
-// Add CORS suport.
+// CORS middleware to allow cross-origin requests
 app.use(cors());
-// Parse requests of content-type - application/json.
+// Middleware to parse JSON bodies
 app.use(express.json());
 
-// Define a function to initialize the application
+/**
+ * Initializes the application by setting up the database and routes.
+ * Logs errors and starts the database synchronization.
+ */
 async function initializeApp() {
   try {    
-    const db = await initDb();  // Ensure DB is initialized here
-    await db.sequelize.sync();  // Ensure DB is synced here
-    const Product = db.models.Product
-    await seedProductsIfNeeded(Product); //seed products if table is empty
+    const db = await initDb();  // Initialize the database
+    await db.sequelize.sync();  // Synchronize the database schema
     console.log('Database synced!');
 
-    // Define routes
+    // Optionally seed the database with initial data if it's empty
+    await seedProductsIfNeeded(db.models.Product);
+
+    // Define Global Hello route
     app.get("/", (req, res) => {
       res.json({ message: "Hello World from SOIL Organic!" });
     });
 
-    // All other routes setup
-    // Importing the routes function and passing db models to it
-    const setupUserRoutes = require('./src/routes/userRoutes');
-    setupUserRoutes(app, db); // Dependency injection of models
+    // Set up application routes
+    setupRoutes(db);
 
-    const setupProductRoutes = require('./src/routes/productRoutes');
-    setupProductRoutes(app, db); // Dependency injection of models
-
-    const setupReviewRoutes = require('./src/routes/reviewRoutes');
-    setupReviewRoutes(app, db); // Dependency injection of models
-    
-    const setupCartRoutes = require('./src/routes/cartRoutes');
-    setupCartRoutes(app, db); // Dependency injection of models
-
-    // // Routes
-    // app.get('/', (req, res) => {
-    //   throw new Error('Something broke!'); // for errorHandler
-    // });
-
+    // Global error handler
     app.use(errorHandler);
 
   } catch (error) {
@@ -57,7 +52,10 @@ async function initializeApp() {
   }
 }
 
-
+/**
+ * Seeds the database with predefined products.
+ * @param {Model} Product - The Product model that will receive the data.
+ */
 async function seedProducts(Product) {
   try {
     await Product.bulkCreate(products, { validate: true });
@@ -67,6 +65,10 @@ async function seedProducts(Product) {
   }
 }
 
+/**
+ * Seeds the database with product data if the products table is empty.
+ * @param {Model} Product - The Product model to which the data will be seeded.
+ */
 async function seedProductsIfNeeded(Product) {
   const existingCount = await Product.count();
   if (existingCount === 0) {
@@ -77,9 +79,26 @@ async function seedProductsIfNeeded(Product) {
   }
 }
 
+/**
+ * Configures application routes.
+ * @param {object} db - The database object that contains models.
+ */
+function setupRoutes(db) {
+  const setupUserRoutes = require('./src/routes/userRoutes');
+  setupUserRoutes(app, db); // Inject database into user routes
 
-// Start initializing app but do not listen here
+  const setupProductRoutes = require('./src/routes/productRoutes');
+  setupProductRoutes(app, db); // Inject database into product routes
+
+  const setupReviewRoutes = require('./src/routes/reviewRoutes');
+  setupReviewRoutes(app, db); // Inject database into review routes
+
+  const setupCartRoutes = require('./src/routes/cartRoutes');
+  setupCartRoutes(app, db); // Inject database into cart routes
+}
+
+// Initialize the application without starting the HTTP server
 initializeApp();
 
-// Export the app for server.js to use
+// Export the configured app to be used by the server.js module
 module.exports = app;

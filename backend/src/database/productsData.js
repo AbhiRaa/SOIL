@@ -1,33 +1,4 @@
-
-// import organicWatermelon from "images/org-fruit.jpg";
-// import organicMillets from "images/org-millets.jpg";
-// import strawberries from "images/strawberry.jpg";
-// import banana from "images/banana.jpg";
-// import tomatoes from 'images/toamtoes.webp';
-// import spinach from 'images/spinach.webp';
-// import salmon from 'images/salmon.webp';
-// import bread from 'images/bread.webp';
-// import mixedBerries from 'images/mixedBerries.webp';
-// import honey from 'images/honey.webp';
-// import cheese from 'images/cheddarcheese.webp';
-// import nuts from 'images/mixednuts.webp';
-// import grapes from 'images/redgrapes.webp';
-
-// const organicWatermelon = require("images/org-fruit.jpg");
-// const organicMillets = require("images/org-millets.jpg");
-// const strawberries = require("images/strawberry.jpg");
-// const banana = require("images/banana.jpg");
-// const tomatoes = require('images/toamtoes.webp');
-// const spinach = require('images/spinach.webp');
-// const salmon = require('images/salmon.webp');
-// const bread = require('images/bread.webp');
-// const mixedBerries = require('images/mixedBerries.webp');
-// const honey = require('images/honey.webp');
-// const cheese = require('images/cheddarcheese.webp');
-// const nuts = require('images/mixednuts.webp');
-// const grapes = require('images/redgrapes.webp');
-
-
+// Products Seed data
 const products = [
   {
     minimum_purchase_unit: "200 grams",

@@ -22,7 +22,9 @@ module.exports = (app, db) => {
     //fetch replies
     app.get('/api/replies/:reviewId',authenticate,reviewController.fetchReplies)
 
+    // route to be polled from admin backend for latest three reviews
     app.get('/api/reviews/latest', reviewController.fetchLatestReviews)
 
+    // route for be polled from admin backend to gather user-product engagement
     app.get('/api/products/engagement', reviewController.fetchProductEngagement);
 }

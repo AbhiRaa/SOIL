@@ -10,6 +10,5 @@
 
 module.exports = {
     // The port number on which the server listens.
-    // This can be overridden by setting an environment variable PORT before launching the server.
     PORT: 4001
   };

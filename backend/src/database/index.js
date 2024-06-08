@@ -1,8 +1,17 @@
-  // This file will manage the database connection and initialize the database models and assocaiations.
-  const { Sequelize, DataTypes } = require("sequelize");
-  const config = require("../config/config.js");
+/**
+ * Initializes and configures the database connection and models for the SOIL Organic application.
+ * This module establishes a connection to the database using Sequelize and defines the model relationships.
+ *
+ * @module database
+ */
 
-  // Function to establish a database connection with retry logic
+const { Sequelize, DataTypes } = require("sequelize");
+const config = require("../config/config.js");
+
+  /**
+   * Establishes a database connection with retry logic to handle potential connection issues.
+   * @returns {Sequelize} A Sequelize connection instance.
+   */
   async function establishConnection() {
     const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
       host: config.HOST,
@@ -32,6 +41,10 @@
     throw new Error('Max retries reached, exiting application');
   }
 
+  /**
+ * Initializes the database by establishing a connection and setting up the models and their associations.
+ * @returns {Object} An object containing the Sequelize instance and models.
+ */
 module.exports = async function initDb() {
   const sequelize = await establishConnection();
 

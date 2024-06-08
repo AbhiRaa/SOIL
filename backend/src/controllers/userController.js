@@ -1,3 +1,11 @@
+/**
+ * User Controller
+ * This controller handles requests related to user operations such as signing up, signing in,
+ * deleting, updating user details, and managing user follow relationships.
+ * 
+ * @module UserController
+ */
+
 module.exports = (db) => {
   const bcrypt = require('bcrypt');
   const { generateToken } = require('../utils/jwtUtils');
@@ -5,6 +13,11 @@ module.exports = (db) => {
   const { sequelize } = db;
 
   return {
+      /**
+       * Signs up a new user, creates associated Profile and Cart, and generates a JWT token.
+       * @param {Object} req - HTTP request object containing name, email, and password.
+       * @param {Object} res - HTTP response object for sending responses.
+       */
       signup: async (req, res) => {
           const { name, email, password } = req.body;
 
@@ -63,6 +76,11 @@ module.exports = (db) => {
           }
       },
 
+      /**
+       * Signs in an existing user by validating credentials and returns a JWT token.
+       * @param {Object} req - HTTP request object containing email and password.
+       * @param {Object} res - HTTP response object for sending responses.
+       */
       signin: async (req, res) => {
           const { email, password } = req.body;
           try {
@@ -94,6 +112,11 @@ module.exports = (db) => {
           }
       },  
 
+      /**
+       * Retrieves details of a user including their profile.
+       * @param {Object} req - HTTP request object with userId as parameter.
+       * @param {Object} res - HTTP response object for sending responses.
+       */
       getUserDetails: async (req, res) => {
         const { userId } = req.params;
 
@@ -133,6 +156,11 @@ module.exports = (db) => {
         }
       },
 
+      /**
+       * Deletes a user along with their profile and associated data atomically.
+       * @param {Object} req - HTTP request object with userId as parameter.
+       * @param {Object} res - HTTP response object for sending responses.
+       */
       deleteUser: async (req, res) => {
         const { userId } = req.params;  // Extract userId from the request parameters
     
@@ -173,6 +201,11 @@ module.exports = (db) => {
         }
     },
 
+    /**
+     * Updates user and profile details within a transaction ensuring data consistency.
+     * @param {Object} req - HTTP request object with userId as parameter and updated user details in the body.
+     * @param {Object} res - HTTP response object for sending responses.
+     */
     updateUserDetails: async (req, res) => {
       const { userId } = req.params;
       const { userEmail, userName, age, weight, height, gender, activityLevel, dietaryPreferences, healthGoals } = req.body;
@@ -240,6 +273,11 @@ module.exports = (db) => {
       }
     }, 
 
+    /**
+     * Updates the user's password after validating the current password.
+     * @param {Object} req - HTTP request object with userId as parameter and passwords in the body.
+     * @param {Object} res - HTTP response object for sending responses.
+     */
     updatePassword: async (req, res) => {
       const { userId } = req.params;
       const { currentPassword, newPassword } = req.body;
@@ -266,7 +304,12 @@ module.exports = (db) => {
       }
     },
     
-    followUser:async (req,res) =>{
+    /**
+     * Establishes a follow relationship between two users.
+     * @param {Object} req - HTTP request object containing followerId in params and followingId in body.
+     * @param {Object} res - HTTP response object for sending responses.
+     */
+    followUser: async (req,res) => {
       const{followingId} = req.body
       const {followerId} = req.params
 
@@ -293,6 +336,11 @@ module.exports = (db) => {
         }
     },
 
+    /**
+     * Retrieves the list of users a particular user is following.
+     * @param {Object} req - HTTP request object with followerId as a parameter.
+     * @param {Object} res - HTTP response object for sending responses.
+     */
     fetchFollowing : async (req, res) => {
       const {followerId} = req.params;
       try {
@@ -315,7 +363,12 @@ module.exports = (db) => {
       }
     },
 
-    unfollowUser: async(req,res)=>{
+    /**
+     * Removes a follow relationship between two users.
+     * @param {Object} req - HTTP request object containing followerId in params and followingId in body.
+     * @param {Object} res - HTTP response object for sending responses.
+     */
+    unfollowUser: async(req,res) => {
       const {followerId} = req.params
       const{followingId} = req.body
       try {
@@ -329,10 +382,9 @@ module.exports = (db) => {
 
         res.status(201).json({ message: "Successfully unfollowed the user." });
         } catch (error) {
-        console.error("Error in unfollowing user: ", error);
+          console.error("Error in unfollowing user: ", error);
           res.status(500).json({ message: 'Internal server error' });
         }
     }
-
-}
+  };
 };

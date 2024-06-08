@@ -1,6 +1,18 @@
+/**
+ * Cart Controller for managing the shopping cart operations in the SOIL Organic backend application.
+ * This controller includes functions to manage cart items such as adding, updating, removing, and clearing the cart.
+ * It also handles retrieving the cart with detailed product information.
+ *
+ * @module CartController
+ */
+
 module.exports = (db) => {
     const { Cart, CartItem, Product } = db.models;
     
+     /**
+     * Updates the total amount in the cart by summing up the price of all items in the cart.
+     * @param {number} cartId - The ID of the cart to be updated.
+     */
     const updateCartTotal = async (cartId) => {
         try {
             const cartItems = await CartItem.findAll({
@@ -20,9 +32,12 @@ module.exports = (db) => {
         }
     };
     
-
     return {
-        // Retrieve cart with items and associated product details
+        /**
+         * Retrieves the cart for a specific user, including the items and their associated products.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+         */
         getCart: async (req, res) => {
             try {
                 const { userId } = req.params;
@@ -51,7 +66,11 @@ module.exports = (db) => {
             }
         },
 
-        // Add item to cart
+        /**
+         * Adds an item to the cart or updates the quantity if it already exists.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+         */
         addItem: async (req, res) => {
             const { userId } = req.params;
             const { productId, quantity, price } = req.body;
@@ -92,7 +111,11 @@ module.exports = (db) => {
             }
         },
 
-        // Remove item from cart
+        /**
+         * Removes an item from the cart.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+         */
         removeItem: async (req, res) => {
             const { userId, itemId } = req.params;
             
@@ -112,12 +135,17 @@ module.exports = (db) => {
                 await updateCartTotal(cart.cart_id);
                 res.json({ message: 'Item removed successfully' });
             } catch (error) {
+                console.error('Error removing item from cart:', error);
                 res.status(500).json({ message: 'Error removing item from cart', error });
             }
         },
 
-         // Update item quantity
-         updateItem: async (req, res) => {
+        /**
+         * Updates the quantity of an item in the cart.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+        */
+        updateItem: async (req, res) => {
             const { itemId, quantity } = req.body;
             const { userId } = req.params;
 
@@ -138,11 +166,16 @@ module.exports = (db) => {
                 await updateCartTotal(cart.cart_id);
                 res.json({ message: 'Item updated successfully', item });
             } catch (error) {
+                console.error('Error updating item:', error);
                 res.status(500).json({ message: 'Error updating item', error });
             }
         },
 
-        // Clear all items from a user's cart
+        /**
+         * Clears all items from a user's cart, resetting the cart to empty.
+         * @param {Object} req - The HTTP request object.
+         * @param {Object} res - The HTTP response object.
+         */
         clearCart: async (req, res) => {
             const { userId } = req.params;
 
@@ -176,6 +209,7 @@ module.exports = (db) => {
 
                 res.json({ message: 'Cart cleared successfully' });
             } catch (error) {
+                console.error('Error clearing cart:', error);
                 res.status(500).json({ message: 'Error clearing cart', error });
             }
         }

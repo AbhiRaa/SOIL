@@ -1,8 +1,19 @@
+/**
+ * Review Controller: Manages all operations related to reviews on products, including creating reviews,
+ * updating, deleting, fetching reviews, and managing replies to reviews.
+ */
+
 module.exports = (db) => {
   const { Review, User, Product, ReviewReply } = db.models;
   const { Sequelize } = db;
 
   return {
+    /**
+     * Adds a new review to a product by a user.
+     * @param {Object} req - The HTTP request object.
+     * @listens {ProductID} - Expects product ID in the request body.
+     * @param {Object} res - The HTTP response object.
+     */
     addReview: async (req, res) => {
       try {
         // Add a new review
@@ -13,7 +24,7 @@ module.exports = (db) => {
           include: [
             {
               model: User,
-              as: "author", // Ensure this alias matches the one used in the association
+              as: "author",
             },
           ],
         });
@@ -30,8 +41,13 @@ module.exports = (db) => {
       }
     },
 
+    /**
+     * Fetches all reviews for a specific product.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     */
     fetchReviews: async (req, res) => {
-      const { productId } = req.params; // Assuming the product ID is passed as a URL parameter
+      const { productId } = req.params;
 
       try {
         const reviews = await Review.findAll({
@@ -39,7 +55,7 @@ module.exports = (db) => {
           include: [
             {
               model: User,
-              as: "author", // Make sure 'as' matches the alias used in your association
+              as: "author",
               attributes: ["user_id", "name"], // Select only necessary fields
             },
           ],
@@ -57,17 +73,22 @@ module.exports = (db) => {
         });
       } catch (error) {
         console.error("Error fetching reviews:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error while fetching reviews" });
       }
     },
     
+    /**
+     * Updates a review made by a user.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     * Checks if the user updating the review is authorized to do so.
+     */
     updateReview: async (req, res) => {
         const { reviewId } = req.params;
-        const { rating, content, user_id, product_id } = req.body; // Ensure these are the fields you allow to update
+        const { rating, content, user_id, product_id } = req.body;
 
         try {
-            const review = await Review.findByPk(reviewId); // Assuming you have a Review model
-
+            const review = await Review.findByPk(reviewId);
             if (!review) {
                 return res.status(404).send({ message: "Review not found." });
             }
@@ -84,10 +105,16 @@ module.exports = (db) => {
             
             res.send({ message: "Review updated successfully", review });
         }catch (error) {
-            res.status(500).send({ message: "Error updating review", error: error.message });
+          console.error("Error updating review:", error);
+          res.status(500).send({ message: "Error updating review", error: error.message });
         }
     },
 
+    /**
+     * Deletes a review.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     */
     deleteReview: async(req,res)=>{
       const { reviewId } = req.params;
       try {
@@ -101,11 +128,17 @@ module.exports = (db) => {
 
         res.status(201).json({ message: 'Review deleted successfully.' });
         } catch (error) {
-        console.error('Error deleting review:', error);
-        res.status(500).json({ message: 'Internal server error' });
+          console.error('Error deleting review:', error);
+          res.status(500).json({ message: 'Internal server error while deleting review' });
         }
     },
 
+    /**
+     * Adds a reply to a review.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     * Validates that necessary information is provided before proceeding.
+     */
     addReply : async (req, res) => {
         const { reviewId } = req.params;
         const { user_id, content } = req.body;
@@ -116,70 +149,76 @@ module.exports = (db) => {
         }
     
         try {
-                // Create a reply
-                const newReply = await ReviewReply.create({
-                review_id:reviewId,
-                user_id,
-                content
-                });
-
-                
-                // Since you only need the reply ID and content, there's no need to fetch it again
-                res.json({
-                  message: 'Reply added successfully',
-                  reply: {
-                    reply_id: newReply.reply_id,
-                    content: newReply.content,
-                  }
+            // Create a reply
+            const newReply = await ReviewReply.create({
+            review_id:reviewId,
+            user_id,
+            content
             });
 
+            res.json({
+              message: 'Reply added successfully',
+              reply: {
+                reply_id: newReply.reply_id,
+                content: newReply.content,
+              }
+          });
         } catch (error) {
             console.error('Error adding reply:', error);
             return res.status(500).send({ message: 'Internal server error' });
         }
     },
 
-    fetchReplies:async (req, res) => {
+    /**
+     * Fetches replies for a specific review.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     */
+    fetchReplies: async (req, res) => {
         try {
-            const { reviewId } = req.params;
-            const replies = await ReviewReply.findAll({
-                where: { review_id: reviewId },
-                
-            });
-            
-            if (!replies) {
-                return res.json({ message: 'No replies found', replies });
-            }
-            
+          const { reviewId } = req.params;
+          const replies = await ReviewReply.findAll({
+              where: { review_id: reviewId },
+              
+          });
+          
+          if (!replies) {
+              return res.json({ message: 'No replies found', replies });
+          }
+          
 
-            // Collect user IDs from replies
-        const userIds = replies.map(reply => reply.user_id);
-        // Fetch users using collected user IDs
-        const users = await User.findAll({
-            where: { user_id: userIds },
-            attributes: ['user_id', 'name'] // assuming 'name' is the field for the username
-        });
+          // Collect user IDs from replies
+          const userIds = replies.map(reply => reply.user_id);
+          // Fetch users using collected user IDs
+          const users = await User.findAll({
+              where: { user_id: userIds },
+              attributes: ['user_id', 'name'] // assuming 'name' is the field for the username
+          });
 
-        // Map user data to an object for quick lookup
-        const userMap = users.reduce((map, user) => {
-            map[user.user_id] = user.name;
-            return map;
-        }, {});
+          // Map user data to an object for quick lookup
+          const userMap = users.reduce((map, user) => {
+              map[user.user_id] = user.name;
+              return map;
+          }, {});
 
-        // Add username to each reply based on user ID
-        const repliesWithUsernames = replies.map(reply => ({
-            ...reply.dataValues, // spread existing reply properties
-            userName: userMap[reply.user_id] || 'Unknown' // add username or 'Unknown' if not found
-        }));
-
-
-        return res.json({ message: 'Replies found', replies: repliesWithUsernames });
-        
+          // Add username to each reply based on user ID
+          const repliesWithUsernames = replies.map(reply => ({
+              ...reply.dataValues, // spread existing reply properties
+              userName: userMap[reply.user_id] || 'Unknown' // add username or 'Unknown' if not found
+          }));
+          return res.json({ message: 'Replies found', replies: repliesWithUsernames });
         } catch (error) {
-            res.status(500).json({ message: 'Error retrieving cart', error });
+          console.error('Error fetching replies:', error);
+          res.status(500).json({ message: 'Error retrieving replies', error });
         }
     },
 
+    /**
+     * Fetches the latest reviews, limited to the most recent three. - ADMIN
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response future object.
+     * Includes associated user and product information.
+     */
     fetchLatestReviews: async (req, res) => {
       try {
         const latestReviews = await Review.findAll({
@@ -209,6 +248,12 @@ module.exports = (db) => {
       }
     },
     
+    /**
+     * Fetches engagement data for all products based on reviews. - ADMIN
+     * Calculates the count of reviews and average rating for each product.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     */
     fetchProductEngagement: async (req, res) => {
       try {
         const products = await Product.findAll({
