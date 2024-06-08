@@ -134,7 +134,9 @@ This will start the Express server on the port defined in your environment varia
 * One-to-Many Relationship: Each cart can contain multiple items, but each item is linked to one specific cart. This is handled by the cart_id foreign key in the Cart_Items table, which references the cart_id primary key in the Cart table.
 7. Products to Cart_Items
 * One-to-Many Relationship: Multiple cart items can contain the same product (across different users or even within the same cart if listed separately). The product_id in Cart_Items references the product_id in Products.
-8. Users to Follows (Following and Followers)
+8. Users to Review_Replies
+* One-to-Many Relationship: Each user can have multiple replies, where each reply is associated with only one user. The user_id foreign key in the Review_Replies table references the user_id primary key in the Users table.
+9. Users to Follows (Following and Followers)
 * Many-to-Many Relationship: This is a self-referencing relationship where users can follow other users. The Follows table acts as a junction table with two foreign keys (follower_id and following_id), both pointing to the user_id in the Users table. Each user_id can appear multiple times in follower_id and following_id columns, representing different relationships.
 
 ### Implementation details: 

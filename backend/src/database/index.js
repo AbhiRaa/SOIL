@@ -113,6 +113,18 @@ module.exports = async function initDb() {
     as: 'review'
   });
 
+  // User and Review Replies
+  db.models.User.hasMany(db.models.ReviewReply, {
+    foreignKey: 'user_id',
+    as: 'replies',
+    onDelete: 'CASCADE', // Delete replies when user is deleted
+    onUpdate: 'CASCADE' // Update foreign key when user_id changes
+  });
+  db.models.ReviewReply.belongsTo(db.models.User, {
+    foreignKey: 'user_id',
+    as: 'user'
+  });
+
   // Users and Carts
   db.models.User.hasOne(db.models.Cart, {
     foreignKey: 'user_id',

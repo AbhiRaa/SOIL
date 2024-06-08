@@ -9,7 +9,7 @@
 module.exports = (db) => {
   const bcrypt = require('bcrypt');
   const { generateToken } = require('../utils/jwtUtils');
-  const { User, Profile, Cart, Follows } = db.models;
+  const { User, Profile, Cart, Follows, ReviewReply } = db.models;
   const { sequelize } = db;
 
   return {
@@ -167,26 +167,33 @@ module.exports = (db) => {
         try {
             // Start a transaction to handle the deletion of user and its associated profile
             const result = await sequelize.transaction(async (t) => {
-                // Delete the associated profile first to maintain referential integrity
-                await Profile.destroy({
-                    where: { user_id: userId },
-                    transaction: t
+                // Delete associated ReviewReplies first to maintain referential integrity
+                await ReviewReply.destroy({
+                  where: { user_id: userId },
+                  transaction: t
                 });
 
+                // Delete the associated Cart next
                 await Cart.destroy({
                   where: { user_id: userId },
                   transaction: t
-              });
-    
-                // Now delete the user
-                const userDeleted = await User.destroy({
-                    where: { user_id: userId },
-                    transaction: t
                 });
-    
+
+                // Delete the associated Profile next
+                await Profile.destroy({
+                  where: { user_id: userId },
+                  transaction: t
+                });
+
+                // Finally, delete the User
+                const userDeleted = await User.destroy({
+                  where: { user_id: userId },
+                  transaction: t
+                });
+
                 // Check if the user was actually found and deleted
                 if (!userDeleted) {
-                    throw new Error('User not found');
+                  throw new Error('User not found');
                 }
     
                 return userDeleted;  // Return the result of the delete operation
