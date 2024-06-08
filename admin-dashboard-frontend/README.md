@@ -28,22 +28,22 @@ The Admin Dashboard Frontend for the SOIL Organic website serves as the manageme
     * Common abbreviations used in texting or online communications that imply profanity.
 
 #### Examples for these categories:
-Slurs and Derogatory Language
+- Slurs and Derogatory Language
 * Review: "I can't believe you would sell something this shoddy to slur1."
 * Review: "Absolutely horrible service, and the manager was a real slur2 to us."
-Regional Slang
+- Regional Slang
 * Review: "This product is total regionalProfanity1, I want a refund!"
 * Review: "I've heard good things, but my experience was just regionalProfanity2."
-Newly Coined Phrases
+- Newly Coined Phrases
 * Review: "The advertisement was a total internetSlang1, nothing like the real product."
 * Review: "Feels like I got memed, this is just memePhrase1 quality."
-Double Entendres and Euphemisms
+- Double Entendres and Euphemisms
 * Review: "It’s a doubleMeaning1 if I've ever seen one, completely misleading."
 * Review: "Don’t waste your money on this euphemism1, it’s not worth it."
-Common Misspellings of Profanities
+- Common Misspellings of Profanities
 * Review: "This fuc*ing product broke the first day I got it!"
 * Review: "What a piece of sh*t, it stopped working within a week!"
-Abbreviations and Acronyms
+- Abbreviations and Acronyms
 * Review: "OMFG, I can't handle how bad this is!"
 * Review: "STFU about how good this is, it’s the worst purchase I’ve ever made."
 
