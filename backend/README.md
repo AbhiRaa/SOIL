@@ -2,49 +2,6 @@
 
 SOIL Backend provides the server-side logic for the SOIL application, handling user interactions, product management, reviews, and shopping cart functionalities. Built with Node.js and Express, it integrates with a Sequelize ORM for MySQL database management.
 
-## Directory Structure
-
-Here's a breakdown of the top-level directory structure:
-
-backend/
-│
-├── src/ # Source files
-│ ├── config/ # Configuration files for database, server, and JWT
-│ │ ├── config.js
-│ │ ├── config.jwt.js
-│ │ ├── config.server.js
-│ ├── controllers/ # Business logic for route handling
-│ │ ├── userController.js
-│ │ ├── productController.js
-│ │ ├── reviewController.js
-│ │ ├── cartController.js
-│ ├── middlewares/ # Express middlewares for authentication and error handling
-│ │ ├── errorHandler.js
-│ │ ├── authenticate.js
-│ ├── models/ # Sequelize models
-│ │ ├── User.js
-│ │ ├── Product.js
-│ │ ├── Review.js
-│ │ ├── Cart.js
-│ │ └── ...
-│ ├── routes/ # Express routes
-│ │ ├── userRoutes.js
-│ │ ├── productRoutes.js
-│ │ ├── reviewRoutes.js
-│ │ ├── cartPath.js
-│ ├── database/ # Database initialization and seed data
-│ │ ├── index.js
-│ │ ├── productsData.js
-│ ├── utils/ # Utility functions like JWT handlers
-│ │ └── jwtUtils.js
-│
-├── app.js # Express app setup and initialization
-├── server.js # Server entry point
-├── package.json # NPM dependencies and scripts
-├── .gitignore # Specifies intentionally untracked files to ignore
-└── README.md # This README file
-
-
 ## Getting Started
 
 ### Prerequisites
