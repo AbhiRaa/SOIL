@@ -13,7 +13,6 @@ const RecentReviews = () => {
   useEffect(() => {
     if (data && data.latestReviewsFetched) {
         console.log("Subscription data received:", data);
-        // Ensure that the data.latestReviewsFetched is an array and handle accordingly
         const newReviews = Array.isArray(data.latestReviewsFetched) ? data.latestReviewsFetched : [data.latestReviewsFetched];
         setRecentReviews(prev => [...newReviews, ...prev].slice(0, 3));
     }

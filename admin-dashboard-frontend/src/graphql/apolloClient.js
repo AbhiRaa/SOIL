@@ -1,27 +1,28 @@
+/**
+ * This module configures the Apollo Client for interfacing with the GraphQL server.
+ * It sets up both HTTP and WebSocket connections to enable real-time data fetching
+ * and operations via subscriptions alongside the traditional queries and mutations.
+ */
+
 import { ApolloClient, InMemoryCache, HttpLink, split } from '@apollo/client';
 import { createClient } from 'graphql-ws';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 
-// Create an HTTP link that connects to your GraphQL server
+// Setup an HTTP link to connect to the GraphQL HTTP endpoint for standard queries and mutations.
 const httpLink = new HttpLink({
-  uri: 'http://localhost:4001/graphql', // URL for the GraphQL server
+  uri: 'http://localhost:4001/graphql', // Specify the URL of the GraphQL server.
 });
 
-// Create a WebSocket link for handling subscriptions
-// const wsLink = createClient({
-//   uri: 'ws://localhost:4001/graphql', // WebSocket is enabled at the same URI
-//   options: {
-//     reconnect: true // Automatically reconnect if the WebSocket connection is lost
-//   }
-// });
+// Setup a WebSocket link for handling GraphQL subscriptions.
 const wsLink = new  GraphQLWsLink(createClient({
-  url: 'ws://localhost:4001/graphql', // Your GraphQL WebSocket endpoint
+  url: 'ws://localhost:4001/graphql', // Specify the WebSocket endpoint for GraphQL.
 }));
 
-// Use split to send data to each link depending on what kind of operation is being sent
+// Use the split function to delegate the operation to the correct link based on its type.
 const splitLink = split(
-  // split based on operation type
+  // This function determines whether to route a request to the WebSocket link or HTTP link
+  // by checking if the operation is a subscription.
   ({ query }) => {
     const definition = getMainDefinition(query);
     return (
@@ -29,11 +30,11 @@ const splitLink = split(
       definition.operation === 'subscription'
     );
   },
-  wsLink, // Use WebSocketLink for subscriptions
-  httpLink, // Use HttpLink for queries and mutations
+  wsLink, // Operations requiring subscriptions use the WebSocket link.
+  httpLink, // Other operations (queries and mutations) use the HTTP link.
 );
 
-// Instantiate the Apollo Client with the link and a new instance of InMemoryCache
+// Create the Apollo Client instance configured with the split link and a new in-memory cache.
 const client = new ApolloClient({
   link: splitLink,
   cache: new InMemoryCache(),
