@@ -37,6 +37,7 @@ const ReviewManagement = () => {
             <th className="py-3 px-6 text-left">Author</th>
             <th className="py-3 px-6 text-left">Review</th>
             <th className="py-3 px-6 text-center">Rating</th>
+            <th className='py-3 px-6 text-center'>Visibility</th>
             <th className="py-3 px-6 text-center">Actions</th>
           </tr>
         </thead>
@@ -55,9 +56,12 @@ const ReviewManagement = () => {
                   starRatedColor="orange"
                   numberOfStars={5}
                   name='rating'
-                  starDimension="20px"
-                  starSpacing="2px"
+                  starDimension="15px"
+                  starSpacing="0.5px"
                 />
+              </td>
+              <td className="py-3 px-6 text-left whitespace-nowrap">
+                {review.is_visible ? 'Visible' : 'Hidden'}
               </td>
               <td className="py-3 px-6 text-center">
                 {isProfane(review.content) && <span className="text-red-500 font-medium">Flagged for moderation</span>}
