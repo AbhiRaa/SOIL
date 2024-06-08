@@ -121,7 +121,7 @@ function ProductList({ topRatedLimit }) {
                         <h3 className="text-lg font-bold"> ${parseFloat(product.product_price).toFixed(2)}</h3>
                         <p className="text-md text-primary">{product.product_description}</p>
                         <p className="text-md font-bold">Quantity: {product.minimum_purchase_unit}</p>
-                        <p className="text-md font-bold">Rating:<span> <StarRatings
+                        <div className="text-md font-bold">Rating:<span> <StarRatings
                             rating={averageRatings[product.product_id]}
                             starRatedColor="gold"
                             // changeRating={changeRating}
@@ -129,7 +129,7 @@ function ProductList({ topRatedLimit }) {
                             name='rating'
                             starDimension="15px"
                             starSpacing="0.01px"
-                        /></span></p>
+                        /></span></div>
                         {currentloggedInUser && (
                         <div className='flex gap-5 items-center'>
                             {product.product_stock === 0 ? (
