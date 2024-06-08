@@ -15,6 +15,6 @@ module.exports = (app, db) => {
     // Update the quantity of a specific item in the cart
     app.put('/api/cart/item/:userId', authenticate, cartController.updateItem);
 
-    // Clear all items from a user's cart
+    // Clear all items from a user's cart - used when user completes a purchase, a stock update that happens when user reaches purchase summary on UI
     app.delete('/api/cart/clear/:userId', authenticate, cartController.clearCart);
 };

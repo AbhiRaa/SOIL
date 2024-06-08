@@ -2,14 +2,24 @@ module.exports = (db) => {
     const { Cart, CartItem, Product } = db.models;
     
     const updateCartTotal = async (cartId) => {
-        const cartItems = await CartItem.findAll({
-            where: { cart_id: cartId },
-            include: [{ model: Product, as: 'product' }]
-        });
-
-        const total = cartItems.reduce((acc, item) => acc + (item.quantity * item.price_at_time), 0);
-        await Cart.update({ total, updated_at: new Date() }, { where: { cart_id: cartId } });
+        try {
+            const cartItems = await CartItem.findAll({
+                where: { cart_id: cartId },
+                include: [{ model: Product, as: 'product' }]
+            });
+    
+            if (!cartItems || cartItems.length === 0) {
+                console.log('No items found in cart:', cartId);
+                return;
+            }
+    
+            const total = cartItems.reduce((acc, item) => acc + (item.quantity * item.price_at_time), 0);
+            await Cart.update({ total, updated_at: new Date() }, { where: { cart_id: cartId } });
+        } catch (error) {
+            console.error('Error updating cart total:', error);
+        }
     };
+    
 
     return {
         // Retrieve cart with items and associated product details
@@ -29,39 +39,56 @@ module.exports = (db) => {
                 });
 
                 if (!cart) {
+                    console.log('No cart found for user:', userId);
                     return res.status(404).json({ message: 'Cart not found' });
                 }
 
+                console.log('Cart found:', cart);
                 res.json(cart);
             } catch (error) {
-                res.status(500).json({ message: 'Error retrieving cart', error });
+                console.error('Failed to retrieve cart:', error);
+                res.status(500).json({ message: 'Error retrieving cart', error: error.message });
             }
         },
 
         // Add item to cart
         addItem: async (req, res) => {
-            const { productId, quantity, price } = req.body;
             const { userId } = req.params;
-
+            const { productId, quantity, price } = req.body;
+        
             try {
-                let cart = await Cart.findOrCreate({
-                    where: { user_id: userId }
+                let [cart, created] = await Cart.findOrCreate({
+                    where: { user_id: userId },
+                    defaults: { user_id: userId, total: 0 }
                 });
-
-                const [item, created] = await CartItem.findOrCreate({
-                    where: { cart_id: cart[0].cart_id, product_id: productId },
+        
+                if (!cart) {
+                    console.log('Failed to find or create cart for user:', userId);
+                    return res.status(500).json({ message: 'Failed to create cart' });
+                }
+        
+                const [item, itemCreated] = await CartItem.findOrCreate({
+                    where: { cart_id: cart.cart_id, product_id: productId },
                     defaults: { quantity, price_at_time: price }
                 });
-
-                if (!created) {
+        
+                if (!itemCreated) {
                     item.quantity += quantity;
                     await item.save();
                 }
 
-                await updateCartTotal(cart[0].cart_id);
+                if (!cart || !item) {
+                    console.error('Cart or item not found/created:', { cart, item });
+                    res.status(500).json({ message: 'Failed to handle cart or item correctly' });
+                    return;
+                }                
+        
+                await updateCartTotal(cart.cart_id);
+                console.log('Item added successfully:', item);
                 res.status(201).json({ message: 'Item added successfully', item });
             } catch (error) {
-                res.status(500).json({ message: 'Error adding item to cart', error });
+                console.error('Failed to add item:', error);
+                res.status(500).json({ message: 'Error adding item to cart', error: error.message });
             }
         },
 
