@@ -145,8 +145,17 @@ module.exports = (db) => {
                 height: user.profile ? user.profile.height : null,
                 gender: user.profile ? user.profile.gender : '',
                 activityLevel: user.profile ? user.profile.activity_level : '',
-                dietaryPreferences: user.profile ? JSON.parse(user.profile.dietary_preferences) : [],
-                healthGoals: user.profile ? JSON.parse(user.profile.health_goals) : []
+                dietaryPreferences: Array.isArray(user.profile?.dietary_preferences)
+                  ? user.profile.dietary_preferences
+                  : (typeof user.profile?.dietary_preferences === 'string' && user.profile.dietary_preferences.trim() !== ''
+                      ? JSON.parse(user.profile.dietary_preferences)
+                      : []),
+
+                healthGoals: Array.isArray(user.profile?.health_goals)
+                  ? user.profile.health_goals
+                  : (typeof user.profile?.health_goals === 'string' && user.profile.health_goals.trim() !== ''
+                      ? JSON.parse(user.profile.health_goals)
+                      : []),
             };
 
             res.status(200).json(userProfile);

@@ -2,13 +2,13 @@ module.exports = (sequelize, DataTypes) => {
     const Cart = sequelize.define('Cart', {
       // Primary key for the cart table, automatically incremented.
       cart_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
       // Foreign key linking to the user who owns the cart.
       user_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: true,  // Ensuring one-to-one relationship between user and cart.
         references: {

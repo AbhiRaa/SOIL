@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define('Product', {
     // Primary key for the product table, automatically incremented.
     product_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },

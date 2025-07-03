@@ -2,13 +2,13 @@ module.exports = (sequelize, DataTypes) => {
     const Profile = sequelize.define('Profile', {
       // Unique identifier for the profile, automatically incremented.
       profile_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
       // Corresponding user identifier, creating a one-to-one relationship.
       user_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: true,
         references: {

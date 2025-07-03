@@ -2,13 +2,13 @@ module.exports = (sequelize, DataTypes) => {
     const Review = sequelize.define('Review', {
       // Primary key for the review table, automatically incremented.
       review_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
       // Foreign key linking to the product reviewed.
       product_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'products',
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       // Foreign key linking to the user who wrote the review.
       user_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
           model: 'users',

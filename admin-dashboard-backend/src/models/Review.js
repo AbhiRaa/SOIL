@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
     const Review = sequelize.define('Review', {
       // Primary key for the review table, automatically incremented.
       review_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
