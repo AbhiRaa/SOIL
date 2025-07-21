@@ -1,28 +1,121 @@
 @import url('https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap');
 
 .logoImage{
     max-width: 50%; 
     max-height: 50%;
     height:auto;
     width:auto;
-    
 }
 
 .parent-container{
-        color:white;
-        background-image: url('../images/header-background.jpg');
-        height: 100vh;
-        opacity: 0.97;
-        width: 100%;
-        
+    color: white;
+    background-image: url('../images/header-background.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
-
-h3{
-    font-size: 1.2em;
-}
-
-h1 {
-    font-size: 6em;
+.hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
     font-weight: 700;
+    line-height: 1.1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-weight: 400;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Animation Classes */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-down {
+    animation: fadeInDown 1s ease-out forwards;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+.animation-delay-200 {
+    animation-delay: 0.2s;
+    animation-fill-mode: both;
+}
+
+.animation-delay-400 {
+    animation-delay: 0.4s;
+    animation-fill-mode: both;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
+}
+
+.animation-delay-1000 {
+    animation-delay: 1s;
+    animation-fill-mode: both;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .parent-container {
+        height: 100vh;
+        padding: 1rem;
+    }
+    
+    .hero-title {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+    }
+    
+    .hero-subtitle {
+        font-size: clamp(1rem, 4vw, 1.2rem);
+    }
+}
+
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Enhanced button hover effects */
+.hero-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
