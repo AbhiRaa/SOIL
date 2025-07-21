@@ -17,6 +17,9 @@ const config = require("../config/config.js");
       host: config.HOST,
       dialect: config.DIALECT,
       logging: console.log,  // Enable Sequelize logging to console
+      define: {
+        schema: 'public'     // Explicitly specify the PostgreSQL schema
+      },
       pool: {
         max: 10,             // Maximum number of connection in pool
         min: 0,              // Minimum number of connection in pool

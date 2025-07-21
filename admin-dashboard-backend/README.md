@@ -25,7 +25,7 @@ The Admin Dashboard Backend is part of the SOIL Organic project, serving as the 
 
 - Node.js
 - npm (Node Package Manager)
-- Access to a SQL database (Postgres, MySQL, SQLite, etc.)
+- Access to a PostgreSQL database
 
 ### Installation
 

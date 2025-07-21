@@ -145,17 +145,8 @@ module.exports = (db) => {
                 height: user.profile ? user.profile.height : null,
                 gender: user.profile ? user.profile.gender : '',
                 activityLevel: user.profile ? user.profile.activity_level : '',
-                dietaryPreferences: Array.isArray(user.profile?.dietary_preferences)
-                  ? user.profile.dietary_preferences
-                  : (typeof user.profile?.dietary_preferences === 'string' && user.profile.dietary_preferences.trim() !== ''
-                      ? JSON.parse(user.profile.dietary_preferences)
-                      : []),
-
-                healthGoals: Array.isArray(user.profile?.health_goals)
-                  ? user.profile.health_goals
-                  : (typeof user.profile?.health_goals === 'string' && user.profile.health_goals.trim() !== ''
-                      ? JSON.parse(user.profile.health_goals)
-                      : []),
+                dietaryPreferences: user.profile?.dietary_preferences || [],
+                healthGoals: user.profile?.health_goals || [],
             };
 
             res.status(200).json(userProfile);
@@ -277,8 +268,8 @@ module.exports = (db) => {
           height: updatedUserData.profile.height,
           gender: updatedUserData.profile.gender,
           activityLevel: updatedUserData.profile.activity_level,
-          dietaryPreferences: JSON.parse(updatedUserData.profile.dietary_preferences),
-          healthGoals: JSON.parse(updatedUserData.profile.health_goals)
+          dietaryPreferences: updatedUserData.profile.dietary_preferences,
+          healthGoals: updatedUserData.profile.health_goals
         };
 
         res.status(200).json({ message: "User and profile updated successfully", updatedUser: updatedUser });
