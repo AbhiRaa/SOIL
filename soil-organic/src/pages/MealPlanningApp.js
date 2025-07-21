@@ -81,7 +81,12 @@ function MealPlanningApp() {
     }
     fetchDetails();
     saveMealPlan(mealPlanData);
-  }, [mealPlanData, currentloggedInUser]);
+    
+    // Initialize nutrition data for the selected day if meal plan exists
+    if (mealPlanData && mealPlanData[selectedDay] && mealPlanData[selectedDay].nutrients) {
+      setSelectedDayNutrition(mealPlanData[selectedDay].nutrients);
+    }
+  }, [mealPlanData, currentloggedInUser, selectedDay]);
 
   const handleMealSearch = async (query) => {
     setLoading(true);
@@ -214,6 +219,78 @@ function MealPlanningApp() {
     }
   };
 
+  const handleRemoveMeal = (mealToRemove) => {
+    const updatedMealPlanData = { ...mealPlanData };
+    const selectedDayMeals = updatedMealPlanData[selectedDay]?.meals || [];
+    const originalMealsCount = selectedDayMeals.length;
+    
+    // Find and remove the meal
+    const updatedMeals = selectedDayMeals.filter(meal => meal.id !== mealToRemove.id);
+    updatedMealPlanData[selectedDay] = {
+      ...updatedMealPlanData[selectedDay],
+      meals: updatedMeals,
+    };
+
+    // Handle nutrition data based on whether individual meals have nutrition info
+    let updatedNutrition;
+    const currentDayNutrition = updatedMealPlanData[selectedDay]?.nutrients || { calories: 0, protein: 0, fat: 0, carbohydrates: 0 };
+    
+    // Check if any remaining meals have nutrition data
+    const mealsWithNutrition = updatedMeals.some(meal => meal.nutrition);
+    
+    if (mealsWithNutrition) {
+      // If meals have nutrition data, recalculate from remaining meals
+      updatedNutrition = updatedMeals.reduce((acc, meal) => {
+        let mealNutrition;
+        
+        if (meal.nutrition) {
+          if (meal.nutrition.nutrients && Array.isArray(meal.nutrition.nutrients)) {
+            mealNutrition = normalizeNutritionData(meal.nutrition);
+          } else if (typeof meal.nutrition === 'object' && meal.nutrition.calories !== undefined) {
+            mealNutrition = meal.nutrition;
+          } else {
+            mealNutrition = { calories: 0, protein: 0, fat: 0, carbohydrates: 0 };
+          }
+        } else {
+          mealNutrition = { calories: 0, protein: 0, fat: 0, carbohydrates: 0 };
+        }
+        
+        return {
+          calories: acc.calories + (parseFloat(mealNutrition.calories) || 0),
+          protein: acc.protein + (parseFloat(mealNutrition.protein) || 0),
+          fat: acc.fat + (parseFloat(mealNutrition.fat) || 0),
+          carbohydrates: acc.carbohydrates + (parseFloat(mealNutrition.carbohydrates) || 0),
+        };
+      }, { calories: 0, protein: 0, fat: 0, carbohydrates: 0 });
+    } else {
+      // If meals don't have nutrition data, estimate based on proportion
+      const remainingMealsCount = updatedMeals.length;
+      if (remainingMealsCount > 0 && originalMealsCount > 0) {
+        const nutritionRatio = remainingMealsCount / originalMealsCount;
+        updatedNutrition = {
+          calories: currentDayNutrition.calories * nutritionRatio,
+          protein: currentDayNutrition.protein * nutritionRatio,
+          fat: currentDayNutrition.fat * nutritionRatio,
+          carbohydrates: currentDayNutrition.carbohydrates * nutritionRatio,
+        };
+      } else {
+        // No meals left
+        updatedNutrition = { calories: 0, protein: 0, fat: 0, carbohydrates: 0 };
+      }
+    }
+
+    updatedMealPlanData[selectedDay].nutrients = updatedNutrition;
+
+    // Update states
+    setMealPlanData(updatedMealPlanData);
+    setSelectedDayNutrition(updatedNutrition);
+    setSelectedMeals((prevSelectedMeals) => ({
+      ...prevSelectedMeals,
+      [selectedDay]: updatedMeals,
+    }));
+    saveMealPlan(updatedMealPlanData);
+  };
+
   // Helper function to render meals for a day
   const renderMealsForDay = (day) => {
     if (!mealPlanData || !mealPlanData[day.toLowerCase()]) {
@@ -225,100 +302,219 @@ function MealPlanningApp() {
   };
 
   return (
-    <div className="bg-cyan-50">
+    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-orange-50">
       <Navigator />
-      <div className="max-w-full mx-auto mt-6 p-6 bg-orange-50 border-t-2 shadow-md ">
-        <h2 className="text-5xl font-semibold mb-4 text-primary flex justify-center">Meal Planner</h2>
-        <div className="flex gap-5 justify-evenly mt-4 p-4">
-        <h2 className="text-2xl font-bold mb-4 text-primary">Daily Calorie Target: {dailyCalories.toFixed(0)} kcal (BMR)</h2>
-        <h2 className="text-2xl font-bold mb-4 text-primary">Total Daily Energy Expenditure: {tdee.toFixed(0)} kcal</h2>
-        {macros && ( 
-          <div className="text-2xl mb-2 text-primary font-bold">
-            <h2 className="mb-2">Macronutrients Target according to Health Goals:</h2>
-            <ul className="text-primary text-lg font-bold">
-              <li>Protein: {macros.protein} grams</li>
-              <li>Carbs: {macros.carbs} grams</li>
-              <li>Fat: {macros.fat} grams</li>
-            </ul>
+      
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <h1 className="text-6xl font-bold text-center text-primary mb-4">🍽️ Personal Meal Planner</h1>
+          <p className="text-lg text-center text-gray-700 mb-8">Create customized meal plans based on your health goals and dietary preferences</p>
+          
+          {/* User Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow-md p-6 text-center">
+              <div className="text-3xl font-bold text-blue-600">{dailyCalories.toFixed(0)}</div>
+              <div className="text-gray-600">BMR (kcal/day)</div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md p-6 text-center">
+              <div className="text-3xl font-bold text-green-600">{tdee.toFixed(0)}</div>
+              <div className="text-gray-600">TDEE (kcal/day)</div>
+            </div>
+            {macros && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="font-bold text-primary mb-2 text-center">Daily Macros Target</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>🥩 Protein:</span>
+                    <span className="font-bold">{macros.protein}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>🍞 Carbs:</span>
+                    <span className="font-bold">{macros.carbs}g</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>🥑 Fat:</span>
+                    <span className="font-bold">{macros.fat}g</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        <div className="flex-col gap-4">
-          {/* Multi-select dropdown for dietary restrictions */}
-          <div className="w-full flex-col gap-3">
-            <label htmlFor="intolerances" className="block text-2xl font-bold text-primary  mb-1">Select Dietary Restrictions:</label>
-            <p className="text-primary text-sm">*press Ctrl for multiple selections to add restrictions on both meal generation and search</p>
-            <select multiple id="intolerances" name="intolerances" value={intolerances} onChange={handleChangeIntolerance} className="form-multiselect bg-orange-50 block w-full mt-1 pl-3 pr-10 py-2 text-primary text-xl border-gray-300 focus:outline-none focus:ring-primary focus:border-primary  rounded-md">
-              {intoleranceOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </div>
-
-        {/* Generate and Clear Meal Plan Buttons */}
-        <div className="flex gap-4 mt-4 ">
-          <button onClick={handleGenerateMealPlan} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Generate Meal Plan</button>
-          {loading && <p>Loading meals...</p>}
-          {error && <p>Error: {error}</p>}
-          <button onClick={handleClearMealPlan} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Clear Meal Plan</button>
-        </div>
-        </div>
-
-        </div>
-
-        {/* Meal Plan and Nutrition Chart for the Selected Day */}
-        <div className="md:flex   mt-6 border-t-2 justify-around border-primary">
-          <div className="w-full lg:w-1/2 m-4">
-            {/* Weekly Menu Navigation */}
-            <div className="flex gap-4 justify-between">
-            <div className="flex flex-wrap gap-2 space-x-4 overflow-auto">
-            {daysOfWeek.map((day) => (
-            <button
-              key={day}
-              onClick={() => handleDaySelection(day)}
-              className={`py-2 px-4 active:bg-primary rounded-md ${selectedDay === day.toLowerCase() ? 'bg-primary text-white' : 'bg-gray-200'}`}
-            >
-              {day}
-            </button>
-          ))}
-          </div>
+          {/* Controls Section */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-primary mb-4">🎯 Customize Your Plan</h2>
             
-          </div>
-            <h3 className="font-bold text-3xl mt-5 mb-5 text-primary">Your Meal Plan for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</h3>
-             {/* Render meals for the selected day */}
-            <div className="flex flex-wrap justify-center gap-5 mx-2">
-              {renderMealsForDay(selectedDay)}
+            {/* Dietary Restrictions */}
+            <div className="mb-6">
+              <label htmlFor="intolerances" className="block text-lg font-semibold text-gray-700 mb-2">
+                🚫 Dietary Restrictions & Allergies
+              </label>
+              <p className="text-sm text-gray-500 mb-2">Hold Ctrl/Cmd to select multiple items</p>
+              <select 
+                multiple 
+                id="intolerances" 
+                name="intolerances" 
+                value={intolerances} 
+                onChange={handleChangeIntolerance} 
+                className="w-full p-3 border-2 border-orange-200 rounded-lg focus:border-primary focus:outline-none bg-orange-50 text-primary"
+                size="4"
+              >
+                {intoleranceOptions.map(option => (
+                  <option key={option.value} value={option.value} className="p-2">{option.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4">
+              <button 
+                onClick={handleGenerateMealPlan} 
+                disabled={loading}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
+              >
+                {loading ? "🔄 Generating..." : "✨ Generate Meal Plan"}
+              </button>
+              <button 
+                onClick={handleClearMealPlan}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
+              >
+                🗑️ Clear All
+              </button>
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  {error}
+                </div>
+              )}
             </div>
           </div>
-          {/* Conditionally render the NutritionChart component if nutritional data is available */}
-        {selectedDayNutrition && (
-          <div className="w-full border-l-2 border-sm border-primary p-2 lg:w-1/3 mt-4 lg:mt-0 lg:ml-4">
-            <h1 className="text-5xl text-center mb-6 text-primary"> Your Daily Macros</h1>
-            <NutritionChart nutritionData={selectedDayNutrition} />
-          </div>
-        )}
-        </div>
-        {/* Meal Plan Generation and Dietary Restrictions */}
-        {/* Save Meal Plan Button */}
-            <div className="mt-8 flex justify-center">
-              <button onClick={handleSaveMealPlan} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Save Meal Plan</button>
-            </div>
-        <div className="mt-5 flex-col justify-between">
-          <div className="flex justify-between items-center">
-            <div>
-            <h1 className="text-5xl mt-5 text-primary text-bold">Find Your Favourite Recipes</h1>
-            <p className="text-sm text-primary">*enter any recipe you desire in the search bar and directly add the meal from search to the selected day meal plan </p>
-            </div>
-            <div className="searchbox">
-            <MealSearch onSearch={handleMealSearch} />  
-            </div>
-          </div>
-        {loading && <p>Loading meals...</p>}
-        {error && <p>Error: {error}</p>}
-        <MealList meals={meals} onAdd={handleAddMeal} />
-        {/* <MealPlanner selectedMeals={selectedMeals} onRemove={handleRemoveMeal} /> */}
         </div>
       </div>
+
+      {/* Weekly Meal Plan Section */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <h2 className="text-3xl font-bold text-primary mb-6 text-center">📅 Your Weekly Meal Plan</h2>
+          
+          {/* Day Selection Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {daysOfWeek.map((day) => (
+              <button
+                key={day}
+                onClick={() => handleDaySelection(day)}
+                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 ${
+                  selectedDay === day.toLowerCase() 
+                    ? 'bg-gradient-to-r from-primary to-blue-600 text-white shadow-md' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {day.slice(0, 3)}
+              </button>
+            ))}
+          </div>
+
+          {/* Selected Day Content */}
+          {mealPlanData && mealPlanData[selectedDay.toLowerCase()] ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Meals for Selected Day */}
+              <div className="lg:col-span-2">
+                <h3 className="text-2xl font-bold text-primary mb-4">
+                  🍽️ Meals for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {mealPlanData[selectedDay.toLowerCase()].meals.map((meal, index) => (
+                    <MealCard 
+                      key={`${meal.id}-${index}`} 
+                      meal={meal} 
+                      showNutrition={true} 
+                      removable={true}
+                      onRemove={handleRemoveMeal}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Nutrition Chart */}
+              {selectedDayNutrition && (
+                <div className="lg:col-span-1">
+                  <div className="bg-gradient-to-b from-orange-50 to-yellow-50 rounded-lg p-6">
+                    <h3 className="text-xl font-bold text-primary mb-4 text-center">📊 Daily Nutrition</h3>
+                    <NutritionChart nutritionData={selectedDayNutrition} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* No Meals - Full Width Centered */
+            <div className="text-center py-16">
+              <div className="text-8xl mb-6">🍽️</div>
+              <h3 className="text-2xl font-bold text-primary mb-4">
+                🍽️ Meals for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+              </h3>
+              <p className="text-gray-500 text-xl mb-2">No meals planned for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</p>
+              <p className="text-gray-400 text-lg">Generate a meal plan or search for recipes to add meals</p>
+            </div>
+          )}
+        </div>
+      </div>
+      {/* Save Meal Plan Section */}
+      <div className="max-w-6xl mx-auto px-6 pb-8">
+        <div className="text-center">
+          <button 
+            onClick={handleSaveMealPlan}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
+          >
+            💾 Save Meal Plan
+          </button>
+        </div>
+      </div>
+
+      {/* Recipe Search Section */}
+      <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-4xl font-bold text-primary mb-4 text-center">🔍 Discover New Recipes</h2>
+            <p className="text-gray-600 text-center mb-8">Search for recipes and add them directly to your selected day's meal plan</p>
+            
+            {/* Search Box */}
+            <div className="flex justify-center mb-8">
+              <div className="w-full max-w-md">
+                <MealSearch onSearch={handleMealSearch} loading={loading} />
+              </div>
+            </div>
+
+            {/* Loading State */}
+            {loading && (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p className="mt-2 text-primary">Searching for delicious recipes...</p>
+              </div>
+            )}
+
+            {/* Search Results */}
+            {!loading && meals.length > 0 && (
+              <div>
+                <h3 className="text-2xl font-bold text-primary mb-6">
+                  🍳 Found {meals.length} Recipe{meals.length !== 1 ? 's' : ''}
+                </h3>
+                <MealList meals={meals} onAdd={handleAddMeal} selectedDay={selectedDay} />
+              </div>
+            )}
+
+            {/* No Results State */}
+            {!loading && meals.length === 0 && (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">🔍</div>
+                <p className="text-gray-500 text-lg">Search for recipes to get started</p>
+                <p className="text-gray-400">Try searching for "chicken", "vegetarian", or "breakfast"</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <Footer/>
     </div>
   );
