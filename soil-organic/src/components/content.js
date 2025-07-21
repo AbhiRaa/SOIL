@@ -12,12 +12,14 @@
 import React from "react";
 import Products from "./content/TopProducts";
 import About from "./content/about";
+import BackyardGardeningTips from '../components/gardeningInfo';
 
 function Content() {
   return (
     <div>
       <About />
       <Products />
+      <BackyardGardeningTips />
     </div>
   );
 }

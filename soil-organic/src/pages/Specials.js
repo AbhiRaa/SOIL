@@ -1,7 +1,6 @@
 import React from "react";
 import Navigator from "../components/NavigationBar";
 import ProductList from '../components/ProductList';
-import BackyardGardeningTips from '../components/gardeningInfo';
 import imagePeeking1 from '../images/imagePeeking1.png';
 import peekingPeanuts from '../images/peekingPeanuts.webp';
 import Footer from '../components/Footer';
@@ -36,7 +35,6 @@ function Specials() {
       {/* </div> */}
       </section>
       <ProductList />
-      {/* <BackyardGardeningTips /> */}
       <Footer/>
     </div>
   );
