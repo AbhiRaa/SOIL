@@ -12,7 +12,7 @@ import ReviewModal from '../ReviewModal';
 import StarRatings from 'react-star-ratings';
 import { getAllPublicProducts, getAllSecureProducts } from "../../services/productService";
 
-function Products() {
+function Products({ onModalStateChange }) {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   let { currentloggedInUser } = useContext(UserContext);
@@ -74,11 +74,13 @@ function Products() {
   const handleOpenReviewModal = (product) => {
     setSelectedProduct(product);
     setIsReviewModalOpen(true);
+    if (onModalStateChange) onModalStateChange(true);
   };
 
   const handleCloseReviewModal = () => {
     setIsReviewModalOpen(false);
     setSelectedProduct(null);
+    if (onModalStateChange) onModalStateChange(false);
   };
 
   const updateReviewCounts = (productId, newCount) => {

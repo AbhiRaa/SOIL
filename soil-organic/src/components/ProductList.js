@@ -13,7 +13,7 @@ import { getAllPublicProducts, getAllSecureProducts } from "../services/productS
  * 
  * @param {number} props.topRatedLimit - Top - X to filter products.
  */
-function ProductList({ topRatedLimit }) {
+function ProductList({ topRatedLimit, onModalStateChange }) {
     const { addToCart } = useCart();    // Hook to interact with the shopping cart
     const [products, setProducts] = React.useState([]); // Local state to store products
     let { currentloggedInUser } = useContext(UserContext);  // Context to access the currently logged-in user
@@ -98,11 +98,13 @@ function ProductList({ topRatedLimit }) {
     const handleOpenReviewModal = (product) => {
         setSelectedProduct(product);
         setIsReviewModalOpen(true);
+        if (onModalStateChange) onModalStateChange(true);
     };
 
     const handleCloseReviewModal = () => {
         setIsReviewModalOpen(false);
         setSelectedProduct(null);
+        if (onModalStateChange) onModalStateChange(false);
     };
 
     const handleSubmitReview = ({ review, rating }) => {

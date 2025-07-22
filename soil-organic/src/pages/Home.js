@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Content from "../components/content";
 import Footer from "../components/Footer";
@@ -8,6 +8,8 @@ import Footer from "../components/Footer";
  * Matches the premium aesthetic of Specials and MealPlanningApp pages
  */
 function Home(Props) {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">
       {/* Background Pattern Overlay */}
@@ -15,9 +17,9 @@ function Home(Props) {
       
       {/* Content Sections */}
       <div className="relative z-20">
-        <Header />
-        <Content />
-        <Footer />
+        {!isReviewModalOpen && <Header />}
+        <Content onModalStateChange={setIsReviewModalOpen} />
+        {!isReviewModalOpen && <Footer />}
       </div>
     </div>
   );

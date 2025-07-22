@@ -23,6 +23,16 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
   const [followingUsers, setFollowingUsers] = useState([]);
   const [notification, setNotification] = useState(''); // State for displaying notifications
 
+  // Simple background scroll prevention
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   // Simulate fetching existing reviews for the product
   useEffect(() => {
     const fetchReviewsforProduct= async(product)=>{
@@ -313,167 +323,274 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50 ">
-      <div className="p-6 rounded shadow-lg w-2/3 relative bg-orange-100 text-orange-600 text-xl h-[80vh] overflow-y-scroll">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-1000 hover:text-gray-800 text-4xl "
-        >
-          &times;
-        </button>
-        <div className="flex justify-between items-center mb-4 mt-3 p-2">
-          <div className="flex items-center space-x-3 align-middle">
-            <img
-              src={"http://localhost:4000/"+product.product_image}
-              alt={product.product_name}
-              className="w-20 h-20 object-cover rounded mr-4"
-            />
-            <h2 className="text-4xl font-bold space-x-2">
-              {product.product_name}
-            </h2>
-            {product.is_special && (
-              <span className="text-white font-bold bg-green-500 rounded-md p-1">
-                Special
-              </span>
-            )}
-          </div>
-          <button
-            onClick={handleReviewButton}
-            className="bg-teal-500 text-white px-2 py-1 rounded text-xl"
-          >
-            {isEditMode ? "Edit Review" : "Add Review"}
-          </button>
-        </div>
-        <div className="mt-4">
-          <div className="mx-4">
-            <h3 className="text-3xl font-bold">User Reviews</h3>
-          </div>
-          <div ref={reviewsRef} className="mt-2   px-5">
-          {existingReviews.length === 0 ? (
-            <p className="text-center text-lg mt-4">No reviews available.</p>
-          ) :
-            existingReviews.map((review) => (
-              <div
-                key={review.review_id}
-                className=" border-b py-2 flex-col justify-between items-start border-black"
+    <>
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
+      
+      {/* Premium Backdrop with Enhanced Blur */}
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-xl z-[100] transition-all duration-300"></div>
+      
+      {/* Premium Centered Modal */}
+      <div className="fixed inset-0 z-[101] overflow-y-auto">
+        <div className="flex items-center justify-center min-h-full p-4">
+          <div className="relative w-full max-w-5xl bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden rounded-3xl pointer-events-none">
+              <div className="absolute top-10 right-10 w-32 h-32 bg-green-400/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-10 left-10 w-24 h-24 bg-blue-400/10 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Modal Content Container */}
+            <div className="relative flex flex-col flex-1 min-h-0">
+              {/* Close Button */}
+              <button 
+                onClick={onClose}
+                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-all duration-200 p-3 hover:bg-white/10 rounded-xl group z-10"
               >
-                <div className="userreviewRatingDiv">
-                  <div className="userratingNameDiv">
-                    <div className="flex space-x-9 items-end">
-                      <div className="flex items-center gap-4">
-                        <p className="font-bold text-2xl">{review.userName}</p>
-                        <p className="createdAt font-thin  text-sm">{formatDate(review.created_at)}</p>
-                      </div> 
-                      <div className="text-lg space-x-5 items-center flex justify-between">
-                        {currentloggedInUser &&
-                          currentloggedInUser.userId !== review.userId && (
-                            <>
-                              <button
-                                onClick={() => handleFollowUser(review.userId,review.userName)}
-                                className="text-slate-500 underline text-sm mb-1"
-                              >
-                                {followingUsers.includes(review.userId) ? ( // conditional  rendering to show different buttons depending on followed or want to unfollow
-                                  <SlUserFollowing size={22} />
-                                ) : (
-                                  <SlUserFollow size={22} />
-                                )}
-                              </button>
-                            </>
-                              )}
-                            <>
-                              <button
-                              onClick={() => toggleReplySection(review.review_id)}
-                              className="text-slate-500 underline text-sm mt-1"
-                              >
-                              <FaReply  size={23}/>
-                              </button>
-                            </>
-                          
-                        <div className="text-lg space-x-5 items-center">
-                          {currentloggedInUser &&
-                            currentloggedInUser.userId === review.userId && (
-                              <>
-                                {/* <button
-                                  onClick={() =>
-                                    handleOpenEditReviewModal(review)
-                                  }
-                                  className="underline text-sm mb-1 text-slate-500 mr-2 p-2"
-                                >
-                                  Edit
-                                </button> */}
-                                <button
-                                  onClick={() => handleDeleteReview(review.review_id)}
-                                  className="text-red-500 underline text-sm"
-                                >
-                                  Delete
-                                </button>
-                              </>
-                            )}
-                          
+                <svg className="w-7 h-7 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              {/* Modal Header */}
+              <div className="relative p-8 pr-20 border-b border-white/20 flex-shrink-0">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-6 flex-1 mr-6">
+                    <div className="relative">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/20">
+                        <img
+                          src={"http://localhost:4000/"+product.product_image}
+                          alt={product.product_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      {product.is_special && (
+                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                          Special
                         </div>
-                      </div>
+                      )}
                     </div>
-                    <StarRatings
-                      name={`rating-${review.review_id}`}
-                      rating={review.rating}
-                      starCount={5}
-                      starRatedColor="gold"
-                      editing={false}
-                      starDimension="20px"
-                      starSpacing="2px"
-                    />
+                    <div className="flex-1">
+                      <h2 className="text-3xl font-bold text-white mb-2">
+                        {product.product_name}
+                      </h2>
+                      <p className="text-gray-400">Customer Reviews & Ratings</p>
+                    </div>
                   </div>
-                  <p>{review.content}</p>
-                </div>
-                {expandedReviewId === review.review_id && (
-                  <div className="mt-2 w-full bg-gray-100 p-3 rounded-lg">
-                    <h4 className="text-lg font-semibold mb-2">Replies</h4>
-                    {replies.map((reply) => (
-                      <div key={reply.reply_id} className="border-b py-2">
-                        <p className="font-bold">{reply.userName}</p>
-                        <p>{reply.content}</p>
-                      </div>
-                    ))}
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        const replyText = e.target.elements.replyText.value;
-                        handleAddReply(review.review_id, replyText);
-                        e.target.reset();
-                      }}
-                      className="mt-4"
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={handleReviewButton}
+                      className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3"
                     >
-                      <input
-                        type="text"
-                        name="replyText"
-                        className="border p-2 rounded w-full"
-                        placeholder="Add a reply under 100 words"
-                        required
-                        maxLength={1000}
-                      />
-                      <div className="flex gap-10">
-                        <button
-                          type="submit"
-                          className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
-                        >
-                          Reply
-                        </button>
-                        <button
-                        onClick={closeReplySection}
-                        className="bg-red-500 text-white px-4 py-2 rounded mt-2"
-                        >
-                        Close
-                        </button>
-                      </div>
-                    </form>
-                    
+                      <span>⭐</span>
+                      <span>{isEditMode ? "Edit Review" : "Add Review"}</span>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Scroll Indicator */}
+                {existingReviews.length > 3 && (
+                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+                    <div className="flex items-center gap-1 text-gray-400 text-xs bg-gray-800/80 px-3 py-1 rounded-full backdrop-blur-sm">
+                      <span>↓</span>
+                      <span>Scroll to see more reviews</span>
+                      <span>↓</span>
+                    </div>
                   </div>
                 )}
               </div>
-            ))}
+              {/* Modal Body - Scrollable Reviews */}
+              <div 
+                className="flex-1 overflow-y-auto min-h-0 custom-scrollbar"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent',
+                }}
+              >
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 bg-blue-400/20 rounded-xl flex items-center justify-center">
+                      <span className="text-xl">💬</span>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">User Reviews</h3>
+                      <p className="text-gray-400 text-sm">{existingReviews.length} review{existingReviews.length !== 1 ? 's' : ''} for this product</p>
+                    </div>
+                  </div>
+                  
+                  <div ref={reviewsRef} className="space-y-6">
+                    {existingReviews.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-gray-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <span className="text-2xl">📝</span>
+                        </div>
+                        <p className="text-gray-300 text-lg mb-4">No reviews available.</p>
+                        <p className="text-gray-400 text-sm">Be the first to share your experience with this product!</p>
+                      </div>
+                    ) :
+                      existingReviews.map((review) => (
+                        <div
+                          key={review.review_id}
+                          className="bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300"
+                        >
+                          {/* Review Header */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-gradient-to-br from-green-400/20 to-blue-400/20 rounded-full flex items-center justify-center border border-white/20">
+                                <span className="text-lg text-white">{review.userName.charAt(0).toUpperCase()}</span>
+                              </div>
+                              <div>
+                                <p className="font-bold text-white text-lg">{review.userName}</p>
+                                <p className="text-gray-400 text-sm">{formatDate(review.created_at)}</p>
+                              </div>
+                            </div> 
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-3">
+                              {currentloggedInUser &&
+                                currentloggedInUser.userId !== review.userId && (
+                                  <button
+                                    onClick={() => handleFollowUser(review.userId, review.userName)}
+                                    className={`p-2 rounded-lg transition-all duration-200 ${
+                                      followingUsers.includes(review.userId)
+                                        ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
+                                        : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
+                                    }`}
+                                    title={followingUsers.includes(review.userId) ? 'Unfollow' : 'Follow'}
+                                  >
+                                    {followingUsers.includes(review.userId) ? (
+                                      <SlUserFollowing size={18} />
+                                    ) : (
+                                      <SlUserFollow size={18} />
+                                    )}
+                                  </button>
+                                )}
+                              
+                              <button
+                                onClick={() => toggleReplySection(review.review_id)}
+                                className="p-2 bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white rounded-lg transition-all duration-200"
+                                title="Reply to review"
+                              >
+                                <FaReply size={18} />
+                              </button>
+                              
+                              {currentloggedInUser &&
+                                currentloggedInUser.userId === review.userId && (
+                                  <button
+                                    onClick={() => handleDeleteReview(review.review_id)}
+                                    className="p-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 hover:text-red-300 rounded-lg transition-all duration-200"
+                                    title="Delete review"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                )}
+                            </div>
+                          </div>
+                          
+                          {/* Rating */}
+                          <div className="mb-3">
+                            <StarRatings
+                              name={`rating-${review.review_id}`}
+                              rating={review.rating}
+                              starCount={5}
+                              starRatedColor="#fbbf24"
+                              editing={false}
+                              starDimension="18px"
+                              starSpacing="2px"
+                            />
+                          </div>
+                          
+                          {/* Review Content */}
+                          <p className="text-gray-300 leading-relaxed">{review.content}</p>
+                          {/* Replies Section */}
+                          {expandedReviewId === review.review_id && (
+                            <div className="mt-6 bg-white/5 backdrop-blur-sm border border-white/20 rounded-xl p-6">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-8 h-8 bg-blue-400/20 rounded-lg flex items-center justify-center">
+                                  <span className="text-sm">💬</span>
+                                </div>
+                                <h4 className="text-lg font-semibold text-white">Replies ({replies.length})</h4>
+                              </div>
+                              
+                              {replies.length > 0 && (
+                                <div className="space-y-4 mb-6">
+                                  {replies.map((reply) => (
+                                    <div key={reply.reply_id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                                      <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-8 h-8 bg-gradient-to-br from-orange-400/20 to-yellow-400/20 rounded-full flex items-center justify-center border border-white/20">
+                                          <span className="text-xs text-white">{reply.userName?.charAt(0)?.toUpperCase()}</span>
+                                        </div>
+                                        <p className="font-bold text-white text-sm">{reply.userName}</p>
+                                      </div>
+                                      <p className="text-gray-300 text-sm pl-11">{reply.content}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              
+                              {/* Reply Form */}
+                              <form
+                                onSubmit={(e) => {
+                                  e.preventDefault();
+                                  const replyText = e.target.elements.replyText.value;
+                                  handleAddReply(review.review_id, replyText);
+                                  e.target.reset();
+                                }}
+                                className="space-y-4"
+                              >
+                                <input
+                                  type="text"
+                                  name="replyText"
+                                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
+                                  placeholder="Add a thoughtful reply..."
+                                  required
+                                  maxLength={1000}
+                                />
+                                <div className="flex gap-3">
+                                  <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+                                  >
+                                    <span>📝</span>
+                                    <span>Reply</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={closeReplySection}
+                                    className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-lg font-medium transition-all duration-300 backdrop-blur-sm"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </form>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      
+      {/* Add Review Modal */}
       {isAddEditReviewModalOpen && (
         <AddReviewModal
           product={product}
@@ -483,6 +600,8 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
           isEditMode={isEditMode}
         />
       )}
+      
+      {/* Notification */}
       {notification && (
         <Notification 
           message={notification} 
@@ -493,15 +612,7 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
           }
         />
       )}
-      {/* {isEditReviewModalOpen && reviewToEdit && (
-        <EditReviewModal
-          product={product}
-          review={reviewToEdit}
-          onClose={handleCloseEditReviewModal}
-          onSubmit={handleEditReview}
-        />
-      )} */}
-    </div>
+    </>
   );
 }
 

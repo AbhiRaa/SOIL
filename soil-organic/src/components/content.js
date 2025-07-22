@@ -10,7 +10,7 @@ import Products from "./content/TopProducts";
 import About from "./content/about";
 import BackyardGardeningTips from '../components/gardeningInfo';
 
-function Content() {
+function Content({ onModalStateChange }) {
   return (
     <main className="relative">
       {/* About Section */}
@@ -22,7 +22,7 @@ function Content() {
 
       {/* Top Products Section */}
       <section className="relative py-8">
-        <Products />
+        <Products onModalStateChange={onModalStateChange} />
         {/* Decorative wave divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg className="w-full h-8 text-green-400/20 opacity-60" viewBox="0 0 1000 40" preserveAspectRatio="none">

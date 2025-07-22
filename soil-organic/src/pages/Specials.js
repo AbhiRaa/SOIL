@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Navigator from "../components/NavigationBar";
 import ProductList from '../components/ProductList';
 import imagePeeking1 from '../images/imagePeeking1.png';
@@ -10,6 +10,8 @@ import Footer from '../components/Footer';
  * Features better navbar visibility and enhanced visual hierarchy
  */
 function Specials() {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">
       {/* Background Pattern Overlay */}
@@ -27,7 +29,11 @@ function Specials() {
       </div>
 
       {/* Navigation */}
-      <Navigator/>
+      {!isReviewModalOpen && (
+        <div className="relative z-20">
+          <Navigator/>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative z-20 pt-8 pb-16">
@@ -84,13 +90,16 @@ function Specials() {
       {/* Products Section */}
       <section className="relative z-20 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          <ProductList />
+          <ProductList onModalStateChange={setIsReviewModalOpen} />
         </div>
       </section>
 
-      <div className="relative z-30">
-        <Footer/>
-      </div>
+      {/* Footer */}
+      {!isReviewModalOpen && (
+        <div className="relative z-30">
+          <Footer/>
+        </div>
+      )}
     </div>
   );
 }
