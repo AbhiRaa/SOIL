@@ -483,7 +483,16 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
           isEditMode={isEditMode}
         />
       )}
-      {notification && <Notification message={notification} />}
+      {notification && (
+        <Notification 
+          message={notification} 
+          type={
+            notification.includes('Error') || notification.includes('hidden') ? 'error' :
+            notification.includes('deleted') || notification.includes('admin') ? 'warning' :
+            'success'
+          }
+        />
+      )}
       {/* {isEditReviewModalOpen && reviewToEdit && (
         <EditReviewModal
           product={product}

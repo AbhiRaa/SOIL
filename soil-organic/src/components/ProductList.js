@@ -255,7 +255,12 @@ function ProductList({ topRatedLimit }) {
             )}
             
             {/* Notifications and Modals */}
-            {notification && <Notification message={notification} />}
+            {notification && (
+                <Notification 
+                    message={notification} 
+                    type={notification.includes('Failed') ? 'error' : 'success'}
+                />
+            )}
             {isReviewModalOpen && (
                 <ReviewModal
                     product={selectedProduct}

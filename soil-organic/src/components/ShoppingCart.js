@@ -154,7 +154,7 @@ function ShoppingCart() {
                     cardNumber: cardNumber.slice(-4)  // Only pass the last four digits
                 }} 
             />
-            {notification && <Notification message={notification} />}
+            {notification && <Notification message={notification} type="success" />}
         </div>
     );
 }

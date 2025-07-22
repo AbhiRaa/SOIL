@@ -100,7 +100,7 @@ function SignInPage(props) {
                     {/* Logo & Header */}
                     <div className="text-center">
                         <div className="flex justify-center mb-6">
-                            <img src={logo} alt="SOIL Logo" className="w-20 h-16 object-contain" />
+                            <img src={logo} alt="SOIL Logo" className="w-32 h-24 object-contain" />
                         </div>
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-400/20 rounded-full mb-6">
                             <span className="text-2xl">🔐</span>
@@ -207,7 +207,12 @@ function SignInPage(props) {
                 </div>
             </div>
             
-            {notification && <Notification message={notification} />}
+            {notification && (
+                <Notification 
+                    message={notification} 
+                    type={notification.includes('blocked') ? 'error' : 'success'}
+                />
+            )}
         </div>
     );
 }

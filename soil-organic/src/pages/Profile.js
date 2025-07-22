@@ -75,13 +75,109 @@ const Profile = (props) => {
     };
 
     const handleDelete = async () => {
-        if (window.confirm("Are you sure you want to delete your profile?")) {
+        // Create a custom confirmation modal
+        const confirmDelete = () => {
+            return new Promise((resolve) => {
+                // Create modal backdrop
+                const backdrop = document.createElement('div');
+                backdrop.className = 'fixed inset-0 bg-black/70 backdrop-blur-xl z-[100] flex items-center justify-center p-4';
+                
+                // Create modal content
+                const modal = document.createElement('div');
+                modal.className = 'bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-xl border border-red-500/30 rounded-3xl shadow-2xl max-w-md w-full p-8 transform scale-100 transition-all';
+                modal.innerHTML = `
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <span class="text-4xl">⚠️</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Delete Profile?</h3>
+                        <p class="text-gray-300 mb-6">
+                            This action cannot be undone. All your data including preferences, 
+                            meal plans, and personal information will be permanently deleted.
+                        </p>
+                        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+                            <p class="text-red-400 text-sm font-medium">
+                                Type <span class="font-mono bg-red-500/20 px-2 py-1 rounded">DELETE</span> to confirm
+                            </p>
+                            <input 
+                                type="text" 
+                                id="delete-confirm-input"
+                                class="w-full mt-3 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                                placeholder="Type DELETE here"
+                            />
+                        </div>
+                        <div class="flex gap-4 justify-center">
+                            <button id="cancel-delete" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-xl font-medium transition-all duration-300">
+                                Cancel
+                            </button>
+                            <button id="confirm-delete" disabled class="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                                Delete My Profile
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                backdrop.appendChild(modal);
+                document.body.appendChild(backdrop);
+                document.body.style.overflow = 'hidden';
+                
+                // Focus input
+                const input = document.getElementById('delete-confirm-input');
+                const confirmBtn = document.getElementById('confirm-delete');
+                const cancelBtn = document.getElementById('cancel-delete');
+                
+                input.focus();
+                
+                // Enable/disable confirm button based on input
+                input.addEventListener('input', (e) => {
+                    if (e.target.value === 'DELETE') {
+                        confirmBtn.disabled = false;
+                        confirmBtn.className = 'px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105';
+                    } else {
+                        confirmBtn.disabled = true;
+                        confirmBtn.className = 'px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed';
+                    }
+                });
+                
+                // Handle confirm
+                confirmBtn.addEventListener('click', () => {
+                    document.body.removeChild(backdrop);
+                    document.body.style.overflow = '';
+                    resolve(true);
+                });
+                
+                // Handle cancel
+                cancelBtn.addEventListener('click', () => {
+                    document.body.removeChild(backdrop);
+                    document.body.style.overflow = '';
+                    resolve(false);
+                });
+                
+                // Handle backdrop click
+                backdrop.addEventListener('click', (e) => {
+                    if (e.target === backdrop) {
+                        document.body.removeChild(backdrop);
+                        document.body.style.overflow = '';
+                        resolve(false);
+                    }
+                });
+            });
+        };
+        
+        const confirmed = await confirmDelete();
+        
+        if (confirmed) {
             try {
+                setNotification('Deleting your profile...');
                 await deleteUser(currentloggedInUser.userId);
-                signOut();
+                setNotification('Profile deleted successfully. Goodbye! 👋');
+                setTimeout(() => {
+                    signOut();
+                }, 1500);
             } catch (error) {
-                setNotification('Failed to delete profile.');
+                setNotification('Failed to delete profile. Please try again.');
                 setTimeout(() => setNotification(''), 3000);
+                console.error('Delete Error:', error);
             }
         }
     };
@@ -125,7 +221,7 @@ const Profile = (props) => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative">
             {/* Background Pattern Overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 via-transparent to-orange-900/10"></div>
             
@@ -135,18 +231,17 @@ const Profile = (props) => {
             <div className="absolute bottom-32 right-20 w-3 h-3 bg-green-400/40 rounded-full animate-pulse animation-delay-1000"></div>
 
             {/* Navigation */}
-            <div className="relative z-20">
-                <NavigationBar />
-            </div>
+            {!isEditModalOpen && !isEditPasswordOpen && (
+                <div className="relative z-20">
+                    <NavigationBar />
+                </div>
+            )}
 
             {/* Main Content */}
-            <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className={`relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${isEditModalOpen || isEditPasswordOpen ? 'pt-20' : ''}`}>
                 
                 {/* Profile Header */}
                 <div className="text-center mb-12">
-                    <div className="flex justify-center mb-6">
-                        <img src={logo} alt="SOIL Logo" className="w-16 h-12 object-contain" />
-                    </div>
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-green-400/20 rounded-full mb-6">
                         <span className="text-3xl">👤</span>
                     </div>
@@ -260,11 +355,22 @@ const Profile = (props) => {
             </div>
 
             {/* Footer */}
-            <div className="relative z-30">
-                <Footer />
-            </div>
+            {!isEditModalOpen && !isEditPasswordOpen && (
+                <div className="relative z-30">
+                    <Footer />
+                </div>
+            )}
 
-            {notification && <Notification message={notification} />}
+            {notification && (
+                <Notification 
+                    message={notification} 
+                    type={
+                        notification.includes('Failed') || notification.includes('error') ? 'error' :
+                        notification.includes('success') || notification.includes('updated') ? 'success' :
+                        'info'
+                    }
+                />
+            )}
         </div>
     );
 }

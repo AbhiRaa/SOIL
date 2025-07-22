@@ -329,7 +329,7 @@ function Products() {
       </div>
 
       {/* Notifications and Modals */}
-      {notification && <Notification message={notification} />}
+      {notification && <Notification message={notification} type="success" />}
       {isReviewModalOpen && (
         <ReviewModal
           product={selectedProduct}

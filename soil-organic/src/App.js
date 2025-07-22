@@ -122,7 +122,7 @@ function App() {
             {/* Redirect to HomePage or another route if the route doesn't exist */}
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
-          <div>{notification && <Notification message={notification} />}</div>
+          <div>{notification && <Notification message={notification} type="warning" />}</div>
         </UserContext.Provider>
       </main>
     </Router>
