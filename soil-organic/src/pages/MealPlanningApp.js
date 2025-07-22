@@ -302,40 +302,56 @@ function MealPlanningApp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-orange-50">
-      <Navigator />
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">
+      {/* Background Pattern Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 via-transparent to-orange-900/10"></div>
+      
+      {/* Navigation */}
+      <div className="relative z-20">
+        <Navigator />
+      </div>
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-12">
+      <div className="relative z-20 py-16">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="text-6xl font-bold text-center text-primary mb-4">🍽️ Personal Meal Planner</h1>
-          <p className="text-lg text-center text-gray-700 mb-8">Create customized meal plans based on your health goals and dietary preferences</p>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
+              <span className="text-2xl">🍽️</span>
+            </div>
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Personal <span className="text-green-400">Meal Planner</span>
+            </h1>
+            <div className="w-32 h-1 bg-gradient-to-r from-green-500 to-green-400 mx-auto mb-8"></div>
+            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed mb-8 max-w-3xl mx-auto">
+              Create customized meal plans based on your health goals and dietary preferences
+            </p>
+          </div>
           
           {/* User Metrics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <div className="text-3xl font-bold text-blue-600">{dailyCalories.toFixed(0)}</div>
-              <div className="text-gray-600">BMR (kcal/day)</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 text-center hover:bg-white/15 transition-all duration-300">
+              <div className="text-3xl font-bold text-blue-400">{dailyCalories.toFixed(0)}</div>
+              <div className="text-gray-300">BMR (kcal/day)</div>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <div className="text-3xl font-bold text-green-600">{tdee.toFixed(0)}</div>
-              <div className="text-gray-600">TDEE (kcal/day)</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 text-center hover:bg-white/15 transition-all duration-300">
+              <div className="text-3xl font-bold text-green-400">{tdee.toFixed(0)}</div>
+              <div className="text-gray-300">TDEE (kcal/day)</div>
             </div>
             {macros && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-bold text-primary mb-2 text-center">Daily Macros Target</h3>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
+                <h3 className="font-bold text-green-400 mb-2 text-center">Daily Macros Target</h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span>🥩 Protein:</span>
-                    <span className="font-bold">{macros.protein}g</span>
+                    <span className="text-gray-300">🥩 Protein:</span>
+                    <span className="font-bold text-white">{macros.protein}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>🍞 Carbs:</span>
-                    <span className="font-bold">{macros.carbs}g</span>
+                    <span className="text-gray-300">🍞 Carbs:</span>
+                    <span className="font-bold text-white">{macros.carbs}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>🥑 Fat:</span>
-                    <span className="font-bold">{macros.fat}g</span>
+                    <span className="text-gray-300">🥑 Fat:</span>
+                    <span className="font-bold text-white">{macros.fat}g</span>
                   </div>
                 </div>
               </div>
@@ -343,22 +359,22 @@ function MealPlanningApp() {
           </div>
 
           {/* Controls Section */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-primary mb-4">🎯 Customize Your Plan</h2>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
+            <h2 className="text-2xl font-bold text-white mb-4">🎯 Customize Your Plan</h2>
             
             {/* Dietary Restrictions */}
             <div className="mb-6">
-              <label htmlFor="intolerances" className="block text-lg font-semibold text-gray-700 mb-2">
+              <label htmlFor="intolerances" className="block text-lg font-semibold text-gray-200 mb-2">
                 🚫 Dietary Restrictions & Allergies
               </label>
-              <p className="text-sm text-gray-500 mb-2">Hold Ctrl/Cmd to select multiple items</p>
+              <p className="text-sm text-gray-400 mb-2">Hold Ctrl/Cmd to select multiple items</p>
               <select 
                 multiple 
                 id="intolerances" 
                 name="intolerances" 
                 value={intolerances} 
                 onChange={handleChangeIntolerance} 
-                className="w-full p-3 border-2 border-orange-200 rounded-lg focus:border-primary focus:outline-none bg-orange-50 text-primary"
+                className="w-full p-3 border-2 border-white/20 rounded-lg focus:border-green-400 focus:outline-none bg-white/10 text-white placeholder-gray-300 backdrop-blur-sm"
                 size="4"
               >
                 {intoleranceOptions.map(option => (
@@ -383,7 +399,7 @@ function MealPlanningApp() {
                 🗑️ Clear All
               </button>
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg flex items-center">
+                <div className="bg-red-500/20 border border-red-400/50 text-red-300 px-4 py-3 rounded-lg flex items-center backdrop-blur-sm">
                   <span className="mr-2">⚠️</span>
                   {error}
                 </div>
@@ -394,9 +410,9 @@ function MealPlanningApp() {
       </div>
 
       {/* Weekly Meal Plan Section */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-3xl font-bold text-primary mb-6 text-center">📅 Your Weekly Meal Plan</h2>
+      <div className="relative z-20 max-w-6xl mx-auto px-6 py-8">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8 mb-8">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">📅 Your Weekly Meal Plan</h2>
           
           {/* Day Selection Tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -406,8 +422,8 @@ function MealPlanningApp() {
                 onClick={() => handleDaySelection(day)}
                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 ${
                   selectedDay === day.toLowerCase() 
-                    ? 'bg-gradient-to-r from-primary to-blue-600 text-white shadow-md' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg' 
+                    : 'bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white border border-white/20'
                 }`}
               >
                 {day.slice(0, 3)}
@@ -420,7 +436,7 @@ function MealPlanningApp() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Meals for Selected Day */}
               <div className="lg:col-span-2">
-                <h3 className="text-2xl font-bold text-primary mb-4">
+                <h3 className="text-2xl font-bold text-white mb-4">
                   🍽️ Meals for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,8 +455,8 @@ function MealPlanningApp() {
               {/* Nutrition Chart */}
               {selectedDayNutrition && (
                 <div className="lg:col-span-1">
-                  <div className="bg-gradient-to-b from-orange-50 to-yellow-50 rounded-lg p-6">
-                    <h3 className="text-xl font-bold text-primary mb-4 text-center">📊 Daily Nutrition</h3>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 p-6">
+                    <h3 className="text-xl font-bold text-green-400 mb-4 text-center">📊 Daily Nutrition</h3>
                     <NutritionChart nutritionData={selectedDayNutrition} />
                   </div>
                 </div>
@@ -450,17 +466,17 @@ function MealPlanningApp() {
             /* No Meals - Full Width Centered */
             <div className="text-center py-16">
               <div className="text-8xl mb-6">🍽️</div>
-              <h3 className="text-2xl font-bold text-primary mb-4">
+              <h3 className="text-2xl font-bold text-white mb-4">
                 🍽️ Meals for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
               </h3>
-              <p className="text-gray-500 text-xl mb-2">No meals planned for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</p>
+              <p className="text-gray-300 text-xl mb-2">No meals planned for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</p>
               <p className="text-gray-400 text-lg">Generate a meal plan or search for recipes to add meals</p>
             </div>
           )}
         </div>
       </div>
       {/* Save Meal Plan Section */}
-      <div className="max-w-6xl mx-auto px-6 pb-8">
+      <div className="relative z-20 max-w-6xl mx-auto px-6 pb-8">
         <div className="text-center">
           <button 
             onClick={handleSaveMealPlan}
@@ -472,11 +488,11 @@ function MealPlanningApp() {
       </div>
 
       {/* Recipe Search Section */}
-      <div className="bg-gradient-to-r from-orange-100 to-yellow-100 py-12">
+      <div className="relative z-20 py-16">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-4xl font-bold text-primary mb-4 text-center">🔍 Discover New Recipes</h2>
-            <p className="text-gray-600 text-center mb-8">Search for recipes and add them directly to your selected day's meal plan</p>
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-8">
+            <h2 className="text-4xl font-bold text-white mb-4 text-center">🔍 Discover New Recipes</h2>
+            <p className="text-gray-300 text-center mb-8">Search for recipes and add them directly to your selected day's meal plan</p>
             
             {/* Search Box */}
             <div className="flex justify-center mb-8">
@@ -489,14 +505,14 @@ function MealPlanningApp() {
             {loading && (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p className="mt-2 text-primary">Searching for delicious recipes...</p>
+                <p className="mt-2 text-green-400">Searching for delicious recipes...</p>
               </div>
             )}
 
             {/* Search Results */}
             {!loading && meals.length > 0 && (
               <div>
-                <h3 className="text-2xl font-bold text-primary mb-6">
+                <h3 className="text-2xl font-bold text-white mb-6">
                   🍳 Found {meals.length} Recipe{meals.length !== 1 ? 's' : ''}
                 </h3>
                 <MealList meals={meals} onAdd={handleAddMeal} selectedDay={selectedDay} />
@@ -507,7 +523,7 @@ function MealPlanningApp() {
             {!loading && meals.length === 0 && (
               <div className="text-center py-8">
                 <div className="text-6xl mb-4">🔍</div>
-                <p className="text-gray-500 text-lg">Search for recipes to get started</p>
+                <p className="text-gray-300 text-lg">Search for recipes to get started</p>
                 <p className="text-gray-400">Try searching for "chicken", "vegetarian", or "breakfast"</p>
               </div>
             )}
@@ -515,7 +531,9 @@ function MealPlanningApp() {
         </div>
       </div>
 
-      <Footer/>
+      <div className="relative z-30">
+        <Footer/>
+      </div>
     </div>
   );
 }

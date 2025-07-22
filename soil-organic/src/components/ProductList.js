@@ -112,51 +112,156 @@ function ProductList({ topRatedLimit }) {
     };
 
     return (
-            <div className="flex flex-wrap justify-center">
+        <div className="w-full">
+            {/* Products Header */}
+            <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    Featured <span className="text-green-400">Products</span>
+                </h2>
+                <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                    Hand-picked organic produce and artisanal goods for your healthy lifestyle
+                </p>
+            </div>
+
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {products.map(product => (
-                    <div key={product.product_id} className={`border-2 text-orange-600 rounded-lg p-4 m-4 w-64 shadow-lg ${product.is_special ? 'border-special-green shadow-special-glow animate-glow-fade' : 'border-teal-300'}`}>
-                         {product.is_special && <h2 className="text-lg font-bold text-green-500 text-center mb-2"> This week's Specials!</h2>}
-                        <img src={"http://localhost:4000/"+product.product_image} alt={product.product_name} className="w-full h-40 object-cover rounded-t-lg"/>
-                        <h3 className="text-lg font-bold" >{product.product_name}</h3>
-                        <h3 className="text-lg font-bold"> ${parseFloat(product.product_price).toFixed(2)}</h3>
-                        <p className="text-md text-primary">{product.product_description}</p>
-                        <p className="text-md font-bold">Quantity: {product.minimum_purchase_unit}</p>
-                        <div className="text-md font-bold">Rating:<span> <StarRatings
-                            rating={averageRatings[product.product_id]}
-                            starRatedColor="gold"
-                            // changeRating={changeRating}
-                            numberOfStars={5}
-                            name='rating'
-                            starDimension="15px"
-                            starSpacing="0.01px"
-                        /></span></div>
-                        {currentloggedInUser && (
-                        <div className='flex gap-5 items-center'>
-                            {product.product_stock === 0 ? (
-                                <span className="mt-4 text-red-500 font-bold">Out of Stock</span>
-                            ) : (
-                                <button
-                                    onClick={() => handleAddToCart(product)}
-                                    className="mt-4 hover:bg-teal-300 text-primary font-bold py-2 px-4 rounded-lg border border-primary"
-                                >
-                                    Add to cart
-                                </button>
-                            )}
-                            <button onClick={() => handleOpenReviewModal(product)} className="mt-4 text-primary underline font-bold py-2">
-                            {reviewCounts[product.product_id] ? `${reviewCounts[product.product_id]} reviews` : 'No reviews'}
-                            </button>
+                    <div 
+                        key={product.product_id} 
+                        className={`group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl overflow-hidden hover:bg-white/15 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                            product.is_special ? 'ring-2 ring-green-400 shadow-green-400/20 shadow-lg' : ''
+                        }`}
+                    >
+                        {/* Special Badge */}
+                        {product.is_special && (
+                            <div className="absolute top-3 left-3 z-10 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                                🌟 Special
+                            </div>
+                        )}
+
+                        {/* Product Image */}
+                        <div className="relative overflow-hidden h-48">
+                            <img 
+                                src={"http://localhost:4000/"+product.product_image} 
+                                alt={product.product_name} 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                         </div>
-                    )} 
-                    
+
+                        {/* Product Content */}
+                        <div className="p-6 space-y-4">
+                            {/* Product Name & Price */}
+                            <div className="flex justify-between items-start">
+                                <h3 className="text-lg font-bold text-white group-hover:text-green-300 transition-colors duration-300">
+                                    {product.product_name}
+                                </h3>
+                                <div className="text-right">
+                                    <span className="text-2xl font-bold text-green-400">
+                                        ${parseFloat(product.product_price).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            <p className="text-gray-300 text-sm leading-relaxed line-clamp-2">
+                                {product.product_description}
+                            </p>
+
+                            {/* Product Details */}
+                            <div className="grid grid-cols-1 gap-2 text-sm">
+                                <div className="flex justify-between items-center text-gray-400">
+                                    <span>Quantity:</span>
+                                    <span className="font-medium text-white">{product.minimum_purchase_unit}</span>
+                                </div>
+                                
+                                {/* Rating */}
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-400">Rating:</span>
+                                    <div className="flex items-center gap-2">
+                                        <StarRatings
+                                            rating={averageRatings[product.product_id]}
+                                            starRatedColor="#fbbf24"
+                                            numberOfStars={5}
+                                            name='rating'
+                                            starDimension="16px"
+                                            starSpacing="1px"
+                                        />
+                                        <span className="text-gray-300 text-xs">
+                                            ({averageRatings[product.product_id]?.toFixed(1) || '0.0'})
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            {currentloggedInUser && (
+                                <div className="pt-4 border-t border-white/10 space-y-3">
+                                    {product.product_stock === 0 ? (
+                                        <div className="text-center py-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                                            <span className="text-red-300 font-bold text-sm">Out of Stock</span>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleAddToCart(product)}
+                                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                        >
+                                            <span>🛒</span>
+                                            <span>Add to Cart</span>
+                                        </button>
+                                    )}
+                                    
+                                    {/* Reviews Button */}
+                                    <button 
+                                        onClick={() => handleOpenReviewModal(product)} 
+                                        className="w-full bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/30 text-gray-300 hover:text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 text-sm"
+                                    >
+                                        {reviewCounts[product.product_id] ? 
+                                            `📝 ${reviewCounts[product.product_id]} reviews` : 
+                                            '📝 No reviews yet'
+                                        }
+                                    </button>
+                                </div>
+                            )}
+                            
+                            {/* Guest View - Show Login Prompt */}
+                            {!currentloggedInUser && (
+                                <div className="pt-4 border-t border-white/10">
+                                    <div className="text-center py-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                        <p className="text-blue-300 text-sm font-medium mb-2">Sign in to purchase</p>
+                                        <a 
+                                            href="/signin" 
+                                            className="text-blue-400 hover:text-blue-300 underline text-sm font-semibold"
+                                        >
+                                            Sign In Now
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            
+            {/* Empty State */}
+            {products.length === 0 && (
+                <div className="text-center py-16">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
+                        <span className="text-4xl">🥬</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-4">No Products Available</h3>
+                    <p className="text-gray-400">We're currently updating our inventory. Check back soon!</p>
                 </div>
-            ))}
+            )}
+            
+            {/* Notifications and Modals */}
             {notification && <Notification message={notification} />}
             {isReviewModalOpen && (
                 <ReviewModal
                     product={selectedProduct}
                     onClose={handleCloseReviewModal}
-                    updateReviewCounts={updateReviewCounts} // Pass the update function as a prop for review counts
-                    updateAverageRatings={updateAverageRatings} // Pass the update function as a prop for avg ratings
+                    updateReviewCounts={updateReviewCounts}
+                    updateAverageRatings={updateAverageRatings}
                     onSubmit={handleSubmitReview}
                 />
             )}

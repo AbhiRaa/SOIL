@@ -14,7 +14,7 @@ function Header() {
       <div className="absolute inset-0 bg-black/30"></div>
       
       {/* Navigation */}
-      <div className="relative z-10">
+      <div className="relative z-100">
         <Navbar />
       </div>
 
@@ -80,7 +80,7 @@ function Header() {
         </div>
 
         {/* Scroll Indicator - Clickable */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
           <button 
             onClick={() => {
               const aboutSection = document.getElementById('about-section');
@@ -88,10 +88,10 @@ function Header() {
                 aboutSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="flex flex-col items-center text-gray-800 hover:text-primary bg-white/90 hover:bg-white backdrop-blur-sm px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce cursor-pointer group"
+            className="flex flex-col items-center text-white hover:text-green-300 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce cursor-pointer group"
           >
-            <span className="text-sm mb-1 font-medium group-hover:text-primary transition-colors duration-300">Discover More</span>
-            <svg className="w-5 h-5 group-hover:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="text-sm mb-1 font-medium group-hover:text-green-300 transition-colors duration-300">Discover More</span>
+            <svg className="w-5 h-5 group-hover:text-green-300 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </button>
