@@ -70,9 +70,6 @@ function MealPlanningApp() {
             setTDEE(tdee);
             setMacros(macrosData);
             setDietPreferences(dietaryPreferences);
-            console.log("Macros:", macrosData);
-            console.log("Dietary Preferences:", dietaryPreferences);
-            console.log("Meal PLAN:", selectedMeals)
           }
         } catch (error) {
           console.error('Failed to fetch user details:', error);
@@ -86,7 +83,7 @@ function MealPlanningApp() {
     if (mealPlanData && mealPlanData[selectedDay] && mealPlanData[selectedDay].nutrients) {
       setSelectedDayNutrition(mealPlanData[selectedDay].nutrients);
     }
-  }, [mealPlanData, currentloggedInUser, selectedDay, saveMealPlan, selectedMeals]);
+  }, [mealPlanData, currentloggedInUser, selectedDay]);
 
   const handleMealSearch = async (query) => {
     setLoading(true);
@@ -96,7 +93,6 @@ function MealPlanningApp() {
         const results = await fetchMeals(query, dietPreferences, intoleranceString, macros);
         setMeals(results);
       } else {
-        console.log("Macros are not defined yet.");
       }
     } catch (err) {
       console.error("Error while fetching meals: ", err);
@@ -171,11 +167,12 @@ function MealPlanningApp() {
     saveMealPlan(updatedMealPlanData);
   };
 
-  const handleChangeIntolerance = (event) => {
-    const selectedOptions = Array.from(event.target.options)
-                                  .filter(option => option.selected)
-                                  .map(option => option.value);
-    setIntolerances(selectedOptions);
+  const handleChangeIntolerance = (value) => {
+    if (intolerances.includes(value)) {
+      setIntolerances(intolerances.filter(item => item !== value));
+    } else {
+      setIntolerances([...intolerances, value]);
+    }
   };
 
   const handleGenerateMealPlan = async () => {
@@ -295,10 +292,10 @@ function MealPlanningApp() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">
       {/* Background Pattern Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 via-transparent to-orange-900/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 via-transparent to-orange-900/10 pointer-events-none"></div>
       
       {/* Navigation */}
-      <div className="relative z-20">
+      <div className="relative z-[100]">
         <Navigator />
       </div>
       
@@ -355,23 +352,29 @@ function MealPlanningApp() {
             
             {/* Dietary Restrictions */}
             <div className="mb-6">
-              <label htmlFor="intolerances" className="block text-lg font-semibold text-gray-200 mb-2">
+              <label className="block text-lg font-semibold text-gray-200 mb-4">
                 🚫 Dietary Restrictions & Allergies
               </label>
-              <p className="text-sm text-gray-400 mb-2">Hold Ctrl/Cmd to select multiple items</p>
-              <select 
-                multiple 
-                id="intolerances" 
-                name="intolerances" 
-                value={intolerances} 
-                onChange={handleChangeIntolerance} 
-                className="w-full p-3 border-2 border-white/20 rounded-lg focus:border-green-400 focus:outline-none bg-white/10 text-white placeholder-gray-300 backdrop-blur-sm"
-                size="4"
-              >
+              <p className="text-sm text-gray-400 mb-3">Select all that apply</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {intoleranceOptions.map(option => (
-                  <option key={option.value} value={option.value} className="p-2">{option.label}</option>
+                  <label 
+                    key={option.value} 
+                    className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/20 rounded-lg cursor-pointer transition-all duration-200"
+                  >
+                    <input
+                      type="checkbox"
+                      value={option.value}
+                      checked={intolerances.includes(option.value)}
+                      onChange={(e) => handleChangeIntolerance(e.target.value)}
+                      className="w-5 h-5 text-green-500 bg-gray-800 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    />
+                    <span className={`text-sm font-medium ${intolerances.includes(option.value) ? 'text-green-400' : 'text-gray-300'}`}>
+                      {option.label}
+                    </span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -522,7 +525,7 @@ function MealPlanningApp() {
         </div>
       </div>
 
-      <div className="relative z-30">
+      <div className="relative z-40">
         <Footer/>
       </div>
     </div>
