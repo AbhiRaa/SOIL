@@ -3,7 +3,8 @@
  */
 
 // API key for accessing the Spoonacular API.
-const API_KEY = 'caa7e9166b5440c7a5e88f6b726a3c7b';
+// const API_KEY = 'caa7e9166b5440c7a5e88f6b726a3c7b';
+const API_KEY = 'b9c5b0ae91e7429392042f7370b57cb5';
 // Base URL for the Spoonacular API.
 const BASE_URL = 'https://api.spoonacular.com';
 
@@ -30,7 +31,9 @@ export const fetchMeals = async (query, dietaryPreferences, intolerances, macros
     url += `&maxProtein=${protein}`;
     url += `&maxCarbs=${carbs}`;
     url += `&maxFat=${fat}`;
-    url += '&number=18'
+    url += '&number=18';
+    url += '&addRecipeNutrition=true'; // CRITICAL: Add nutrition data to response
+    url += '&addRecipeInformation=true'; // Add additional recipe info
 
     console.log("Fetching meals with URL:", url);   // Debugging log for the constructed URL.
 
@@ -58,7 +61,12 @@ export const fetchMeals = async (query, dietaryPreferences, intolerances, macros
  */
 export const generateMealPlan = async ({ timeFrame, targetCalories, diet, exclude }) => {
   // Constructing the URL with query parameters for generating a meal plan.
-  const url = `${BASE_URL}/mealplanner/generate?apiKey=${API_KEY}&timeFrame=${timeFrame}&targetCalories=${targetCalories}&diet=${diet}&exclude=${encodeURIComponent(exclude)}`;
+  let url = `${BASE_URL}/mealplanner/generate?apiKey=${API_KEY}&timeFrame=${timeFrame}&targetCalories=${targetCalories}&diet=${diet}&exclude=${encodeURIComponent(exclude)}`;
+  
+  // Add nutrition data to the meal plan response
+  url += '&addRecipeNutrition=true'; // CRITICAL: Add nutrition data to meals
+  url += '&addRecipeInformation=true'; // Add additional recipe info
+  
   // Debugging
   console.log(url)
   console.log(targetCalories, diet, exclude)
@@ -72,5 +80,43 @@ export const generateMealPlan = async ({ timeFrame, targetCalories, diet, exclud
   } catch (error) {
     console.error("Error fetching meal plan: ", error);
     return null;  // Returning null in case of error.
+  }
+};
+
+/**
+ * Fetches detailed information including nutrition for multiple recipes in bulk.
+ * More efficient than making individual API calls for each recipe.
+ * 
+ * @param {Array<number>} recipeIds - Array of recipe IDs to fetch information for.
+ * @returns {Object} Object containing recipe details keyed by recipe ID, or empty object if error.
+ */
+export const fetchBulkRecipeInformation = async (recipeIds) => {
+  if (!recipeIds || recipeIds.length === 0) {
+    return {};
+  }
+  
+  try {
+    const idsString = recipeIds.join(',');
+    const url = `${BASE_URL}/recipes/informationBulk?ids=${idsString}&apiKey=${API_KEY}&includeNutrition=true`;
+    
+    console.log(`Fetching bulk nutrition data for ${recipeIds.length} recipes`);
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch bulk recipe information');
+    }
+    
+    const recipes = await response.json();
+    
+    // Convert array to object keyed by ID for easy lookup
+    const recipesById = {};
+    recipes.forEach(recipe => {
+      recipesById[recipe.id] = recipe;
+    });
+    
+    return recipesById;
+  } catch (error) {
+    console.error("Error fetching bulk recipe information: ", error);
+    return {};
   }
 };

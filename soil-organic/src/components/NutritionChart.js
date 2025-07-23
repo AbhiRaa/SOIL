@@ -54,7 +54,7 @@ const NutritionChart = ({ nutritionData }) => {
             size: 12,
             weight: '500'
           },
-          color: '#374151',
+          color: '#E5E7EB',
           usePointStyle: true,
           pointStyle: 'circle',
         }
@@ -100,13 +100,13 @@ const NutritionChart = ({ nutritionData }) => {
       {/* Nutrition Stats Cards */}
       <div className="space-y-3">
         {/* Calories - Highlighted */}
-        <div className="bg-gradient-to-r from-orange-100 to-orange-50 border-l-4 border-orange-500 p-3 rounded-lg">
+        <div className="bg-gradient-to-r from-orange-900/30 to-orange-800/20 border-l-4 border-orange-500 p-3 rounded-lg">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <span className="text-lg">🔥</span>
-              <span className="font-semibold text-gray-700">Calories</span>
+              <span className="font-semibold text-gray-200">Calories</span>
             </div>
-            <span className="font-bold text-lg text-orange-600">
+            <span className="font-bold text-lg text-orange-400">
               {Math.round(nutritionData.calories)} kcal
             </span>
           </div>
@@ -115,36 +115,36 @@ const NutritionChart = ({ nutritionData }) => {
         {/* Macronutrients Grid */}
         <div className="grid grid-cols-3 gap-2">
           {/* Protein */}
-          <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-center">
+          <div className="bg-blue-900/20 border border-blue-600/30 p-3 rounded-lg text-center">
             <div className="text-lg mb-1">🥩</div>
-            <div className="font-semibold text-blue-700 text-sm">Protein</div>
-            <div className="font-bold text-blue-800">{Math.round(nutritionData.protein)}g</div>
+            <div className="font-semibold text-blue-300 text-sm">Protein</div>
+            <div className="font-bold text-blue-200">{Math.round(nutritionData.protein)}g</div>
             {totalMacros > 0 && (
-              <div className="text-xs text-blue-600 mt-1">
+              <div className="text-xs text-blue-400 mt-1">
                 {Math.round((nutritionData.protein / totalMacros) * 100)}%
               </div>
             )}
           </div>
 
           {/* Carbohydrates */}
-          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-center">
+          <div className="bg-yellow-900/20 border border-yellow-600/30 p-3 rounded-lg text-center">
             <div className="text-lg mb-1">🍞</div>
-            <div className="font-semibold text-yellow-700 text-sm">Carbs</div>
-            <div className="font-bold text-yellow-800">{Math.round(nutritionData.carbohydrates)}g</div>
+            <div className="font-semibold text-yellow-300 text-sm">Carbs</div>
+            <div className="font-bold text-yellow-200">{Math.round(nutritionData.carbohydrates)}g</div>
             {totalMacros > 0 && (
-              <div className="text-xs text-yellow-600 mt-1">
+              <div className="text-xs text-yellow-400 mt-1">
                 {Math.round((nutritionData.carbohydrates / totalMacros) * 100)}%
               </div>
             )}
           </div>
 
           {/* Fat */}
-          <div className="bg-red-50 border border-red-200 p-3 rounded-lg text-center">
+          <div className="bg-red-900/20 border border-red-600/30 p-3 rounded-lg text-center">
             <div className="text-lg mb-1">🥑</div>
-            <div className="font-semibold text-red-700 text-sm">Fat</div>
-            <div className="font-bold text-red-800">{Math.round(nutritionData.fat)}g</div>
+            <div className="font-semibold text-red-300 text-sm">Fat</div>
+            <div className="font-bold text-red-200">{Math.round(nutritionData.fat)}g</div>
             {totalMacros > 0 && (
-              <div className="text-xs text-red-600 mt-1">
+              <div className="text-xs text-red-400 mt-1">
                 {Math.round((nutritionData.fat / totalMacros) * 100)}%
               </div>
             )}
@@ -152,7 +152,7 @@ const NutritionChart = ({ nutritionData }) => {
         </div>
 
         {/* Additional Info */}
-        <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
+        <div className="text-center text-xs text-gray-400 pt-2 border-t border-gray-700">
           Daily nutrition summary • Tap chart segments for details
         </div>
       </div>

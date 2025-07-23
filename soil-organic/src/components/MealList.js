@@ -8,18 +8,19 @@ import React, { useState } from 'react';
  * @param {Function} onAdd - Callback function to handle adding a meal to the meal plan.
  * @param {string} selectedDay - Currently selected day for adding meals.
  */
-function MealList({ meals, onAdd, selectedDay = 'today' }) {
+function MealList({ meals, onAdd, selectedDay = 'today', mealSections = [] }) {
     const [addingMealId, setAddingMealId] = useState(null);
     const [addedMeals, setAddedMeals] = useState(new Set());
+    const [selectedSections, setSelectedSections] = useState(new Map());
 
     /**
      * Handle adding meal with user feedback
      */
-    const handleAddMeal = async (meal) => {
+    const handleAddMeal = async (meal, targetSection = 'breakfast') => {
         setAddingMealId(meal.id);
         
         try {
-            await onAdd(meal);
+            await onAdd(meal, targetSection);
             setAddedMeals(prev => new Set([...prev, meal.id]));
             
             // Remove from added list after 3 seconds for better UX
@@ -36,6 +37,14 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
         } finally {
             setAddingMealId(null);
         }
+    };
+
+    const getSelectedSection = (mealId) => {
+        return selectedSections.get(mealId) || (mealSections[0]?.id || 'breakfast');
+    };
+
+    const setSelectedSection = (mealId, sectionId) => {
+        setSelectedSections(prev => new Map(prev.set(mealId, sectionId)));
     };
 
     /**
@@ -63,7 +72,7 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
         return (
             <div className="text-center py-12">
                 <div className="text-6xl mb-4">🍽️</div>
-                <p className="text-gray-500 text-lg">No recipes found</p>
+                <p className="text-gray-300 text-lg">No recipes found</p>
                 <p className="text-gray-400">Try adjusting your search terms</p>
             </div>
         );
@@ -73,10 +82,10 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
         <div className="space-y-4">
             {/* Results Header */}
             <div className="flex justify-between items-center">
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                     Showing {meals.length} recipe{meals.length !== 1 ? 's' : ''}
                     {selectedDay && (
-                        <span className="ml-2 px-2 py-1 bg-primary text-white text-sm rounded-full">
+                        <span className="ml-2 px-2 py-1 bg-blue-600 text-white text-sm rounded-full">
                             Adding to {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
                         </span>
                     )}
@@ -84,7 +93,7 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
             </div>
 
             {/* Meals Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {meals.map((meal) => {
                     const nutrition = getNutritionData(meal);
                     const isAdding = addingMealId === meal.id;
@@ -93,18 +102,31 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
                     return (
                         <div 
                             key={meal.id} 
-                            className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl border border-gray-100"
+                            className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-102 hover:shadow-xl border border-gray-700"
                         >
                             {/* Image Section */}
                             <div className="relative">
-                                <img 
-                                    className="w-full h-48 object-cover" 
-                                    src={meal.image} 
-                                    alt={meal.title}
-                                    onError={(e) => {
-                                        e.target.src = 'https://via.placeholder.com/300x200/f97316/ffffff?text=No+Image';
-                                    }}
-                                />
+                                {meal.image ? (
+                                    <img 
+                                        className="w-full h-48 object-cover" 
+                                        src={meal.image} 
+                                        alt={meal.title}
+                                        className="w-full h-32 object-cover"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                ) : null}
+                                <div 
+                                    className="w-full h-32 bg-gray-900 flex items-center justify-center"
+                                    style={{ display: meal.image ? 'none' : 'flex' }}
+                                >
+                                    <div className="text-center">
+                                        <div className="text-4xl mb-2">🍽️</div>
+                                        <p className="text-gray-400">Image not available</p>
+                                    </div>
+                                </div>
                                 
                                 {/* Success Indicator */}
                                 {isAdded && (
@@ -117,64 +139,85 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
                             </div>
 
                             {/* Content Section */}
-                            <div className="p-4">
-                                <h3 className="font-bold text-gray-800 text-lg mb-3 line-clamp-2 leading-tight">
+                            <div className="p-3">
+                                <h3 className="font-bold text-gray-100 text-sm mb-2 line-clamp-2 leading-tight">
                                     {meal.title}
                                 </h3>
 
                                 {/* Nutrition Information */}
                                 {nutrition && (
-                                    <div className="bg-orange-50 rounded-lg p-3 mb-4">
-                                        <div className="grid grid-cols-2 gap-3 text-sm">
+                                    <div className="bg-gray-700/50 rounded-lg p-2 mb-3">
+                                        <div className="grid grid-cols-2 gap-2 text-xs">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">🔥 Calories:</span>
-                                                <span className="font-semibold">{Math.round(nutrition.calories)}</span>
+                                                <span className="text-gray-300">🔥 Calories:</span>
+                                                <span className="font-semibold text-orange-400">{Math.round(nutrition.calories)}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">🥩 Protein:</span>
-                                                <span className="font-semibold">{Math.round(nutrition.protein)}g</span>
+                                                <span className="text-gray-300">🥩 Protein:</span>
+                                                <span className="font-semibold text-blue-300">{Math.round(nutrition.protein)}g</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">🍞 Carbs:</span>
-                                                <span className="font-semibold">{Math.round(nutrition.carbohydrates)}g</span>
+                                                <span className="text-gray-300">🍞 Carbs:</span>
+                                                <span className="font-semibold text-yellow-300">{Math.round(nutrition.carbohydrates)}g</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">🥑 Fat:</span>
-                                                <span className="font-semibold">{Math.round(nutrition.fat)}g</span>
+                                                <span className="text-gray-300">🥑 Fat:</span>
+                                                <span className="font-semibold text-red-300">{Math.round(nutrition.fat)}g</span>
                                             </div>
                                         </div>
                                     </div>
                                 )}
 
-                                {/* Action Button */}
-                                <button 
-                                    onClick={() => handleAddMeal(meal)}
-                                    disabled={isAdding || isAdded}
-                                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:transform-none ${
-                                        isAdded 
-                                            ? 'bg-green-500 text-white cursor-default'
-                                            : isAdding
-                                            ? 'bg-gray-400 text-white cursor-not-allowed'
-                                            : 'bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white shadow-md hover:shadow-lg'
-                                    }`}
-                                >
-                                    {isAdding ? (
-                                        <div className="flex items-center justify-center gap-2">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            <span>Adding...</span>
-                                        </div>
-                                    ) : isAdded ? (
-                                        <div className="flex items-center justify-center gap-2">
-                                            <span>✅</span>
-                                            <span>Added to {selectedDay}!</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-center gap-2">
-                                            <span>➕</span>
-                                            <span>Add to {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</span>
+                                {/* Section Selector and Action Button */}
+                                <div className="space-y-2">
+                                    {mealSections.length > 0 && !isAdded && (
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-300 mb-1">
+                                                Add to section:
+                                            </label>
+                                            <select
+                                                value={getSelectedSection(meal.id)}
+                                                onChange={(e) => setSelectedSection(meal.id, e.target.value)}
+                                                className="w-full px-2 py-1 border border-gray-600 rounded-md bg-gray-700 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                {mealSections.map(section => (
+                                                    <option key={section.id} value={section.id}>
+                                                        {section.icon} {section.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     )}
-                                </button>
+                                    
+                                    <button 
+                                        onClick={() => handleAddMeal(meal, getSelectedSection(meal.id))}
+                                        disabled={isAdding || isAdded}
+                                        className={`w-full py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-102 disabled:transform-none ${
+                                            isAdded 
+                                                ? 'bg-green-500 text-white cursor-default'
+                                                : isAdding
+                                                ? 'bg-gray-400 text-white cursor-not-allowed'
+                                                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-600 text-white shadow-md hover:shadow-lg'
+                                        }`}
+                                    >
+                                        {isAdding ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                                <span>Adding...</span>
+                                            </div>
+                                        ) : isAdded ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <span>✅</span>
+                                                <span>Added to {selectedDay}!</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <span>➕</span>
+                                                <span>Add to {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                </div>
 
                                 {/* Recipe Link */}
                                 {meal.sourceUrl && (
@@ -182,7 +225,7 @@ function MealList({ meals, onAdd, selectedDay = 'today' }) {
                                         href={meal.sourceUrl} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="block text-center mt-2 text-blue-600 hover:text-blue-800 text-sm transition-colors duration-200"
+                                        className="block text-center mt-1 text-blue-400 hover:text-blue-300 text-xs transition-colors duration-200"
                                     >
                                         📋 View Full Recipe
                                     </a>
