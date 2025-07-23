@@ -7,7 +7,6 @@ import EditPasswordModal from '../components/updatePasswordModal';
 import { getUserDetails, deleteUser, updateUserDetails, changeUserPassword } from "../services/userService";
 import Footer from "../components/Footer";
 import Notification from '../utils/notifications';
-import logo from "../images/logo.png";
 
 /**
  * Enhanced ProfilePage Component with Dark Theme

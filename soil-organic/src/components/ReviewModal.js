@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useContext } from "react";
 import StarRatings from "react-star-ratings";
 import AddReviewModal from "./AddReviewModal";
 import UserContext from "../hooks/context";
-import EditReviewModal from "./EditReviewModal";
 import { addReview } from "../services/reviewService";
 // import ReplyComponent from "./replyComponent";
 import { SlUserFollow, SlUserFollowing } from "react-icons/sl";
@@ -32,6 +31,31 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
       document.body.style.overflow = originalStyle;
     };
   }, []);
+
+  const handleNotificationCycle = (review) => {
+    let count = 0;
+    const interval = setInterval(() => {
+      if (count < 5) {
+        setNotification(`Your review on ${product.product_name} has been deleted by the admin.`);
+        setTimeout(() => setNotification(''), 1000);  // Show the notification for 1 second
+        count++;
+      } else {
+        clearInterval(interval); // Stop the interval after 5 cycles
+        deleteReview(review.review_id).then(() => {
+          setExistingReviews(currentReviews => currentReviews.filter(r => r.review_id !== review.review_id));
+          console.log(`Review ${review.review_id} deleted after 5 notifications`);
+
+          // Reset the states
+          setReviewToEdit(null);
+          setIsEditMode(false); // Reset edit mode
+          // Display a notification message
+          setNotification('You review is hidden permanently, contact support at admin@soil.com.');
+          setTimeout(() => setNotification(''), 3000);
+
+        }).catch(error => console.error("Failed to delete review", error));
+      }
+    }, 1500);  // Interval of 1.5 seconds for each cycle of notification
+  };
 
   // Simulate fetching existing reviews for the product
   useEffect(() => {
@@ -96,32 +120,7 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
     }
     fetchFollowingList();
 
-  }, [product, currentloggedInUser.userId]);
-
-  const handleNotificationCycle = (review) => {
-    let count = 0;
-    const interval = setInterval(() => {
-      if (count < 5) {
-        setNotification(`Your review on ${product.product_name} has been deleted by the admin.`);
-        setTimeout(() => setNotification(''), 1000);  // Show the notification for 1 second
-        count++;
-      } else {
-        clearInterval(interval); // Stop the interval after 5 cycles
-        deleteReview(review.review_id).then(() => {
-          setExistingReviews(currentReviews => currentReviews.filter(r => r.review_id !== review.review_id));
-          console.log(`Review ${review.review_id} deleted after 5 notifications`);
-
-          // Reset the states
-          setReviewToEdit(null);
-          setIsEditMode(false); // Reset edit mode
-          // Display a notification message
-          setNotification('You review is hidden permanently, contact support at admin@soil.com.');
-          setTimeout(() => setNotification(''), 3000);
-
-        }).catch(error => console.error("Failed to delete review", error));
-      }
-    }, 1500);  // Interval of 1.5 seconds for each cycle of notification
-  };
+  }, [product, currentloggedInUser.userId, handleNotificationCycle]);
 
   const handleReviewButton = () => {
     setIsAddEditReviewModalOpen(true);

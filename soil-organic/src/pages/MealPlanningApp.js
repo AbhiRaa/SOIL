@@ -86,7 +86,7 @@ function MealPlanningApp() {
     if (mealPlanData && mealPlanData[selectedDay] && mealPlanData[selectedDay].nutrients) {
       setSelectedDayNutrition(mealPlanData[selectedDay].nutrients);
     }
-  }, [mealPlanData, currentloggedInUser, selectedDay]);
+  }, [mealPlanData, currentloggedInUser, selectedDay, saveMealPlan, selectedMeals]);
 
   const handleMealSearch = async (query) => {
     setLoading(true);
@@ -291,15 +291,6 @@ function MealPlanningApp() {
     saveMealPlan(updatedMealPlanData);
   };
 
-  // Helper function to render meals for a day
-  const renderMealsForDay = (day) => {
-    if (!mealPlanData || !mealPlanData[day.toLowerCase()]) {
-      return <p>No meals planned for {day}.</p>;
-    }
-    return mealPlanData[day.toLowerCase()].meals.map((meal) => (
-      <MealCard key={meal.id} meal={meal} />
-    ));
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-x-hidden">

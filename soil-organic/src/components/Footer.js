@@ -52,18 +52,34 @@ function Footer() {
             
             {/* Social Media Links */}
             <div className="flex space-x-3 justify-center sm:justify-start">
-              <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300">
+              <button 
+                type="button"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300"
+                aria-label="Facebook"
+              >
                 <span className="text-sm sm:text-lg">📘</span>
-              </a>
-              <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300">
+              </button>
+              <button 
+                type="button"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300"
+                aria-label="Instagram"
+              >
                 <span className="text-sm sm:text-lg">📷</span>
-              </a>
-              <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300">
+              </button>
+              <button 
+                type="button"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300"
+                aria-label="Twitter"
+              >
                 <span className="text-sm sm:text-lg">🐦</span>
-              </a>
-              <a href="#" className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300">
+              </button>
+              <button 
+                type="button"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors duration-300"
+                aria-label="LinkedIn"
+              >
                 <span className="text-sm sm:text-lg">💼</span>
-              </a>
+              </button>
             </div>
           </div>
 
