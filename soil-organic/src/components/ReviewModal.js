@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useCallback } from "react";
 import StarRatings from "react-star-ratings";
 import AddReviewModal from "./AddReviewModal";
 import UserContext from "../hooks/context";
@@ -32,7 +32,7 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
     };
   }, []);
 
-  const handleNotificationCycle = (review) => {
+  const handleNotificationCycle = useCallback((review) => {
     let count = 0;
     const interval = setInterval(() => {
       if (count < 5) {
@@ -55,7 +55,7 @@ function ReviewModal({ product, onClose, updateReviewCounts, updateAverageRating
         }).catch(error => console.error("Failed to delete review", error));
       }
     }, 1500);  // Interval of 1.5 seconds for each cycle of notification
-  };
+  }, [product.product_name]);
 
   // Simulate fetching existing reviews for the product
   useEffect(() => {
