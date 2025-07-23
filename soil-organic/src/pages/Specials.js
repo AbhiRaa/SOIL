@@ -30,7 +30,7 @@ function Specials() {
 
       {/* Navigation */}
       {!isReviewModalOpen && (
-        <div className="relative z-20">
+        <div className="relative z-[100]">
           <Navigator/>
         </div>
       )}
