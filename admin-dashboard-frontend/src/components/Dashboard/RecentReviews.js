@@ -20,10 +20,10 @@ const RecentReviews = () => {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {[1, 2, 3].map(i => (
           <div key={i} className="animate-pulse">
-            <div className="bg-slate-200 rounded-lg p-4">
+            <div className="bg-slate-200 rounded-lg p-5">
               <div className="h-4 bg-slate-300 rounded w-3/4 mb-2"></div>
               <div className="h-3 bg-slate-300 rounded w-1/2 mb-2"></div>
               <div className="h-3 bg-slate-300 rounded w-full"></div>
@@ -48,14 +48,15 @@ const RecentReviews = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div>
       {recentReviews.length > 0 ? (
-        recentReviews.map((review, index) => (
-          <div 
-            key={review.review_id} 
-            className="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:bg-slate-100 transition-colors duration-200"
-            style={{ animationDelay: `${index * 100}ms` }}
-          >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {recentReviews.map((review, index) => (
+            <div 
+              key={review.review_id} 
+              className="bg-slate-50 border border-slate-200 rounded-lg p-5 hover:bg-slate-100 transition-colors duration-200"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
@@ -111,8 +112,9 @@ const RecentReviews = () => {
                 Live
               </span>
             </div>
-          </div>
-        ))
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="text-center py-8">
           <div className="bg-slate-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">

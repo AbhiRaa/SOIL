@@ -61,6 +61,10 @@ const UserManagement = () => {
     });
   };
 
+  // Calculate metrics
+  const totalUsers = data?.users?.length || 0;
+  const activeUsers = data?.users?.filter(user => !user.is_blocked)?.length || 0;
+
   // Filter and sort users
   const filteredAndSortedUsers = useMemo(() => {
     if (!data?.users) return [];
@@ -270,8 +274,37 @@ const UserManagement = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">User Management</h1>
-          <p className="text-slate-600">Manage user accounts, permissions, and access controls</p>
+          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M3 5a2 2 0 012-2h1a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM3 13a2 2 0 012-2h1a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className='text-4xl font-bold text-white mb-2'>User Management</h1>
+                  <p className='text-xl text-white/90'>Manage user accounts, permissions, and access controls</p>
+                  <div className="flex items-center space-x-4 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      <span className="text-sm text-white/80">{totalUsers} Total Users</span>
+                    </div>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80">{activeUsers} Active</span>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80">{totalUsers - activeUsers} Blocked</span>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3 text-center">
+                  <p className="text-2xl font-bold text-white">{totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0}%</p>
+                  <p className="text-sm text-white/80">Active Rate</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Alerts */}

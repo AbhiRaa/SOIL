@@ -123,6 +123,11 @@ const ProductManagement = () => {
     }
   };
 
+  // Calculate metrics
+  const totalProducts = data?.products?.length || 0;
+  const specialProducts = data?.products?.filter(product => product.is_special)?.length || 0;
+  const lowStockProducts = data?.products?.filter(product => product.product_stock < 10)?.length || 0;
+
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     if (!data?.products) return [];
@@ -286,20 +291,47 @@ const ProductManagement = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2">Product Management</h1>
-              <p className="text-slate-600">Manage your product catalog, inventory, and pricing</p>
+          <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className='text-4xl font-bold text-white mb-2'>Product Management</h1>
+                  <p className='text-xl text-white/90'>Manage your product catalog, inventory, and pricing</p>
+                  <div className="flex items-center space-x-4 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      <span className="text-sm text-white/80">{totalProducts} Total Products</span>
+                    </div>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80">{specialProducts} Special</span>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80 font-medium">{lowStockProducts} Low Stock</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="hidden lg:flex items-center space-x-4">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3 text-center">
+                    <p className="text-2xl font-bold text-white">{totalProducts > 0 ? Math.round(((totalProducts - lowStockProducts) / totalProducts) * 100) : 0}%</p>
+                    <p className="text-sm text-white/80">Stock Health</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleOpenModalForAdd}
+                  className="bg-white text-green-700 font-medium px-6 py-3 rounded-xl hover:bg-white/90 transition-all duration-200 flex items-center gap-2 shadow-lg"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add New Product
+                </button>
+              </div>
             </div>
-            <button
-              onClick={handleOpenModalForAdd}
-              className="btn-primary flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add New Product
-            </button>
           </div>
         </div>
 

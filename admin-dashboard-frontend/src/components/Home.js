@@ -13,7 +13,7 @@ const Home = () => {
 
     // Calculate metrics
     const totalUsers = userData?.users?.length || 0;
-    const activeUsers = userData?.users?.filter(user => !user.isBlocked)?.length || 0;
+    const activeUsers = userData?.users?.filter(user => !user.is_blocked)?.length || 0;
     const totalProducts = productData?.products?.length || 0;
     const lowStockProducts = productData?.products?.filter(product => product.product_stock < 10)?.length || 0;
     const totalReviews = reviewData?.reviews?.length || 0;
@@ -21,13 +21,72 @@ const Home = () => {
         ? (reviewData.reviews.reduce((sum, review) => sum + review.rating, 0) / reviewData.reviews.length).toFixed(1)
         : 0;
 
+    // Calculate performance status based on industry standards
+    const getUserEngagementStatus = (percentage) => {
+        if (percentage >= 80) return { status: 'Excellent', color: 'green' };
+        if (percentage >= 60) return { status: 'Good', color: 'blue' };
+        if (percentage >= 40) return { status: 'Fair', color: 'yellow' };
+        if (percentage >= 20) return { status: 'Poor', color: 'orange' };
+        return { status: 'Critical', color: 'red' };
+    };
+
+    const getInventoryStatus = (percentage) => {
+        if (percentage >= 90) return { status: 'Excellent', color: 'green' };
+        if (percentage >= 75) return { status: 'Good', color: 'blue' };
+        if (percentage >= 60) return { status: 'Fair', color: 'yellow' };
+        if (percentage >= 40) return { status: 'Low', color: 'orange' };
+        return { status: 'Critical', color: 'red' };
+    };
+
+    const getRatingStatus = (rating) => {
+        if (rating >= 4.5) return { status: 'Excellent', color: 'green' };
+        if (rating >= 4.0) return { status: 'Good', color: 'blue' };
+        if (rating >= 3.0) return { status: 'Fair', color: 'yellow' };
+        if (rating >= 2.0) return { status: 'Poor', color: 'orange' };
+        return { status: 'Critical', color: 'red' };
+    };
+
+    const userEngagementPercentage = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
+    const inventoryHealthPercentage = totalProducts > 0 ? Math.round(((totalProducts - lowStockProducts) / totalProducts) * 100) : 0;
+    
+    const userStatus = getUserEngagementStatus(userEngagementPercentage);
+    const inventoryStatus = getInventoryStatus(inventoryHealthPercentage);
+    const ratingStatus = getRatingStatus(parseFloat(averageRating));
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
             {/* Welcome Header */}
             <div className="mb-8">
-                <h1 className='text-4xl font-bold text-slate-800 mb-2'>Welcome to SOIL Organic Admin</h1>
-                <p className='text-lg text-slate-600'>Comprehensive dashboard for managing your organic marketplace</p>
+                <div className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 rounded-2xl p-8 shadow-xl">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-6">
+                            <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 className='text-4xl font-bold text-white mb-2'>Welcome to SOIL Organic Admin</h1>
+                                <p className='text-xl text-white/90'>Comprehensive dashboard for managing your organic marketplace</p>
+                                <div className="flex items-center space-x-4 mt-3">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                        <span className="text-sm text-white/80">Live System</span>
+                                    </div>
+                                    <div className="text-sm text-white/80">•</div>
+                                    <span className="text-sm text-white/80">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="hidden lg:flex items-center space-x-4">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3">
+                                <p className="text-sm text-white/80">Admin Portal</p>
+                                <p className="text-lg font-semibold text-white">v2.1.0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* Quick Stats Cards */}
@@ -104,77 +163,17 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="lg:col-span-2">
-                    {/* Recent Activity */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className='text-2xl font-bold text-slate-800'>Recent Reviews</h2>
-                            <div className="flex items-center text-sm text-slate-600">
-                                <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                                Live Updates
-                            </div>
-                        </div>
-                        <RecentReviews />
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    {/* Quick Actions */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">Quick Actions</h3>
-                        <div className="space-y-3">
-                            <a href="/products" className="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
-                                <div className="bg-blue-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                </div>
-                                <span className="font-medium text-slate-700">Add New Product</span>
-                            </a>
-                            
-                            <a href="/users" className="flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
-                                <div className="bg-green-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <span className="font-medium text-slate-700">Manage Users</span>
-                            </a>
-                            
-                            <a href="/metrics" className="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
-                                <div className="bg-purple-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h2a2 2 0 01-2-2z" />
-                                    </svg>
-                                </div>
-                                <span className="font-medium text-slate-700">View Analytics</span>
-                            </a>
+            {/* Recent Reviews Section - Full Width */}
+            <div className="mb-8">
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className='text-2xl font-bold text-slate-800'>Recent Reviews</h2>
+                        <div className="flex items-center text-sm text-slate-600">
+                            <div className="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                            Live Updates
                         </div>
                     </div>
-
-                    {/* System Info */}
-                    <div className="bg-white rounded-xl shadow-lg p-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-4">System Information</h3>
-                        <div className="space-y-3 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-slate-600">Version:</span>
-                                <span className="font-medium text-slate-800">v2.1.0</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-600">Last Updated:</span>
-                                <span className="font-medium text-slate-800">{new Date().toLocaleDateString()}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-600">Server Status:</span>
-                                <span className="flex items-center font-medium text-green-600">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                    Healthy
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    <RecentReviews />
                 </div>
             </div>
 
@@ -212,11 +211,23 @@ const Home = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                                        {totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0}%
+                                        {userEngagementPercentage}%
                                     </p>
                                     <div className="flex items-center space-x-1">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <p className="text-sm text-green-600 font-medium">Healthy</p>
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            userStatus.color === 'green' ? 'bg-green-500' :
+                                            userStatus.color === 'blue' ? 'bg-blue-500' :
+                                            userStatus.color === 'yellow' ? 'bg-yellow-500' :
+                                            userStatus.color === 'orange' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                        }`}></div>
+                                        <p className={`text-sm font-medium ${
+                                            userStatus.color === 'green' ? 'text-green-600' :
+                                            userStatus.color === 'blue' ? 'text-blue-600' :
+                                            userStatus.color === 'yellow' ? 'text-yellow-600' :
+                                            userStatus.color === 'orange' ? 'text-orange-600' :
+                                            'text-red-600'
+                                        }`}>{userStatus.status}</p>
                                     </div>
                                 </div>
                             </div>
@@ -245,11 +256,23 @@ const Home = () => {
                                 </div>
                                 <div className="text-right">
                                     <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
-                                        {totalProducts > 0 ? Math.round(((totalProducts - lowStockProducts) / totalProducts) * 100) : 0}%
+                                        {inventoryHealthPercentage}%
                                     </p>
                                     <div className="flex items-center space-x-1">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <p className="text-sm text-green-600 font-medium">Good</p>
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            inventoryStatus.color === 'green' ? 'bg-green-500' :
+                                            inventoryStatus.color === 'blue' ? 'bg-blue-500' :
+                                            inventoryStatus.color === 'yellow' ? 'bg-yellow-500' :
+                                            inventoryStatus.color === 'orange' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                        }`}></div>
+                                        <p className={`text-sm font-medium ${
+                                            inventoryStatus.color === 'green' ? 'text-green-600' :
+                                            inventoryStatus.color === 'blue' ? 'text-blue-600' :
+                                            inventoryStatus.color === 'yellow' ? 'text-yellow-600' :
+                                            inventoryStatus.color === 'orange' ? 'text-orange-600' :
+                                            'text-red-600'
+                                        }`}>{inventoryStatus.status}</p>
                                     </div>
                                 </div>
                             </div>
@@ -281,8 +304,20 @@ const Home = () => {
                                         {averageRating}/5
                                     </p>
                                     <div className="flex items-center space-x-1">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <p className="text-sm text-green-600 font-medium">Excellent</p>
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            ratingStatus.color === 'green' ? 'bg-green-500' :
+                                            ratingStatus.color === 'blue' ? 'bg-blue-500' :
+                                            ratingStatus.color === 'yellow' ? 'bg-yellow-500' :
+                                            ratingStatus.color === 'orange' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                        }`}></div>
+                                        <p className={`text-sm font-medium ${
+                                            ratingStatus.color === 'green' ? 'text-green-600' :
+                                            ratingStatus.color === 'blue' ? 'text-blue-600' :
+                                            ratingStatus.color === 'yellow' ? 'text-yellow-600' :
+                                            ratingStatus.color === 'orange' ? 'text-orange-600' :
+                                            'text-red-600'
+                                        }`}>{ratingStatus.status}</p>
                                     </div>
                                 </div>
                             </div>
@@ -328,6 +363,75 @@ const Home = () => {
                                 <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">{totalReviews} Total</span>
                                 <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">★ {averageRating} Average</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Quick Actions and System Info - Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                {/* Quick Actions */}
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4">Quick Actions</h3>
+                    <div className="space-y-3">
+                        <a href="/products" className="flex items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group">
+                            <div className="bg-blue-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </div>
+                            <span className="font-medium text-slate-700">Add New Product</span>
+                        </a>
+                        
+                        <a href="/users" className="flex items-center p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group">
+                            <div className="bg-green-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <span className="font-medium text-slate-700">Manage Users</span>
+                        </a>
+                        
+                        <a href="/metrics" className="flex items-center p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group">
+                            <div className="bg-purple-500 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h2a2 2 0 01-2-2z" />
+                                </svg>
+                            </div>
+                            <span className="font-medium text-slate-700">View Analytics</span>
+                        </a>
+                    </div>
+                </div>
+
+                {/* System Info */}
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                    <h3 className="text-xl font-bold text-slate-800 mb-4">System Information</h3>
+                    <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                            <span className="text-slate-600">Version:</span>
+                            <span className="font-medium text-slate-800">v2.1.0</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-600">Last Updated:</span>
+                            <span className="font-medium text-slate-800">{new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-600">Server Status:</span>
+                            <span className="flex items-center font-medium text-green-600">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                Healthy
+                            </span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-600">Environment:</span>
+                            <span className="font-medium text-slate-800">Production</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-600">API Status:</span>
+                            <span className="flex items-center font-medium text-green-600">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                Connected
+                            </span>
                         </div>
                     </div>
                 </div>

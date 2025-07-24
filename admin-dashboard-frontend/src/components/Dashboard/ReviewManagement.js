@@ -42,6 +42,14 @@ const ReviewManagement = () => {
 
   const isProfane = (text) => filter.isProfane(text);
 
+  // Calculate metrics
+  const totalReviews = data?.reviews?.length || 0;
+  const visibleReviews = data?.reviews?.filter(review => review.is_visible)?.length || 0;
+  const profanityReviews = data?.reviews?.filter(review => isProfane(review.content))?.length || 0;
+  const averageRating = data?.reviews?.length > 0 
+    ? (data.reviews.reduce((sum, review) => sum + review.rating, 0) / data.reviews.length).toFixed(1)
+    : 0;
+
   // Filter and sort reviews
   const filteredAndSortedReviews = useMemo(() => {
     if (!data?.reviews) return [];
@@ -255,8 +263,42 @@ const ReviewManagement = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Review Management</h1>
-          <p className="text-slate-600">Monitor and moderate user reviews with advanced filtering and bulk actions</p>
+          <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl p-8 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className='text-4xl font-bold text-white mb-2'>Review Management</h1>
+                  <p className='text-xl text-white/90'>Monitor and moderate user reviews with advanced filtering and bulk actions</p>
+                  <div className="flex items-center space-x-4 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      <span className="text-sm text-white/80">{totalReviews} Total Reviews</span>
+                    </div>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80">{visibleReviews} Visible</span>
+                    <div className="text-sm text-white/80">•</div>
+                    <span className="text-sm text-white/80">{profanityReviews} With Profanity</span>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3 text-center">
+                  <p className="text-2xl font-bold text-white flex items-center">
+                    <svg className="w-5 h-5 text-yellow-300 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    {averageRating}
+                  </p>
+                  <p className="text-sm text-white/80">Avg Rating</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Alerts */}
