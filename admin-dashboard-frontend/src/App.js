@@ -12,9 +12,9 @@ import Home from './components/Home';
 function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App min-h-screen flex flex-col bg-slate-50">
         <Header />
-        <main>
+        <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />  {/* Home page */}
             <Route path="/users" element={<UserManagement />} />  {/* User Management route */}
